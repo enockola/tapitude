@@ -31,6 +31,11 @@
   color: var(--color-heading);
 }
 
+.button--ghost:hover {
+  background: var(--color-primary);
+  color: #ffffff;
+}
+
 .button--danger {
   background: var(--color-danger);
 }
