@@ -1,0 +1,43 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Create Creator Account</h1>
+    <p>Create a login account for a new content creator.</p>
+  </div>
+</section>
+
+<section class="card">
+  <% if (error) { %>
+    <p class="form-error"><%= error %></p>
+  <% } %>
+
+  <form action="/admin/creators" method="POST" class="form-grid">
+    <label>
+      Name
+      <input type="text" name="name" required>
+    </label>
+
+    <label>
+      Brand Name
+      <input type="text" name="brandName">
+    </label>
+
+    <label>
+      Email
+      <input type="email" name="email" required>
+    </label>
+
+    <label>
+      Temporary Password
+      <input type="password" name="password" required minlength="8">
+    </label>
+
+    <div class="form-actions">
+      <button class="button" type="submit">Create Account</button>
+    </div>
+  </form>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>

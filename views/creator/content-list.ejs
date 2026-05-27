@@ -1,0 +1,33 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Creator</p>
+    <h1>My Content</h1>
+    <p>Manage public content pages.</p>
+  </div>
+  <a class="button" href="/content-pages/new">+ New Post</a>
+</section>
+
+<section class="card">
+  <% if (contentPages.length === 0) { %>
+    <p>No content pages yet.</p>
+  <% } else { %>
+    <div class="table-list">
+      <% contentPages.forEach((page) => { %>
+        <article class="table-row">
+          <div>
+            <strong><%= page.title %></strong>
+            <span>/p/<%= page.slug %></span>
+          </div>
+          <div class="row-actions">
+            <span class="badge"><%= page.status %></span>
+            <a class="button button--small button--secondary" href="/content-pages/<%= page._id %>/edit">Edit</a>
+          </div>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>

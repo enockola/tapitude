@@ -1,0 +1,66 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">CreatorHub</p>
+    <h1>Your Performance</h1>
+    <p>Quick overview of your content pages.</p>
+  </div>
+  <a class="button" href="/content-pages/new">+ New Post</a>
+</section>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <span>Total Pages</span>
+    <strong><%= stats.totalPages %></strong>
+  </article>
+
+  <article class="stat-card">
+    <span>Published</span>
+    <strong><%= stats.publishedPages %></strong>
+  </article>
+
+  <article class="stat-card">
+    <span>Scheduled</span>
+    <strong><%= stats.scheduledPages %></strong>
+  </article>
+</section>
+
+<section class="dashboard-grid">
+  <article class="card">
+    <div class="card-header">
+      <div>
+        <p class="eyebrow">Create</p>
+        <h2>Schedule Content</h2>
+      </div>
+      <a class="button button--secondary" href="/content-pages/new">Open Editor</a>
+    </div>
+
+    <p>
+      Create a public content page with text, links, embeds, and theme settings.
+      Publish it right away or schedule it for later.
+    </p>
+  </article>
+
+  <article class="card">
+    <div class="card-header">
+      <h2>Recent Content</h2>
+      <a href="/creator/content">View all</a>
+    </div>
+
+    <% if (contentPages.length === 0) { %>
+      <p>No content pages yet.</p>
+    <% } else { %>
+      <div class="mini-list">
+        <% contentPages.forEach((page) => { %>
+          <a class="mini-list__item" href="/content-pages/<%= page._id %>/edit">
+            <span><%= page.title %></span>
+            <small><%= page.status %></small>
+          </a>
+        <% }) %>
+      </div>
+    <% } %>
+  </article>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>

@@ -1,0 +1,141 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Content</p>
+    <h1><%= contentPage ? "Edit Content Page" : "Create Content Page" %></h1>
+    <p>Create a simple public page for consumers to view from an NFC chip.</p>
+  </div>
+
+  <% if (publicUrl) { %>
+    <a class="button button--secondary" href="<%= publicUrl %>" target="_blank">Preview Public Page</a>
+  <% } %>
+</section>
+
+<section class="editor-layout">
+  <article class="card">
+    <% if (error) { %>
+      <p class="form-error"><%= error %></p>
+    <% } %>
+
+    <form
+      action="<%= contentPage ? `/content-pages/${contentPage._id}?_method=PATCH` : '/content-pages' %>"
+      method="POST"
+      class="form-stack"
+    >
+      <label>
+        Schedule Time
+        <input
+          type="datetime-local"
+          name="scheduledFor"
+          value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : '' %>"
+        >
+      </label>
+
+      <label>
+        Title
+        <input
+          type="text"
+          name="title"
+          placeholder="Add a catchy title..."
+          value="<%= contentPage?.title || '' %>"
+          required
+        >
+      </label>
+
+      <label>
+        Body
+        <textarea name="body" rows="8" placeholder="Tell your story..."><%= contentPage?.body || '' %></textarea>
+      </label>
+
+      <div class="form-grid">
+        <label>
+          Button Text
+          <input
+            type="text"
+            name="buttonText"
+            placeholder="Learn More"
+            value="<%= contentPage?.buttonText || '' %>"
+          >
+        </label>
+
+        <label>
+          External Link
+          <input
+            type="url"
+            name="externalLink"
+            placeholder="https://example.com"
+            value="<%= contentPage?.externalLink || '' %>"
+          >
+        </label>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          Embed Type
+          <select name="embedType">
+            <% const currentEmbedType = contentPage?.embedType || "none"; %>
+            <% ["none", "youtube", "vimeo", "imageUrl", "googleDrive", "dropbox", "externalWebsite", "socialPost"].forEach((type) => { %>
+              <option value="<%= type %>" <%= currentEmbedType === type ? "selected" : "" %>><%= type %></option>
+            <% }) %>
+          </select>
+        </label>
+
+        <label>
+          Embed URL
+          <input
+            type="url"
+            name="embedUrl"
+            placeholder="Paste media/link URL"
+            value="<%= contentPage?.embedUrl || '' %>"
+          >
+        </label>
+      </div>
+
+      <label>
+        Publish Option
+        <select name="status">
+          <% const currentStatus = contentPage?.status || "published"; %>
+          <option value="published" <%= currentStatus === "published" ? "selected" : "" %>>Publish now</option>
+          <option value="scheduled" <%= currentStatus === "scheduled" ? "selected" : "" %>>Schedule for later</option>
+        </select>
+      </label>
+
+      <div class="form-actions">
+        <button class="button" type="submit"><%= contentPage ? "Update Page" : "Publish" %></button>
+
+        <% if (contentPage) { %>
+          <button
+            class="button button--danger"
+            type="submit"
+            form="delete-content-form"
+          >
+            Delete
+          </button>
+        <% } %>
+      </div>
+    </form>
+
+    <% if (contentPage) { %>
+      <form
+        id="delete-content-form"
+        action="/content-pages/<%= contentPage._id %>?_method=DELETE"
+        method="POST"
+      ></form>
+    <% } %>
+  </article>
+
+  <aside class="card preview-card">
+    <p class="eyebrow">Public Preview</p>
+    <h2><%= contentPage?.title || "Your title will appear here" %></h2>
+    <p><%= contentPage?.body || "Your content preview will appear here after you save." %></p>
+
+    <% if (contentPage?.externalLink) { %>
+      <a class="button button--full" href="<%= contentPage.externalLink %>" target="_blank">
+        <%= contentPage.buttonText || "Open Link" %>
+      </a>
+    <% } %>
+  </aside>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>

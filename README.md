@@ -1,33 +1,120 @@
-# Tapitude Creator Hub
+# Tapitude Creator Hub Starter
 
-Tapitude is a creator-focused web application that lets users create, manage, customize, and publish digital content pages that can be accessed through a unique URL or NFC chip scan. Creators can schedule and publish content, personalize the page design, and share it easily with their audience.
+This is a starter Express/EJS project for the Tapitude Creator Hub.
 
 ## Tech Stack
 
 - Node.js
-- Express.js
-- JavaScript
-- EJS views for server-rendered HTML
-- CSS and client-side JavaScript
-- MongoDB
+- Express
+- EJS
+- MongoDB/Mongoose
+- HTML, CSS, and client-side JavaScript
 
-## Main User Types
+## Important Project Direction
 
-- **Admin:** Creates and manages creator accounts.
-- **Creator:** Creates, edits, schedules, publishes, and customizes content pages.
-- **Consumer:** Views public content pages. Consumers do not need accounts.
+Tapitude does **not** store creator-uploaded media files in this starter version.
 
-## MVP Features
+Creators create public content pages with:
 
-- Admin login
-- Admin creates creator accounts
-- Creator login
-- Creator dashboard
-- Creator creates and edits content pages
-- Creator can schedule posts
-- Creator can publish posts right away
-- Public content page by slug
-- Basic theme/personalization options
+- Text
+- External links
+- Embed URLs
+- Theme settings
+- Publish/schedule status
+- Public slugs
+
+## Setup
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create your environment file:
+
+```bash
+cp .env.example .env
+```
+
+On Windows PowerShell, use:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+3. Make sure your `.env` has:
+
+```env
+USE_MOCK_DATA=true
+MONGODB_URI=
+```
+
+4. Start the app:
+
+```bash
+npm run dev
+```
+
+5. Open:
+
+```txt
+http://localhost:3000
+```
+
+## Mock Login
+
+Because this is frontend/mock mode, login accepts these demo accounts:
+
+```txt
+admin@tapitude.test
+creator@tapitude.test
+```
+
+## How the Project Works Right Now
+
+This version of Tapitude Creator Hub is currently running in **frontend/mock mode**.
+
+That means the app uses Express and EJS to render real pages, but it does **not** connect to MongoDB yet. Instead, it uses sample data from a local mock data file so the team can work on the frontend, dashboard layout, routes, forms, and page flow before the real database is available.
+
+## Why We Are Using Mock Mode
+
+We do not currently have access to the MongoDB database yet, so connecting the app to MongoDB would cause the server to crash.
+
+To avoid that, the app checks this value in `.env`:
+
+```env
+USE_MOCK_DATA=true
+
+Any password will work in mock mode.
+
+## Helpful Routes
+
+```txt
+/
+ /auth/login
+/admin/dashboard
+/admin/creators
+/admin/creators/new
+/creator/dashboard
+/creator/content
+/content-pages/new
+/p/summer-drop-2026
+```
+
+## Current Starter Features
+
+- EJS view setup
+- Static CSS/JS setup
+- Session authentication setup
+- Admin and creator roles
+- Basic admin dashboard
+- Basic creator dashboard
+- Content page model
+- Theme model
+- Public page route by slug
+- Simple layered CSS structure
+
 
 ## Project Documentation
 
@@ -42,11 +129,10 @@ Detailed planning documents are in the `docs/` folder:
 - [Authentication and Roles](docs/auth-and-roles.md)
 - [Deployment Plan](docs/deployment-plan.md)
 
-## Suggested Project Structure
+## Folder Structure
 
 ```txt
-tapitude-creator-hub/
-├── README.md
+tapitude/
 ├── docs/
 ├── src/
 ├── views/
@@ -60,10 +146,28 @@ tapitude-creator-hub/
 │   ├── css/
 │   ├── js/
 │   └── assets/
-├── uploads/
-└── tests/
+└── README.md
 ```
 
-## Current Status
+## Important Note
 
-Planning stage. No HTML files need to be created yet. The next step is to finalize the MVP scope, database schema, API plan, and directory structure before coding.
+This version is not meant to be production-ready. It is for frontend work while the MongoDB connection is unavailable.
+
+When MongoDB is ready, set:
+
+```env
+USE_MOCK_DATA=false
+MONGODB_URI=your_mongodb_connection_string
+```
+
+Then reconnect the real database controllers and models.
+
+
+## Next Build Steps
+
+1. Finish authentication flow.
+2. Build admin creator-account management.
+3. Build creator content CRUD.
+4. Add publish/schedule logic.
+5. Render public content pages by slug.
+6. Improve dashboard styling based on Figma feedback.

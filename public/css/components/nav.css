@@ -1,0 +1,33 @@
+.topbar {
+  min-height: var(--topbar-height);
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: 0 var(--space-xl);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-lg);
+}
+
+.brand {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-heading);
+}
+
+.topbar__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.topbar__nav a {
+  color: var(--color-muted);
+}
+
+.topbar__nav a:hover {
+  color: var(--color-heading);
+}

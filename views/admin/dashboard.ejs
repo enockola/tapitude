@@ -1,0 +1,29 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Dashboard</h1>
+    <p>Manage creators and review system activity.</p>
+  </div>
+  <a class="button" href="/admin/creators/new">+ Create Creator</a>
+</section>
+
+<section class="stats-grid">
+  <article class="stat-card">
+    <span>Total Creators</span>
+    <strong><%= creatorCount %></strong>
+  </article>
+
+  <article class="stat-card">
+    <span>Total Content Pages</span>
+    <strong><%= contentCount %></strong>
+  </article>
+</section>
+
+<section class="card">
+  <h2>Admin Tasks</h2>
+  <p>Start by creating creator accounts. Content creators can then log in and create public pages.</p>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>

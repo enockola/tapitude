@@ -1,0 +1,31 @@
+<%- include("../partials/head", { title }) %>
+<%- include("../partials/topbar") %>
+
+<main class="auth-page">
+  <section class="auth-card">
+    <p class="eyebrow">Welcome back</p>
+    <h1>Log in</h1>
+
+    <% if (error) { %>
+      <p class="form-error"><%= error %></p>
+    <% } %>
+
+    <p class="mock-hint">Mock mode: use <strong>admin@tapitude.test</strong> or <strong>creator@tapitude.test</strong>. Any password works.</p>
+
+    <form action="/auth/login" method="POST" class="form-stack">
+      <label>
+        Email
+        <input type="email" name="email" required autocomplete="email">
+      </label>
+
+      <label>
+        Password
+        <input type="password" name="password" required autocomplete="current-password">
+      </label>
+
+      <button class="button button--full" type="submit">Log in</button>
+    </form>
+  </section>
+</main>
+
+<%- include("../partials/scripts") %>

@@ -1,0 +1,30 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Creators</h1>
+    <p>Manage creator accounts.</p>
+  </div>
+  <a class="button" href="/admin/creators/new">+ Create Creator</a>
+</section>
+
+<section class="card">
+  <% if (creators.length === 0) { %>
+    <p>No creators yet.</p>
+  <% } else { %>
+    <div class="table-list">
+      <% creators.forEach((creator) => { %>
+        <article class="table-row">
+          <div>
+            <strong><%= creator.name %></strong>
+            <span><%= creator.email %></span>
+          </div>
+          <span class="badge"><%= creator.status %></span>
+        </article>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>

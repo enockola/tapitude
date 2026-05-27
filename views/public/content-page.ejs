@@ -1,0 +1,29 @@
+<%- include("../partials/head", { title }) %>
+
+<main class="public-page">
+  <article class="public-card">
+    <p class="eyebrow">Tapitude</p>
+    <h1><%= contentPage.title %></h1>
+
+    <% if (contentPage.body) { %>
+      <p><%= contentPage.body %></p>
+    <% } %>
+
+    <% if (contentPage.embedUrl) { %>
+      <div class="embed-box">
+        <p><strong>Linked media:</strong></p>
+        <a href="<%= contentPage.embedUrl %>" target="_blank" rel="noopener">
+          <%= contentPage.embedUrl %>
+        </a>
+      </div>
+    <% } %>
+
+    <% if (contentPage.externalLink) { %>
+      <a class="button button--full" href="<%= contentPage.externalLink %>" target="_blank" rel="noopener">
+        <%= contentPage.buttonText || "Open Link" %>
+      </a>
+    <% } %>
+  </article>
+</main>
+
+<%- include("../partials/scripts") %>

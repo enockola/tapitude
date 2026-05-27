@@ -1,0 +1,24 @@
+.landing,
+.page,
+.auth-page,
+.error-page {
+  min-height: calc(100vh - var(--topbar-height));
+  padding: var(--space-2xl);
+}
+
+.landing {
+  display: grid;
+  place-items: center;
+}
+
+.landing__hero {
+  width: min(56rem, 100%);
+  display: grid;
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.page {
+  width: min(64rem, 100%);
+  margin-inline: auto;
+}

@@ -1,0 +1,28 @@
+.public-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: var(--space-xl);
+  background:
+    radial-gradient(circle at top left, rgb(38 50 65 / 0.12), transparent 22rem),
+    var(--color-bg);
+}
+
+.public-card {
+  width: min(36rem, 100%);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: var(--space-xl);
+  display: grid;
+  gap: var(--space-lg);
+  text-align: center;
+}
+
+.embed-box {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  overflow-wrap: anywhere;
+}

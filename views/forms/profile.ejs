@@ -1,0 +1,17 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Settings</p>
+    <h1>Creator Profile</h1>
+    <p>This page is a placeholder for creator profile settings.</p>
+  </div>
+</section>
+
+<section class="card">
+  <p><strong>Display Name:</strong> <%= profile?.displayName || currentUser.name %></p>
+  <p><strong>Brand Name:</strong> <%= profile?.brandName || "Not set yet" %></p>
+  <p><strong>Bio:</strong> <%= profile?.bio || "Not set yet" %></p>
+</section>
+
+<%- include("../partials/dashboard-shell-end") %>
