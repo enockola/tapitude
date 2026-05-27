@@ -85,7 +85,7 @@ To avoid that, the app checks this value in `.env`:
 
 ```env
 USE_MOCK_DATA=true
-
+```
 Any password will work in mock mode.
 
 ## Helpful Routes
