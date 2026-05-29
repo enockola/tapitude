@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 async function connectDB() {
   const mongoUri = process.env.MONGODB_URI;
-
+  console.log("Attempting to connect to MongoDB...");
   if (!mongoUri) {
-    console.warn("MONGODB_URI is missing. Database features will not work.");
+    console.warn("DATABASE: MONGODB_URI is missing. Database features will not work.");
     return;
   }
 
@@ -12,7 +12,7 @@ async function connectDB() {
 
   await mongoose.connect(mongoUri);
 
-  console.log("Connected to MongoDB");
+  console.log("DATABASE: Connected to MongoDB");
 }
 
 module.exports = connectDB;
