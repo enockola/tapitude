@@ -30,7 +30,6 @@ Creators create public content pages with:
 2. Install dependencies:
 ```bash
 npm install
-npm install dotenv
 ```
 
 3. Create your environment file:
