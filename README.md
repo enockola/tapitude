@@ -25,13 +25,15 @@ Creators create public content pages with:
 
 ## Setup
 
-1. Install dependencies:
+1. [Install npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
 
+2. Install dependencies:
 ```bash
 npm install
+npm install dotenv
 ```
 
-2. Create your environment file:
+3. Create your environment file:
 
 ```bash
 cp .env.example .env
