@@ -47,6 +47,7 @@ Consumers should be able to view the creator's latest content history. For the M
 2. Install dependencies:
 ```bash
 npm install
+npm install dotenv
 ```
 
 3. Create your environment file:
