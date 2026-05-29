@@ -1,27 +1,44 @@
-# Tapitude Creator Hub Starter
+# Tapitude Creator Hub
 
-This is a starter Express/EJS project for the Tapitude Creator Hub.
+Tapitude Creator Hub is a web dashboard for content creators to create, manage, customize, schedule, and publish content posts. Consumers will access a creator's public content experience through URLs connected to Tapitude NFC chips.
 
 ## Tech Stack
 
 - Node.js
-- Express
-- EJS
-- MongoDB/Mongoose
-- HTML, CSS, and client-side JavaScript
+- Express.js
+- JavaScript
+- EJS views for server-rendered pages
+- CSS and client-side JavaScript
+- MongoDB
+- Media upload support
 
-## Important Project Direction
+## Main User Types
 
-Tapitude does **not** store creator-uploaded media files in this starter version.
+- **Admin:** Creates and manages creator accounts.
+- **Creator:** Creates, edits, schedules, publishes, and customizes content posts.
+- **Consumer:** Views a creator's public content experience. Consumers do not need accounts.
 
-Creators create public content pages with:
+## Updated Content Direction
 
-- Text
-- External links
-- Embed URLs
-- Theme settings
-- Publish/schedule status
-- Public slugs
+Creators can upload media as part of their content posts. This can include images, videos, or document-style media depending on the final MVP upload limits.
+
+Consumers should be able to view the creator's latest content history. For the MVP, the public consumer view should show the **latest 10 published posts** from a creator.
+
+## MVP Features
+
+- Admin login
+- Admin creates creator accounts
+- Creator login
+- Creator dashboard
+- Creator creates and edits content posts
+- Creator can upload media for posts
+- Creator can schedule posts
+- Creator can publish posts right away
+- Public creator page showing the latest 10 published posts
+- Individual public post page by slug
+- Basic theme/personalization options
+- MongoDB stores users, creator profiles, content posts, media metadata, and theme settings
+
 
 ## Setup
 
@@ -119,35 +136,25 @@ Any password will work in mock mode.
 
 ## Project Documentation
 
-Detailed planning documents are in the `docs/` folder:
+Detailed planning documents are in the wiki
 
-- [Project Plan](docs/project-plan.md)
-- [Directory Structure](docs/directory-structure.md)
-- [Express Views and Static Assets](docs/express-views.md)
-- [API Plan](docs/api-plan.md)
-- [Database Schema](docs/database-schema.md)
-- [Content Strategy](docs/content-strategy.md)
-- [Authentication and Roles](docs/auth-and-roles.md)
-- [Deployment Plan](docs/deployment-plan.md)
-
-## Folder Structure
+## Suggested Project Structure
 
 ```txt
-tapitude/
+tapitude-creator-hub/
+├── README.md
+├── package.json
+├── .env.example
+├── .gitignore
 ├── docs/
 ├── src/
 ├── views/
-│   ├── errors/
-│   ├── forms/
-│   ├── partials/
-│   ├── admin/
-│   ├── creator/
-│   └── public/
 ├── public/
 │   ├── css/
 │   ├── js/
 │   └── assets/
-└── README.md
+├── uploads/
+└── tests/
 ```
 
 ## Important Note
@@ -162,6 +169,10 @@ MONGODB_URI=your_mongodb_connection_string
 ```
 
 Then reconnect the real database controllers and models.
+
+## Current Status
+
+Planning and early build stage. The project direction now includes MongoDB connection and media upload support. The next step is to update the working application so creators can upload media and consumers can view the latest 10 published posts from a creator.
 
 
 ## Next Build Steps
