@@ -1,6 +1,4 @@
-const bcrypt = require("bcryptjs");
-const User = require("../models/User");
-const { findMockUserByEmail } = require("../data/mockData");
+import User from "../models/User";
 
 function showLogin(req, res) {
   res.render("forms/login", {
@@ -21,7 +19,7 @@ async function login(req, res) {
 
   //We get the user from the User model
   const user = await User.findOne({ email: email?.toLowerCase().trim() });
-  console.log("The user is: ", user);
+  // console.log("The user is: ", user);
 
   if (!user || user.status !== "active") {
     return res.status(401).render("forms/login", {
@@ -30,7 +28,7 @@ async function login(req, res) {
     });
   }
 
-  const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+  const passwordMatches = await user.comparePassword(password);
   if (!passwordMatches) {
     return res.status(401).render("forms/login", {
       title: "Log in",
@@ -40,6 +38,7 @@ async function login(req, res) {
 
   req.session.userId = user._id.toString();
 
+  //We automatically redirect the user based on their role
   if (user.role === "admin") {
     return res.redirect("/admin/dashboard");
   }

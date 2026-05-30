@@ -50,16 +50,16 @@ function showCreateCreator(req, res) {
   });
 }
 
+/**
+ * Creates a new creator account
+ * @param {the input for the creator account} req 
+ * @param {redirects the admin to the creators page} res 
+ * @returns 
+ */
 async function createCreator(req, res) {
   const { name, email, password, brandName } = req.body;
 
-  if (process.env.USE_MOCK_DATA === "true") {
-    addMockCreator({ name, email, brandName });
-    return res.redirect("/admin/creators");
-  }
-
   const existingUser = await User.findOne({ email: email?.toLowerCase().trim() });
-
   if (existingUser) {
     return res.status(400).render("forms/creator-account", {
       title: "Create Creator Account",
