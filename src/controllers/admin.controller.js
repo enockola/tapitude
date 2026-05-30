@@ -1,6 +1,5 @@
-const bcrypt = require("bcryptjs");
 import User from "../models/User";
-const CreatorProfile = require("../models/CreatorProfile");
+import CreatorProfile from "../models/CreatorProfile";
 const ContentPage = require("../models/ContentPage");
 const {
   mockCreators,
@@ -59,7 +58,7 @@ function showCreateCreator(req, res) {
 async function createCreator(req, res) {
   const { name, email, password, brandName } = req.body;
 
-  const existingUser = await User.findOne({ email: email?.toLowerCase().trim() });
+  const existingUser = await User.findByEmail(email);
   if (existingUser) {
     return res.status(400).render("forms/creator-account", {
       title: "Create Creator Account",
@@ -67,16 +66,10 @@ async function createCreator(req, res) {
     });
   }
 
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  const user = await User.create({
-    name,
-    email,
-    passwordHash,
-    role: "creator",
-    status: "active"
-  });
-
+  const user = await User.createAccount({ name: name, email: email, password: password, role: "creator" });
+  if(user === null) {
+    throw new Error("Error creating creator account");
+  }
   await CreatorProfile.create({
     userId: user._id,
     displayName: name,

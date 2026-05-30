@@ -6,13 +6,13 @@ import bcrypt from "bcryptjs";
 
 // We define these to tell typescript what methods we have
 interface IUserMethods {
-    disableAccount(): Promise<Document>;
-    enableAccount(): Promise<Document>;
-    changePassword(newPassword: string): Promise<Document>;
-    comparePassword(password: string): Promise<boolean>;
+  disableAccount(): Promise<Document>;
+  enableAccount(): Promise<Document>;
+  changePassword(newPassword: string): Promise<Document>;
+  comparePassword(password: string): Promise<boolean>;
 }
 interface UserModel extends mongoose.Model<any, {}, IUserMethods> {
-    createAccount(userData: CreateUserData): Promise<any>;
+  createAccount(userData: CreateUserData): Promise<any>;
 }
 
 const userSchema = new mongoose.Schema(
@@ -48,22 +48,27 @@ const userSchema = new mongoose.Schema(
 );
 
 interface CreateUserData {
-    name: string;
-    email: string;
-    password: string;
-    role: "admin" | "creator";
-    status?: "active" | "disabled";
+  name: string;
+  email: string;
+  password: string;
+  role: "admin" | "creator";
+  status?: "active" | "disabled";
 }
+userSchema.statics.findByEmail = async function (email: string) {
+  const self = this as any;
+  return await self.findOne({ email: email.toLowerCase().trim() });
+}
+
 userSchema.statics.createAccount = async function (userData: CreateUserData) {
   // Use 'this' normally. To make TS happy inside the function, cast 'this' to any or UserModel
-  const self = this as any; 
-  
+  const self = this as any;
+
   const isExistingAccount = await self.findOne({ email: userData.email.toLowerCase().trim() });
   if (isExistingAccount) {
     throw new Error("An account with this email already exists.");
   }
 
-  const saltRounds = 10; 
+  const saltRounds = 10;
   const hashedPassword = await bcrypt.hash(userData.password, saltRounds);
 
   // Use 'this' as a constructor safely
@@ -74,7 +79,7 @@ userSchema.statics.createAccount = async function (userData: CreateUserData) {
     role: userData.role,
     status: userData.status === undefined ? "active" : userData.status
   });
-  
+
   await newUser.save();
   return newUser;
 };
