@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const User = require("../models/User");
+import User from "../models/User";
 const CreatorProfile = require("../models/CreatorProfile");
 const ContentPage = require("../models/ContentPage");
 const {
