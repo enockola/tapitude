@@ -20,7 +20,10 @@
             <strong><%= creator.name %></strong>
             <span><%= creator.email %></span>
           </div>
-          <span class="badge"><%= creator.status %></span>
+          <span>
+            <span class="badge"><%= creator.status %></span>
+            <a class="edit" href="/admin/edit-creator-account/<%= creator._id %>"><i class="ph-fill ph-pencil-simple-line"></i></a>
+          </span>
         </article>
       <% }) %>
     </div>

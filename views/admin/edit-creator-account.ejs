@@ -1,0 +1,59 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Edit Creator</h1>
+    <p>Manage creator account of <%= creator.name %>.</p>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Account Settings</h2>
+  <form action="/admin/edit-creator-account/<%= creator._id %>" method="POST">
+    <!-- <input type="hidden" name="id" value="<%= creator._id %>"> -->
+
+    <div class="form-group">
+      <label for="name">Full Name</label>
+      <input type="text" id="name" name="name" value="<%= creator.name %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" value="<%= creator.email %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="status">Account Status</label>
+      <select id="status" name="status">
+        <option value="active"  <%= creator.status === "active" ? "selected" : "" %> >Active</option>
+        <option value="disabled" <%= creator.status === "disabled" ? "selected" : "" %> >Disabled</option>
+      </select>
+    </div>
+
+    <button class="button" type="submit" class="button-primary">Save Changes</button>
+  </form>
+</section>
+<br>
+
+<section class="card">
+  <h2>Danger Zone</h2>
+  <p>Permanently delete this creator account and all associated data.</p>
+  
+  <button type="button" class="button danger" onclick="confirmDelete('<%= creator._id %>')">
+    Delete Account
+  </button>
+</section>
+
+<script>
+  function confirmDelete(creatorId) {
+    // Show a browser-native confirmation dialog
+    const isConfirmed = confirm("Are you sure you want to delete this creator? This action cannot be undone.");
+    
+    if (isConfirmed) {
+      // If user clicks "OK", redirect to the delete route
+      window.location.href = `/admin/delete-creator-account/${creatorId}`;
+    }
+  }
+</script>
+<%- include("../partials/dashboard-shell-end") %>
