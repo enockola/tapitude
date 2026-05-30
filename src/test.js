@@ -6,6 +6,12 @@ require("dotenv").config();
 async function startServer() {
     await connectDB();
 
+    const totalUsers = await User.countDocuments({});
+    console.log(`Total users: ${totalUsers}`);
+
+    const anyUser = await User.findOne({});
+    console.log("First user document in DB:", anyUser);
+
     const user = await User.findOne({ email: "admin@tapitude.test" });
     console.log(user); //TODO: THe user returns null, is it connected to the database?
 }

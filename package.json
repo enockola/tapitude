@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "test": "node src/test.js"
+    "test": "node src/test.js",
+    "new_admin_account": "node src/new_admin_account.js"
   },
   "keywords": [
     "node",
