@@ -1,6 +1,7 @@
 import User from "../models/User";
 import CreatorProfile from "../models/CreatorProfile";
-const ContentPage = require("../models/ContentPage");
+import ContentPage from "../models/ContentPage";
+
 const {
   mockCreators,
   mockContentPages,

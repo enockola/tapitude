@@ -1,5 +1,5 @@
-const ContentPage = require("../models/ContentPage");
-const { mockContentPages } = require("../data/mockData");
+import ContentPage from "../models/ContentPage";
+import mockContentPages from "../data/mockData";
 
 async function showPublicContent(req, res) {
   if (process.env.USE_MOCK_DATA === "true") {

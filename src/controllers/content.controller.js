@@ -1,6 +1,7 @@
-const ContentPage = require("../models/ContentPage");
-const createSlug = require("../utils/createSlug");
-const generatePublicUrl = require("../utils/generatePublicUrl");
+import ContentPage from "../models/ContentPage";
+import createSlug from "../utils/createSlug";
+import generatePublicUrl from "../utils/generatePublicUrl";
+
 const {
   mockContentPages,
   addMockContentPage,
