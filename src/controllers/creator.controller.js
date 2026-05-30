@@ -1,11 +1,8 @@
 import ContentPage from "../models/ContentPage";
 import CreatorProfile from "../models/CreatorProfile";
-const {
-  mockContentPages,
-  mockProfile
-} = require("../data/mockData");
 
 async function dashboard(req, res) {
+
   const contentPages = await ContentPage.find({ creatorId: req.user._id })
     .sort({ updatedAt: -1 })
     .limit(5);
@@ -32,6 +29,13 @@ async function dashboard(req, res) {
 }
 
 async function contentList(req, res) {
+  if (process.env.USE_MOCK_DATA === "true") {
+    return res.render("creator/content-list", {
+      title: "My Content",
+      contentPages: mockContentPages
+    });
+  }
+
   const contentPages = await ContentPage.find({ creatorId: req.user._id })
     .sort({ updatedAt: -1 });
 
@@ -42,9 +46,16 @@ async function contentList(req, res) {
 }
 
 async function profile(req, res) {
+  if (process.env.USE_MOCK_DATA === "true") {
+    return res.render("forms/profile", {
+      title: "Profile",
+      profile: mockProfile
+    });
+  }
+
   const profile = await CreatorProfile.findOne({ userId: req.user._id });
 
-  res.render("creator/profile", {
+  res.render("forms/profile", {
     title: "Profile",
     profile
   });

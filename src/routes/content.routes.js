@@ -1,8 +1,8 @@
-const express = require("express");
+import express from "express";
 import asyncHandler from "../utils/asyncHandler";
-const requireAuth = require("../middleware/requireAuth");
-const requireRole = require("../middleware/requireRole");
-const contentController = require("../controllers/content.controller");
+import requireAuth from "../middleware/requireAuth";
+import requireRole from "../middleware/requireRole";
+import contentController from "../controllers/content.controller";
 
 const router = express.Router();
 

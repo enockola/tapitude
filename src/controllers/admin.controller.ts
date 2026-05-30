@@ -18,10 +18,9 @@ export class AdminController {
   }
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {
-    console.log("RENDERING renderDashboardView");
     const creatorCount = await User.countDocuments({ role: "creator" });
     const contentCount = await ContentPage.countDocuments();
-
+    
     res.render("admin/dashboard", {
       title: "Admin Dashboard",
       creatorCount,
