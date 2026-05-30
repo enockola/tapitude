@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "node --watch src/server.js",
     "start": "node src/server.js",
-    "seed:admin": "node scripts/seed-admin.js"
+    "test": "node src/test.js"
   },
   "keywords": [
     "node",
