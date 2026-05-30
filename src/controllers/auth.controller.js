@@ -9,39 +9,28 @@ function showLogin(req, res) {
   });
 }
 
+/**
+ * Authenticates the user
+ * @param {The request} req 
+ * @param {The response} res 
+ * @returns 
+ */
 async function login(req, res) {
+  //First we get the request
   const { email, password } = req.body;
 
-  if (process.env.USE_MOCK_DATA === "true") {
-    const mockUser = findMockUserByEmail(email);
-
-    if (!mockUser) {
-      return res.status(401).render("forms/login", {
-        title: "Log in",
-        error: "Use admin@tapitude.test or creator@tapitude.test in mock mode."
-      });
-    }
-
-    req.session.userId = mockUser._id;
-
-    if (mockUser.role === "admin") {
-      return res.redirect("/admin/dashboard");
-    }
-
-    return res.redirect("/creator/dashboard");
-  }
-
+  //We get the user from the User model
   const user = await User.findOne({ email: email?.toLowerCase().trim() });
+  console.log("The user is: ", user);
 
   if (!user || user.status !== "active") {
     return res.status(401).render("forms/login", {
       title: "Log in",
-      error: "Invalid email or password."
+      error: "User account not found."
     });
   }
 
   const passwordMatches = await bcrypt.compare(password, user.passwordHash);
-
   if (!passwordMatches) {
     return res.status(401).render("forms/login", {
       title: "Log in",

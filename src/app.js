@@ -29,7 +29,16 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-app.use(morgan("dev"));
+//Use Morgan, a logging middleware for HTTP requests
+//Morgan logs the client request and the servers response to said request
+app.use(morgan('dev', {
+  skip: function (req, res) { 
+    return req.url.includes('/css/') || 
+           req.url.includes('/js/') || 
+           req.url.includes('/images/'); 
+  }
+}));
+
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
