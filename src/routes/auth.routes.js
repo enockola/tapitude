@@ -1,5 +1,5 @@
 const express = require("express");
-const asyncHandler = require("../utils/asyncHandler");
+import asyncHandler from "../utils/asyncHandler";
 const authController = require("../controllers/auth.controller");
 
 const router = express.Router();

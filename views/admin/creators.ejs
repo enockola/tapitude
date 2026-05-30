@@ -6,7 +6,7 @@
     <h1>Creators</h1>
     <p>Manage creator accounts.</p>
   </div>
-  <a class="button" href="/admin/creators/new">+ Create Creator</a>
+  <%- include("./create-button") %>
 </section>
 
 <section class="card">
@@ -22,7 +22,7 @@
           </div>
           <span>
             <span class="badge"><%= creator.status %></span>
-            <a class="edit" href="/admin/edit-creator-account/<%= creator._id %>"><i class="ph-fill ph-pencil-simple-line"></i></a>
+            <a class="edit button" href="/admin/edit-creator-account/<%= creator._id %>"><i class="ph-fill ph-pencil-simple-line"></i></a>
           </span>
         </article>
       <% }) %>

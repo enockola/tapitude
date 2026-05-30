@@ -1,5 +1,5 @@
 const express = require("express");
-const asyncHandler = require("../utils/asyncHandler");
+import asyncHandler from "../utils/asyncHandler";
 const requireAuth = require("../middleware/requireAuth");
 const requireRole = require("../middleware/requireRole");
 const contentController = require("../controllers/content.controller");
