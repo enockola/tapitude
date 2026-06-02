@@ -56,3 +56,13 @@
   gap: var(--space-sm);
   flex-wrap: wrap;
 }
+
+.danger {
+  background: #dc3545;
+  color: white;
+  border: none;
+}
+
+.danger:hover {
+  background: #b52a37;
+}

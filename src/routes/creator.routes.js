@@ -9,8 +9,6 @@ const router = express.Router();
 router.use(requireAuth);
 router.use(requireRole("creator", "admin"));
 
-router.get("/dashboard", asyncHandler(creatorController.dashboard));
-router.get("/content", asyncHandler(creatorController.contentList));
-router.get("/profile", asyncHandler(creatorController.profile));
+creatorController.registerRoutes(router);
 
 module.exports = router;
