@@ -1,358 +1,111 @@
 # Tapitude Creator Hub
 
-Tapitude Creator Hub is a web dashboard for content creators to create, manage, customize, schedule, and publish content posts. Consumers will access a creator's public content experience through URLs connected to Tapitude NFC chips.
+Tapitude Creator Hub is a web dashboard that allows approved content creators to manage posts that appear on their public Tapitude page. Public consumers access a creator's page through a URL connected to a Tapitude NFC chip.
+
+This repository is currently in the MVP planning and early build stage.
+
+## Current MVP Direction
+
+- Tapitude admins manually create and manage creator accounts.
+- Creators log in to create, upload, schedule, and manage posts.
+- Public consumers do not need accounts.
+- Each creator can have up to **25 active posts** visible on their public page.
+- Each creator can have up to **25 scheduled posts** queued for future publishing.
+- When a 26th active post is published, the oldest active post and its media are permanently deleted.
+- Support is handled through email at `support@tapitude.com`, not through an in-app ticket system.
 
 ## Tech Stack
 
 - Node.js
 - Express.js
+- EJS views
 - JavaScript
-- EJS views for server-rendered pages
-- CSS and client-side JavaScript
+- CSS
 - MongoDB
-- Media upload support
+- Local media uploads for development
+- Cloud media storage planned for production
 
-## Main User Types
+## Quick Start
 
-- **Admin:** Creates and manages creator accounts.
-- **Creator:** Creates, edits, schedules, publishes, and customizes content posts.
-- **Consumer:** Views a creator's public content experience. Consumers do not need accounts.
+Install dependencies:
 
-## Updated Content Direction
-
-Creators can upload media as part of their content posts. This can include images, videos, or document-style media depending on the final MVP upload limits.
-
-Consumers should be able to view the creator's latest content history. For the MVP, the public consumer view should show the **latest 10 published posts** from a creator.
-
-## MVP Features
-
-- Admin login
-- Admin creates creator accounts
-- Creator login
-- Creator dashboard
-- Creator creates and edits content posts
-- Creator can upload media for posts
-- Creator can schedule posts
-- Creator can publish posts right away
-- Public creator page showing the latest 10 published posts
-- Individual public post page by slug
-- Basic theme/personalization options
-- MongoDB stores users, creator profiles, content posts, media metadata, and theme settings
-
-
-## Setup
-
-1. [Install npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-
-2. Install dependencies:
 ```bash
 npm install
-npm install dotenv
 ```
 
-3. Create your environment file:
+Create an environment file:
 
 ```bash
 cp .env.example .env
 ```
 
-On Windows PowerShell, use:
+On Windows PowerShell:
 
 ```powershell
 Copy-Item .env.example .env
 ```
 
-3. Make sure your `.env` has:
+Recommended development values:
 
 ```env
 USE_MOCK_DATA=true
 MONGODB_URI=
+SESSION_SECRET=replace-with-local-secret
 ```
 
-4. Start the app:
+Start the development server:
 
 ```bash
 npm run dev
 ```
 
-5. Open:
+Open the app locally:
 
 ```txt
 http://localhost:3000
 ```
 
-## Mock Login
+## Mock Mode
 
-Because this is frontend/mock mode, login accepts these demo accounts:
-
-```txt
-admin@tapitude.test
-creator@tapitude.test
-```
-
-## How the Project Works Right Now
-
-This version of Tapitude Creator Hub is currently running in **frontend/mock mode**.
-
-That means the app uses Express and EJS to render real pages, but it does **not** connect to MongoDB yet. Instead, it uses sample data from a local mock data file so the team can work on the frontend, dashboard layout, routes, forms, and page flow before the real database is available.
-
-## Why We Are Using Mock Mode
-
-We do not currently have access to the MongoDB database yet, so connecting the app to MongoDB would cause the server to crash.
-
-To avoid that, the app checks this value in `.env`:
+During early development, the app may run in mock mode so the team can build page flow, forms, EJS views, and dashboard screens without requiring a live MongoDB connection.
 
 ```env
 USE_MOCK_DATA=true
 ```
-Any password will work in mock mode.
 
-## MVP Features
-
-- Admin login
-- Admin creates creator accounts
-- Creator login
-- Creator dashboard
-- Creator creates and edits content posts
-- Creator can upload media for posts
-- Creator can schedule posts
-- Creator can publish posts right away
-- Public creator page showing the latest 10 published posts
-- Individual public post page by slug
-- Basic theme/personalization options
-- MongoDB stores users, creator profiles, content posts, media metadata, and theme settings
-
-## Project Documentation
-
-Detailed planning documents are in the wiki
-
-## Suggested Project Structure
-
-```txt
-tapitude-creator-hub/
-├── README.md
-├── package.json
-├── .env.example
-├── .gitignore
-├── docs/
-├── src/
-├── views/
-├── public/
-│   ├── css/
-│   ├── js/
-│   └── assets/
-├── uploads/
-└── tests/
-```
-
-## Important Note
-
-This version is not meant to be production-ready. It is for frontend work while the MongoDB connection is unavailable.
-
-When MongoDB is ready, set:
+When MongoDB integration is ready, update the environment values:
 
 ```env
 USE_MOCK_DATA=false
 MONGODB_URI=your_mongodb_connection_string
 ```
 
-Then reconnect the real database controllers and models.
+## Documentation
 
-## Current Status
+The full project documentation is maintained in the Wiki/docs files.
 
-Planning and early build stage. The project direction now includes MongoDB connection and media upload support. The next step is to update the working application so creators can upload media and consumers can view the latest 10 published posts from a creator.
+| Document | Purpose |
+| --- | --- |
+| [Home](docs/Home.md) | Wiki landing page and documentation map |
+| [Project Plan](docs/project-plan.md) | MVP scope, priorities, out-of-scope items, and next steps |
+| [Authentication and Roles](docs/auth-and-roles.md) | Admin, creator, and public consumer permissions |
+| [Content Strategy](docs/content-strategy.md) | Post lifecycle, 25 active posts, 25 scheduled posts, and public display rules |
+| [Media and Storage](docs/media-and-storage.md) | Upload rules, storage plan, and media deletion behavior |
+| [API Plan](docs/api-plan.md) | Route map for API and public routes |
+| [Database Schema](docs/database-schema.md) | MongoDB collections, fields, indexes, and data rules |
+| [Data Model Diagram](docs/database-model-diagram.md) | Mermaid diagram of MongoDB collection relationships |
+| [Express Views](docs/express-views.md) | EJS view structure and page responsibilities |
+| [Directory Structure](docs/directory-structure.md) | Recommended project folders and responsibilities |
+| [Deployment Plan](docs/deployment-plan.md) | Deployment, environment variables, storage, and production checklist |
 
+## Documentation Update Rule
 
-## Next Build Steps
+To keep documentation easy to maintain, update the source page first:
 
-1. Finish authentication flow.
-2. Build admin creator-account management.
-3. Build creator content CRUD.
-4. Add publish/schedule logic.
-5. Render public content pages by slug.
-6. Improve dashboard styling based on Figma feedback.
-# Tapitude Creator Hub
+- Scope changes go in [Project Plan](docs/project-plan.md).
+- Post limits and lifecycle rules go in [Content Strategy](docs/content-strategy.md).
+- Media upload or deletion changes go in [Media and Storage](docs/media-and-storage.md).
+- Route changes go in [API Plan](docs/api-plan.md).
+- Data field or relationship changes go in [Database Schema](docs/database-schema.md).
 
-Tapitude Creator Hub is a web dashboard for content creators to create, manage, customize, schedule, and publish content posts. Consumers will access a creator's public content experience through URLs connected to Tapitude NFC chips.
-
-## Tech Stack
-
-- Node.js
-- Express.js
-- JavaScript
-- EJS views for server-rendered pages
-- CSS and client-side JavaScript
-- MongoDB
-- Media upload support
-
-## Main User Types
-
-- **Admin:** Creates and manages creator accounts.
-- **Creator:** Creates, edits, schedules, publishes, and customizes content posts.
-- **Consumer:** Views a creator's public content experience. Consumers do not need accounts.
-
-## Updated Content Direction
-
-Creators can upload media as part of their content posts. This can include images, videos, or document-style media depending on the final MVP upload limits.
-
-Consumers should be able to view the creator's latest content history. For the MVP, the public consumer view should show the **latest 10 published posts** from a creator.
-
-## MVP Features
-
-- Admin login
-- Admin creates creator accounts
-- Creator login
-- Creator dashboard
-- Creator creates and edits content posts
-- Creator can upload media for posts
-- Creator can schedule posts
-- Creator can publish posts right away
-- Public creator page showing the latest 10 published posts
-- Individual public post page by slug
-- Basic theme/personalization options
-- MongoDB stores users, creator profiles, content posts, media metadata, and theme settings
-
-
-## Setup
-
-1. [Install npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm)
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. Create your environment file:
-
-```bash
-cp .env.example .env
-```
-
-On Windows PowerShell, use:
-
-```powershell
-Copy-Item .env.example .env
-```
-
-3. Make sure your `.env` has:
-
-```env
-USE_MOCK_DATA=true
-MONGODB_URI=
-```
-
-4. Start the app:
-
-```bash
-npm run dev
-```
-
-5. Open:
-
-```txt
-http://localhost:3000
-```
-
-## Mock Login
-
-Because this is frontend/mock mode, login accepts these demo accounts:
-
-```txt
-admin@tapitude.test
-creator@tapitude.test
-```
-
-## How the Project Works Right Now
-
-This version of Tapitude Creator Hub is currently running in **frontend/mock mode**.
-
-That means the app uses Express and EJS to render real pages, but it does **not** connect to MongoDB yet. Instead, it uses sample data from a local mock data file so the team can work on the frontend, dashboard layout, routes, forms, and page flow before the real database is available.
-
-## Why We Are Using Mock Mode
-
-We do not currently have access to the MongoDB database yet, so connecting the app to MongoDB would cause the server to crash.
-
-To avoid that, the app checks this value in `.env`:
-
-```env
-USE_MOCK_DATA=true
-```
-Any password will work in mock mode.
-
-## Helpful Routes
-
-```txt
-/
- /auth/login
-/admin/dashboard
-/admin/creators
-/admin/creators/new
-/creator/dashboard
-/creator/content
-/content-pages/new
-/p/summer-drop-2026
-```
-
-## Current Starter Features
-
-- EJS view setup
-- Static CSS/JS setup
-- Session authentication setup
-- Admin and creator roles
-- Basic admin dashboard
-- Basic creator dashboard
-- Content page model
-- Theme model
-- Public page route by slug
-- Simple layered CSS structure
-
-
-## Project Documentation
-
-Detailed planning documents are in the wiki
-
-## Suggested Project Structure
-
-```txt
-tapitude-creator-hub/
-├── README.md
-├── package.json
-├── .env.example
-├── .gitignore
-├── docs/
-├── src/
-├── views/
-├── public/
-│   ├── css/
-│   ├── js/
-│   └── assets/
-├── uploads/
-└── tests/
-```
-
-## Important Note
-
-This version is not meant to be production-ready. It is for frontend work while the MongoDB connection is unavailable.
-
-When MongoDB is ready, set:
-
-```env
-USE_MOCK_DATA=false
-MONGODB_URI=your_mongodb_connection_string
-```
-
-Then reconnect the real database controllers and models.
-
-## Current Status
-
-Planning and early build stage. The project direction now includes MongoDB connection and media upload support. The next step is to update the working application so creators can upload media and consumers can view the latest 10 published posts from a creator.
-
-
-## Next Build Steps
-
-1. Finish authentication flow.
-2. Build admin creator-account management.
-3. Build creator content CRUD.
-4. Add publish/schedule logic.
-5. Render public content pages by slug.
-6. Improve dashboard styling based on Figma feedback.
+The README should stay short and point to the Wiki/docs for details.
