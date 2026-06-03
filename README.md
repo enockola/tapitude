@@ -87,16 +87,16 @@ The full project documentation is maintained in the Wiki/docs files.
 | Document | Purpose |
 | --- | --- |
 | [Home](docs/Home.md) | Wiki landing page and documentation map |
-| [Project Plan](docs/project-plan.md) | MVP scope, priorities, out-of-scope items, and next steps |
-| [Authentication and Roles](docs/auth-and-roles.md) | Admin, creator, and public consumer permissions |
-| [Content Strategy](docs/content-strategy.md) | Post lifecycle, 25 active posts, 25 scheduled posts, and public display rules |
-| [Media and Storage](docs/media-and-storage.md) | Upload rules, storage plan, and media deletion behavior |
-| [API Plan](docs/api-plan.md) | Route map for API and public routes |
-| [Database Schema](docs/database-schema.md) | MongoDB collections, fields, indexes, and data rules |
-| [Data Model Diagram](docs/database-model-diagram.md) | Mermaid diagram of MongoDB collection relationships |
-| [Express Views](docs/express-views.md) | EJS view structure and page responsibilities |
-| [Directory Structure](docs/directory-structure.md) | Recommended project folders and responsibilities |
-| [Deployment Plan](docs/deployment-plan.md) | Deployment, environment variables, storage, and production checklist |
+| [Project Plan](https://github.com/enockola/tapitude/wiki/Project-Plan) | MVP scope, priorities, out-of-scope items, and next steps |
+| [Authentication and Roles](https://github.com/enockola/tapitude/wiki/Authentication-and-Roles) | Admin, creator, and public consumer permissions |
+| [Content Strategy](https://github.com/enockola/tapitude/wiki/Content-Strategy) | Post lifecycle, 25 active posts, 25 scheduled posts, and public display rules |
+| [Media and Storage](https://github.com/enockola/tapitude/wiki/Media-and-Storage) | Upload rules, storage plan, and media deletion behavior |
+| [API Plan](https://github.com/enockola/tapitude/wiki/Api-Plan) | Route map for API and public routes |
+| [Database Schema](https://github.com/enockola/tapitude/wiki/Database-Schema) | MongoDB collections, fields, indexes, and data rules |
+| [Data Model Diagram](https://github.com/enockola/tapitude/wiki/Data-Model-Diagram) | Mermaid diagram of MongoDB collection relationships |
+| [Express Views](https://github.com/enockola/tapitude/wiki/Express-Views) | EJS view structure and page responsibilities |
+| [Directory Structure](https://github.com/enockola/tapitude/wiki/Directory-Structure) | Recommended project folders and responsibilities |
+| [Deployment Plan](https://github.com/enockola/tapitude/wiki/Deployment-Plan) | Deployment, environment variables, storage, and production checklist |
 
 ## Documentation Update Rule
 
