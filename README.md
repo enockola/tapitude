@@ -86,7 +86,7 @@ The full project documentation is maintained in the Wiki/docs files.
 
 | Document | Purpose |
 | --- | --- |
-| [Home](docs/Home.md) | Wiki landing page and documentation map |
+| [Home](https://github.com/enockola/tapitude/wiki) | Wiki landing page and documentation map |
 | [Project Plan](https://github.com/enockola/tapitude/wiki/Project-Plan) | MVP scope, priorities, out-of-scope items, and next steps |
 | [Authentication and Roles](https://github.com/enockola/tapitude/wiki/Authentication-and-Roles) | Admin, creator, and public consumer permissions |
 | [Content Strategy](https://github.com/enockola/tapitude/wiki/Content-Strategy) | Post lifecycle, 25 active posts, 25 scheduled posts, and public display rules |
@@ -102,10 +102,10 @@ The full project documentation is maintained in the Wiki/docs files.
 
 To keep documentation easy to maintain, update the source page first:
 
-- Scope changes go in [Project Plan](docs/project-plan.md).
-- Post limits and lifecycle rules go in [Content Strategy](docs/content-strategy.md).
-- Media upload or deletion changes go in [Media and Storage](docs/media-and-storage.md).
-- Route changes go in [API Plan](docs/api-plan.md).
-- Data field or relationship changes go in [Database Schema](docs/database-schema.md).
+- Scope changes go in [Project Plan](https://github.com/enockola/tapitude/wiki/Project-Plan).
+- Post limits and lifecycle rules go in [Content Strategy](https://github.com/enockola/tapitude/wiki/Content-Strategy).
+- Media upload or deletion changes go in [Media and Storage](https://github.com/enockola/tapitude/wiki/Media-and-Storage).
+- Route changes go in [API Plan](https://github.com/enockola/tapitude/wiki/Api-Plan).
+- Data field or relationship changes go in [Database Schema](https://github.com/enockola/tapitude/wiki/Database-Schema).
 
 The README should stay short and point to the Wiki/docs for details.
