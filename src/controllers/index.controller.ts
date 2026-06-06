@@ -1,7 +1,7 @@
 import asyncHandler from "../utils/asyncHandler";
 import { Request, Response, Router } from 'express';
 
-export class PageController {
+export class IndexController {
   registerRoutes(router: Router) {
     router.get("/", this.home);
     router.get("/about", this.about);
@@ -20,4 +20,4 @@ export class PageController {
   }
 }
 
-export default new PageController();
+export default new IndexController();

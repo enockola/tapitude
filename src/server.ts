@@ -8,12 +8,6 @@ const methodOverride = require("method-override");
 const helmet = require("helmet");
 const morgan = require("morgan");
 const connectDB = require("./config/db");
-const pageRoutes = require("./routes/page.routes");
-const authRoutes = require("./routes/auth.routes");
-const adminRoutes = require("./routes/admin.routes");
-const creatorRoutes = require("./routes/creator.routes");
-const contentRoutes = require("./routes/content.routes");
-const publicRoutes = require("./routes/public.routes");
 
 const notFound = require("./middleware/notFound");
 const errorHandler = require("./middleware/errorHandler");
@@ -66,7 +60,15 @@ app.use(session(sessionOptions));
 
 app.use(attachUser);
 
-app.use("/", pageRoutes);
+// routes
+const indexRoutes = require("./routes/index.routes");
+const authRoutes = require("./routes/auth.routes");
+const adminRoutes = require("./routes/admin.routes");
+const creatorRoutes = require("./routes/creator.routes");
+const contentRoutes = require("./routes/content.routes");
+const publicRoutes = require("./routes/public.routes");
+
+app.use("/", indexRoutes);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/creator", creatorRoutes);
