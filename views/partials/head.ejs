@@ -6,12 +6,12 @@
     <title><%= title ? `${title} | Tapitude` : "Tapitude" %></title>
     <link rel="stylesheet" href="/css/main.css" />
     <!-- https://github.com/phosphor-icons/homepage#phosphor-icons -->
-    <!-- Select icons in https://phosphoricons.com/-->
-    <link
+    <!-- Select icons in https://phosphoricons.com/ -->
+    <!-- <link
       rel="stylesheet"
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css"
-    />
+    /> -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -22,6 +22,10 @@
       type="text/css"
       href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css"
     />
+    <script>
+      const currentPath = "<%= currentPath %>";
+      console.log("Current path is: ", currentPath);
+    </script>
   </head>
   <body></body>
 </html>

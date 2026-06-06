@@ -1,9 +1,12 @@
 <%- include("../partials/dashboard-shell-start", { title }) %>
+<script>
+  console.log("contentPage:", <%- JSON.stringify(contentPage) %>);
+</script>
 
 <section class="content-header">
   <div>
     <p class="eyebrow">Content</p>
-    <h1><%= contentPage ? "Edit Content Page" : "Create Content Page" %></h1>
+    <h1><%= contentPage ? "Edit Post" : "New Post" %></h1>
     <p>Create a simple public page for consumers to view from an NFC chip.</p>
   </div>
 
@@ -28,7 +31,7 @@
         <input
           type="datetime-local"
           name="scheduledFor"
-          value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : '' %>"
+          value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : new Date().toISOString().slice(0,16) %>"
         >
       </label>
 
@@ -128,7 +131,7 @@
   <aside class="card preview-card">
     <p class="eyebrow">Public Preview</p>
     <h2><%= contentPage?.title || "Your title will appear here" %></h2>
-    <p><%= contentPage?.body || "Your content preview will appear here after you save." %></p>
+    <p><%= contentPage?.body || "Your content preview will appear here." %></p>
 
     <% if (contentPage?.externalLink) { %>
       <a class="button button--full" href="<%= contentPage.externalLink %>" target="_blank">

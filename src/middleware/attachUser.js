@@ -19,6 +19,10 @@ import User from "../models/User";
  * @returns {Promise<void>} Passes control to the next middleware or error handler.
  */
 async function attachUser(req, res, next) {
+  // We add the current path to the response locals
+  res.locals.currentPath = req.path;
+
+  // We try to attach the user to the request and response locals
   try {
     res.locals.currentUser = null;
 

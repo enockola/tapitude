@@ -12,6 +12,8 @@
   z-index: 20;
 }
 
+
+
 .brand {
   font-family: var(--font-display);
   font-size: clamp(1.6rem, 6vw, 2rem);
@@ -41,6 +43,21 @@
 
 .topbar__nav a:hover {
   color: var(--color-heading);
+}
+
+.topbar__nav button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-muted);
+}
+
+.topbar__nav button:hover {
+  color: var(--color-heading);
+}
+
+.topbar__nav a.is-active {
+  color: var(--color-primary);
 }
 
 .topbar__toggle {
