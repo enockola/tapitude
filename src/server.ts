@@ -1,17 +1,25 @@
-require("dotenv").config();
+import "dotenv/config";
 
-const path = require("path");
-const express = require("express");
-const session = require("express-session");
-const MongoStore = require("connect-mongo");
-const methodOverride = require("method-override");
-const helmet = require("helmet");
-const morgan = require("morgan");
-const connectDB = require("./config/db");
+import path from "path";
+import express from "express";
+import session from "express-session";
+import MongoStore from "connect-mongo";
+import methodOverride from "method-override";
+import helmet from "helmet";
+import morgan from "morgan";
+import connectDB from "./config/db.js";
 
-const notFound = require("./middleware/notFound");
-const errorHandler = require("./middleware/errorHandler");
-const attachUser = require("./middleware/attachUser");
+import notFound from "./middleware/notFound.js";
+import errorHandler from "./middleware/errorHandler.js";
+import attachUser from "./middleware/attachUser.js";
+
+// routes
+import indexRoutes from "./routes/index.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import creatorRoutes from "./routes/creator.routes.js";
+import contentRoutes from "./routes/content.routes.js";
+import publicRoutes from "./routes/public.routes.js";
 
 const app = express();
 const useMockData = process.env.USE_MOCK_DATA === "true";
@@ -60,14 +68,7 @@ app.use(session(sessionOptions));
 
 app.use(attachUser);
 
-// routes
-const indexRoutes = require("./routes/index.routes");
-const authRoutes = require("./routes/auth.routes");
-const adminRoutes = require("./routes/admin.routes");
-const creatorRoutes = require("./routes/creator.routes");
-const contentRoutes = require("./routes/content.routes");
-const publicRoutes = require("./routes/public.routes");
-
+//Routes
 app.use("/", indexRoutes);
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
