@@ -36,6 +36,15 @@ export class ContentController {
       scheduledFor
     } = req.body;
 
+    if (!title || typeof title !== "string") {
+      return res.status(400).render("creator/content-editor", {
+        title: "New Content Page",
+        contentPage: null,
+        publicUrl: null,
+        error: "Title is required."
+      });
+    }
+
     const pageStatus = status || "published";
 
     const contentPage = await ContentPage.create({
@@ -70,7 +79,10 @@ export class ContentController {
     res.render("creator/content-editor", {
       title: "Edit Content Page",
       contentPage,
-      publicUrl: generatePublicUrl(contentPage.slug),
+      publicUrl:
+        contentPage.status === "published"
+          ? generatePublicUrl(contentPage.slug)
+          : null,
       error: null
     });
   }
@@ -87,7 +99,7 @@ export class ContentController {
       scheduledFor
     } = req.body;
 
-    const updates = {
+    const updates: Record<string, any> = {
       title,
       body,
       buttonText,

@@ -81,3 +81,37 @@
   position: sticky;
   top: calc(var(--topbar-height) + var(--space-md));
 }
+
+.content-summary {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.content-summary a {
+  width: fit-content;
+}
+
+.content-summary strong {
+  color: var(--color-heading);
+}
+
+.content-summary small,
+.muted-link {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}
+
+.public-link {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  word-break: break-word;
+}
+
+.public-link:hover {
+  color: var(--color-heading);
+}
+
+.mini-list__item {
+  align-items: flex-start;
+}
+

@@ -32,9 +32,43 @@
           type="datetime-local"
           name="scheduledFor"
           value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : new Date().toISOString().slice(0,16) %>"
-        >
+          >
       </label>
 
+      <div class="media-upload">
+        <label class="media-dropzone" for="mediaUpload">
+          <span class="media-dropzone__icon">▧</span>
+
+          <strong>Your Media</strong>
+          <small>Upload your content video and images</small>
+
+          <span class="button button--secondary button--small">
+            Browse Files
+          </span>
+
+          <input
+            id="mediaUpload"
+            type="file"
+            name="media"
+            accept="image/*,video/*"
+          >
+        </label>
+
+        <% if (contentPage?.mediaUrl) { %>
+          <div class="current-media">
+            <p class="eyebrow">Current Media</p>
+
+            <% if (contentPage.mediaType?.startsWith("image")) { %>
+              <img src="<%= contentPage.mediaUrl %>" alt="Uploaded media preview">
+            <% } else if (contentPage.mediaType?.startsWith("video")) { %>
+              <video controls src="<%= contentPage.mediaUrl %>"></video>
+            <% } else { %>
+              <a href="<%= contentPage.mediaUrl %>" target="_blank">View uploaded media</a>
+            <% } %>
+          </div>
+        <% } %>
+      </div>
+        
       <label>
         Title
         <input
@@ -51,49 +85,6 @@
         <textarea name="body" rows="8" placeholder="Tell your story..."><%= contentPage?.body || '' %></textarea>
       </label>
 
-      <div class="form-grid">
-        <label>
-          Button Text
-          <input
-            type="text"
-            name="buttonText"
-            placeholder="Learn More"
-            value="<%= contentPage?.buttonText || '' %>"
-          >
-        </label>
-
-        <label>
-          External Link
-          <input
-            type="url"
-            name="externalLink"
-            placeholder="https://example.com"
-            value="<%= contentPage?.externalLink || '' %>"
-          >
-        </label>
-      </div>
-
-      <div class="form-grid">
-        <label>
-          Embed Type
-          <select name="embedType">
-            <% const currentEmbedType = contentPage?.embedType || "none"; %>
-            <% ["none", "youtube", "vimeo", "imageUrl", "googleDrive", "dropbox", "externalWebsite", "socialPost"].forEach((type) => { %>
-              <option value="<%= type %>" <%= currentEmbedType === type ? "selected" : "" %>><%= type %></option>
-            <% }) %>
-          </select>
-        </label>
-
-        <label>
-          Embed URL
-          <input
-            type="url"
-            name="embedUrl"
-            placeholder="Paste media/link URL"
-            value="<%= contentPage?.embedUrl || '' %>"
-          >
-        </label>
-      </div>
 
       <label>
         Publish Option

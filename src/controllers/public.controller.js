@@ -1,9 +1,9 @@
 import ContentPage from "../models/ContentPage";
-import mockContentPages from "../data/mockData";
+import mockData from "../data/mockData";
 
 async function showPublicContent(req, res) {
   if (process.env.USE_MOCK_DATA === "true") {
-    const contentPage = mockContentPages.find((page) => {
+    const contentPage = mockData.mockContentPages.find((page) => {
       return page.slug === req.params.slug && page.status === "published";
     });
 

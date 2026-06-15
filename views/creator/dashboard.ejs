@@ -26,37 +26,76 @@
   </article>
 </section>
 
+<%
+  const publishedContent = contentPages.filter((page) => page.status === "published");
+  const scheduledContent = contentPages.filter((page) => page.status === "scheduled");
+%>
+
 <section class="dashboard-grid">
   <article class="card">
     <div class="card-header">
-      <div>
-        <p class="eyebrow">Create</p>
-        <h2>Create Content</h2>
-      </div>
-      <a class="button button--secondary" href="/content-pages/new">Open Editor</a>
+      <h2>Published Content</h2>
+      <a href="/creator/content">View all</a>
     </div>
 
-    <p>
-      Create a public content page with text, links, embeds, and theme settings.
-      Publish it right away or schedule it for later.
-    </p>
+    <% if (publishedContent.length === 0) { %>
+      <p>No published content yet.</p>
+    <% } else { %>
+      <div class="mini-list">
+        <% publishedContent.forEach((page) => { %>
+          <div class="mini-list__item">
+            <div class="content-summary">
+              <a href="/content-pages/<%= page._id %>/edit">
+                <strong><%= page.title %></strong>
+              </a>
+
+              <a class="public-link" href="/p/<%= page.slug %>" target="_blank">
+                /p/<%= page.slug %>
+              </a>
+            </div>
+
+            <div class="item-meta">
+              <small class="badge">
+                Published:
+                <%= page.publishedAt ? new Date(page.publishedAt).toLocaleDateString() : "No date" %>
+              </small>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
   </article>
 
   <article class="card">
     <div class="card-header">
-      <h2>Recent Content</h2>
+      <h2>Scheduled Content</h2>
       <a href="/creator/content">View all</a>
     </div>
 
-    <% if (contentPages.length === 0) { %>
-      <p>No content pages yet.</p>
+    <% if (scheduledContent.length === 0) { %>
+      <p>No scheduled content yet.</p>
     <% } else { %>
       <div class="mini-list">
-        <% contentPages.forEach((page) => { %>
-          <a class="mini-list__item" href="/content-pages/<%= page._id %>/edit">
-            <span><%= page.title %></span>
-            <small><%= page.status %></small>
-          </a>
+        <% scheduledContent.forEach((page) => { %>
+          <div class="mini-list__item">
+            <div class="content-summary">
+              <a href="/content-pages/<%= page._id %>/edit">
+                <strong><%= page.title %></strong>
+              </a>
+
+              <span class="muted-link">/p/<%= page.slug %></span>
+            </div>
+
+            <div class="item-meta">
+              <small class="badge">
+
+                Scheduled:
+
+                <%= page.scheduledFor ? new Date(page.scheduledFor).toLocaleDateString() : "No date" %>
+
+              </small>
+            </div>
+          </div>
         <% }) %>
       </div>
     <% } %>
