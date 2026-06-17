@@ -9,7 +9,6 @@ export class ViewerContentHubController {
   }
 
   home = async (req: Request, res: Response): Promise<void> => {
-    console.log("USER CONTENT HUB: Viewer home page");
     res.render("content_hub/index");
   }
 }
