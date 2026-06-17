@@ -27,12 +27,15 @@
       class="form-stack"
     >
       <label>
-        Schedule Time
+        Schedule Time (<%= scheduleTimeZoneLabel %>)
         <input
           type="datetime-local"
           name="scheduledFor"
-          value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : new Date().toISOString().slice(0,16) %>"
-          >
+          value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>"
+        >
+        <small class="field-hint">
+          All scheduled posts use Eastern Time. The server saves this as UTC.
+        </small>
       </label>
 
       <div class="media-upload">
