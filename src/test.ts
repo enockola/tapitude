@@ -1,22 +1,7 @@
-const User = require("./models/User");
-const connectDB = require("./config/db");
+const fileService = require("./utils/fileService");
 
 require("dotenv").config();
 
-async function startServer() {
-    await connectDB();
+console.log(fileService);
 
-    const totalUsers = await User.countDocuments({});
-    console.log(`Total users: ${totalUsers}`);
-
-    const anyUser = await User.findOne({});
-    console.log("First user document in DB:", anyUser);
-
-    const user = await User.findOne({ email: "admin@tapitude.test" });
-    console.log(user); //TODO: THe user returns null, is it connected to the database?
-}
-
-startServer().catch((error) => {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-});
+fileService.writeFile("test", "test");
