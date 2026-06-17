@@ -20,6 +20,7 @@ import adminRoutes from "./routes/admin.routes.js";
 import creatorRoutes from "./routes/creator.routes.js";
 import creatorContentRoutes from "./routes/creator_content.routes.js";
 import publicRoutes from "./routes/public.routes.js";
+import viewerContentHubRoutes from "./routes/viewer_content_hub.routes.js";
 
 const app = express();
 const useMockData = process.env.USE_MOCK_DATA === "true";
@@ -75,6 +76,7 @@ app.use("/admin", adminRoutes);
 app.use("/creator", creatorRoutes);
 app.use("/content-pages", creatorContentRoutes);
 app.use("/p", publicRoutes);
+app.use("/content-hub", viewerContentHubRoutes);
 
 app.use(notFound);
 app.use(errorHandler);
