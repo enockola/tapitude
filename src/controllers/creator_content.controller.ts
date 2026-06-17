@@ -5,7 +5,7 @@ import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
 
 
-export class ContentController {
+export class CreatorContentController {
 
   registerRoutes(router: Router) {
     router.get("/new", this.showNewContent);
@@ -139,4 +139,4 @@ export class ContentController {
   }
 }
 
-export default new ContentController();
+export default new CreatorContentController();
