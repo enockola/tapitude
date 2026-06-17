@@ -26,14 +26,7 @@
       method="POST"
       class="form-stack"
     >
-      <label>
-        Schedule Time
-        <input
-          type="datetime-local"
-          name="scheduledFor"
-          value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : new Date().toISOString().slice(0,16) %>"
-          >
-      </label>
+
 
       <div class="media-upload">
         <label class="media-dropzone" for="mediaUpload">
@@ -88,11 +81,20 @@
 
       <label>
         Publish Option
-        <select name="status">
+        <select name="status" id="publishOption">
           <% const currentStatus = contentPage?.status || "published"; %>
           <option value="published" <%= currentStatus === "published" ? "selected" : "" %>>Publish now</option>
           <option value="scheduled" <%= currentStatus === "scheduled" ? "selected" : "" %>>Schedule for later</option>
         </select>
+      </label>
+
+      <label id="scheduledForLabel">
+        Schedule Time
+        <input
+          type="datetime-local"
+          name="scheduledFor"
+          value="<%= contentPage?.scheduledFor ? new Date(contentPage.scheduledFor).toISOString().slice(0,16) : new Date().toISOString().slice(0,16) %>"
+          >
       </label>
 
       <div class="form-actions">
@@ -131,5 +133,24 @@
     <% } %>
   </aside>
 </section>
+
+<script>
+  const scheduledForLabel  = document.querySelector("#scheduledForLabel");
+  const publishOption = document.querySelector("#publishOption");
+  
+    function updatePublishOption(){
+      if (publishOption.value === "scheduled") {
+          scheduledForLabel.style.display = "block";
+          } else {
+          scheduledForLabel.style.display = "none";
+          }
+    }
+
+    updatePublishOption();
+
+  publishOption.addEventListener("change", (event) => {
+     updatePublishOption();
+    });
+</script>
 
 <%- include("../partials/dashboard-shell-end") %>
