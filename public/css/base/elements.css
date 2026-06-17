@@ -5,6 +5,25 @@ body {
   line-height: 1.5;
 }
 
+.ph-spin {
+    display: inline-flex;
+    transform-origin: center;
+    /* padding-bottom: 0.1em; */
+    animation: ph-spin 1.5s linear infinite;
+    /* padding-left: 10.01em; */
+    /* border: 1px solid red; */
+    /* background: rgba(0, 0, 255, 0.1);*/
+}
+
+@keyframes ph-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 h1,
 h2,
 h3 {
@@ -55,7 +74,11 @@ dialog {
   width: 90%;
   max-width: 400px;
   overflow: hidden;
-  transition: opacity 0.3s ease, transform 0.3s ease, overlay 0.3s allow-discrete, display 0.3s allow-discrete;
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease,
+    overlay 0.3s allow-discrete,
+    display 0.3s allow-discrete;
   opacity: 0;
   transform: translateY(10px);
 }
@@ -111,4 +134,3 @@ dialog::backdrop {
   backdrop-filter: blur(2px); /* Subtle glass effect */
   transition: background 0.3s ease;
 }
-
