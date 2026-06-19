@@ -86,7 +86,7 @@ class FileService {
       });
       await fileMetadata.save();
 
-      console.log(`File saved: ${fullPath}\ncontentType: ${options.contentType}\nsize: ${options.data.length} bytes`);
+      console.log(`File saved: ${key}\ncontentType: ${options.contentType}\nsize: ${options.data.length} bytes`);
       return key; // Return the key to store in your main business logic
 
     } catch (e) {
@@ -127,7 +127,7 @@ class FileService {
       if (result.deletedCount === 0) {
         console.warn(`File deleted from disk, but no metadata found in DB for key: ${key}`);
       } else {
-        console.log(`Metadata deleted from MongoDB for key: ${key}`);
+        console.log(`Deleted from MongoDB for key: ${key}`);
       }
     } catch (e) {
       console.error(e);
