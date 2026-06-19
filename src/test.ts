@@ -1,7 +1,15 @@
-const fileService = require("./utils/fileService");
+import { FileServiceInstance } from './models/FileService';
+import connectDB from "./utils/db";
 
-require("dotenv").config();
 
-console.log(fileService);
+const mockData = Buffer.from('hello');
+(async () => {
+    await connectDB();
 
-fileService.writeFile("test", "test");
+    await FileServiceInstance.uploadFile({
+        data: mockData,
+        ownerId: 'user123',
+        filename: 'test.png'
+    });
+
+})();
