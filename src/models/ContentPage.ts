@@ -12,6 +12,7 @@ export interface IContentPage extends Document {
   embedType: "none" | "youtube" | "vimeo" | "imageUrl" | "googleDrive" | "dropbox" | "externalWebsite" | "socialPost";
   status: "draft" | "scheduled" | "published";
   scheduledFor?: Date;
+  scheduledTimeZone?: string;
   publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -59,6 +60,10 @@ const contentPageSchema = new Schema<IContentPage>(
       index: true
     },
     scheduledFor: { type: Date },
+    scheduledTimeZone: {
+      type: String,
+      default: "America/New_York"
+    },
     publishedAt: { type: Date }
   },
   { timestamps: true }

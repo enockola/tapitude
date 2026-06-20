@@ -8,6 +8,12 @@ import methodOverride from "method-override";
 import helmet from "helmet";
 import morgan from "morgan";
 import connectDB from "./utils/db.js";
+import { startContentScheduler } from "./services/contentScheduler.service";
+import {
+  formatEtDateTime,
+  toEtDateTimeInputValue,
+  SCHEDULE_TIME_ZONE_LABEL
+} from "./utils/etDateTime";
 
 import notFound from "./middleware/notFound.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -28,6 +34,10 @@ const useMockData = process.env.USE_MOCK_DATA === "true";
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
 
+app.locals.formatEtDateTime = formatEtDateTime;
+app.locals.toEtDateTimeInputValue = toEtDateTimeInputValue;
+app.locals.scheduleTimeZoneLabel = SCHEDULE_TIME_ZONE_LABEL;
+
 app.use(helmet({
   contentSecurityPolicy: false
 }));
@@ -35,10 +45,10 @@ app.use(helmet({
 //Use Morgan, a logging middleware for HTTP requests
 //Morgan logs the client request and the servers response to said request
 app.use(morgan('dev', {
-  skip: function (req, res) { 
-    return req.url.includes('/css/') || 
-           req.url.includes('/js/') || 
-           req.url.includes('/images/'); 
+  skip: function (req, res) {
+    return req.url.includes('/css/') ||
+      req.url.includes('/js/') ||
+      req.url.includes('/images/');
   }
 }));
 
@@ -85,6 +95,10 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   await connectDB();
+
+  if (process.env.MONGODB_URI && process.env.USE_MOCK_DATA !== "true") {
+    startContentScheduler();
+  }
 
   app.listen(PORT, () => {
     console.log(`Tapitude Creator Hub running on http://localhost:${PORT}`);

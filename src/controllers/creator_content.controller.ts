@@ -3,6 +3,7 @@ import createSlug from "../utils/createSlug";
 import generatePublicUrl from "../utils/generatePublicUrl";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
+import { etInputToUtcDate, SCHEDULE_TIME_ZONE} from "../utils/etDateTime";
 
 
 export class CreatorContentController {
@@ -57,7 +58,8 @@ export class CreatorContentController {
       embedUrl,
       embedType: embedType || "none",
       status: pageStatus,
-      scheduledFor: pageStatus === "scheduled" && scheduledFor ? new Date(scheduledFor) : null,
+      scheduledFor: pageStatus === "scheduled" ? etInputToUtcDate(scheduledFor) : null,
+      scheduledTimeZone: pageStatus === "scheduled" ? SCHEDULE_TIME_ZONE : undefined,
       publishedAt: pageStatus === "published" ? new Date() : null
     });
 
@@ -110,7 +112,8 @@ export class CreatorContentController {
     };
 
     if (status === "scheduled") {
-      updates.scheduledFor = scheduledFor ? new Date(scheduledFor) : null;
+      updates.scheduledFor = etInputToUtcDate(scheduledFor);
+      updates.scheduledTimeZone = SCHEDULE_TIME_ZONE;
       updates.publishedAt = null;
     }
 

@@ -57,7 +57,7 @@
             <div class="item-meta">
               <small class="badge">
                 Published:
-                <%= page.publishedAt ? new Date(page.publishedAt).toLocaleDateString() : "No date" %>
+                <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
               </small>
             </div>
           </div>
@@ -91,7 +91,7 @@
 
                 Scheduled:
 
-                <%= page.scheduledFor ? new Date(page.scheduledFor).toLocaleDateString() : "No date" %>
+                <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
 
               </small>
             </div>
