@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import connectDB from "./config/db";
+import connectDB from "./utils/db";
 import User from "./models/User";
 import fs from "fs";
 

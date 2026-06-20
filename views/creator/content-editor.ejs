@@ -26,17 +26,7 @@
       method="POST"
       class="form-stack"
     >
-      <label>
-        Schedule Time (<%= scheduleTimeZoneLabel %>)
-        <input
-          type="datetime-local"
-          name="scheduledFor"
-          value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>"
-        >
-        <small class="field-hint">
-          All scheduled posts use Eastern Time. The server saves this as UTC.
-        </small>
-      </label>
+
 
       <div class="media-upload">
         <label class="media-dropzone" for="mediaUpload">
@@ -91,11 +81,23 @@
 
       <label>
         Publish Option
-        <select name="status">
+        <select name="status" id="publishOption">
           <% const currentStatus = contentPage?.status || "published"; %>
           <option value="published" <%= currentStatus === "published" ? "selected" : "" %>>Publish now</option>
           <option value="scheduled" <%= currentStatus === "scheduled" ? "selected" : "" %>>Schedule for later</option>
         </select>
+      </label>
+
+      <label>
+        Schedule Time (<%= scheduleTimeZoneLabel %>)
+        <input
+          type="datetime-local"
+          name="scheduledFor"
+          value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>"
+        >
+        <small class="field-hint">
+         NOTE: All scheduled posts use Eastern Time. <!--The server saves this as UTC.-->
+        </small>
       </label>
 
       <div class="form-actions">
@@ -134,5 +136,24 @@
     <% } %>
   </aside>
 </section>
+
+<script>
+  const scheduledForLabel  = document.querySelector("#scheduledForLabel");
+  const publishOption = document.querySelector("#publishOption");
+  
+    function updatePublishOption(){
+      if (publishOption.value === "scheduled") {
+          scheduledForLabel.style.display = "block";
+          } else {
+          scheduledForLabel.style.display = "none";
+          }
+    }
+
+    updatePublishOption();
+
+  publishOption.addEventListener("change", (event) => {
+     updatePublishOption();
+    });
+</script>
 
 <%- include("../partials/dashboard-shell-end") %>

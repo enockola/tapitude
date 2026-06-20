@@ -7,7 +7,7 @@ import MongoStore from "connect-mongo";
 import methodOverride from "method-override";
 import helmet from "helmet";
 import morgan from "morgan";
-import connectDB from "./config/db.js";
+import connectDB from "./utils/db.js";
 import { startContentScheduler } from "./services/contentScheduler.service";
 import {
   formatEtDateTime,

@@ -3,7 +3,7 @@ import { Request, Response, NextFunction, RequestHandler } from 'express';
 /**
  * AsyncHandler is an Express middleware function that wraps a 
  * Promise-based function in a try/catch block.
- * * @param fn - The Promise-based function to wrap. 
+ * @param fn - The Promise-based function to wrap. 
  * @returns A RequestHandler that Express can safely execute.
  */
 export const asyncHandler = (

@@ -1,22 +1,33 @@
-const User = require("./models/User");
-const connectDB = require("./config/db");
+import { FileServiceInstance } from './models/FileService';
+import connectDB from "./utils/db";
 
-require("dotenv").config();
 
-async function startServer() {
+const mockData = Buffer.from('hello');
+(async () => {
     await connectDB();
 
-    const totalUsers = await User.countDocuments({});
-    console.log(`Total users: ${totalUsers}`);
+    let key = await FileServiceInstance.uploadFile({
+        data: mockData,
+        ownerId: 'user123',
+        filename: 'test.png'
+    });
 
-    const anyUser = await User.findOne({});
-    console.log("First user document in DB:", anyUser);
+    console.log(key + "\n");
 
-    const user = await User.findOne({ email: "admin@tapitude.test" });
-    console.log(user); //TODO: THe user returns null, is it connected to the database?
-}
+    let bytes = await FileServiceInstance.getFileBytes(key);
+    console.log(bytes.toString() + "\n");
 
-startServer().catch((error) => {
-    console.error("Failed to start server:", error);
-    process.exit(1);
-});
+    let meta = await FileServiceInstance.getFileMetadata(key);
+    console.log(meta.toString());
+
+    await FileServiceInstance.updateFile(key, {
+        ownerId: 'user456',
+        isActive: false
+    });
+
+    meta = await FileServiceInstance.getFileMetadata(key);
+    console.log(meta.toString());
+
+    // await FileServiceInstance.deleteFile('634b15bdd8b64dafa6a05ddfef2966ee.png');
+
+})();
