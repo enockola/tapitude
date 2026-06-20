@@ -36,18 +36,27 @@ interface UploadOptions {
   filename: string;
 }
 
+interface UpdateOptions {
+  data?: Buffer;
+  contentType?: string;
+  ownerId?: string;
+  isActive?: boolean;
+}
+
 class FileService {
   private readonly STORAGE_DIR = path.join(__dirname, '../../storage');
 
+  //All of these operations are fully atomic.
+
   /**
-   * A fully atomic operation. 
-   * Return a URL or a unique key to identify the file
+   * Return a URL or a unique key to identify the file.
+   * Returns an error if the upload fails
    * @param key 
    * @param data 
    * @param contentType 
    * @returns 
    */
-  async uploadFile(options:UploadOptions): Promise<string> {
+  async uploadFile(options: UploadOptions): Promise<string> {
     if (mongoose.connection.readyState != 1) {
       throw new Error("Database not connected");
     }
@@ -57,7 +66,7 @@ class FileService {
     const key = `${uuid}${extension}`;
 
     //Determine the content type
-    if(!options.contentType) {
+    if (!options.contentType) {
       const contentType = options.contentType ?? mime.getType(options.filename) ?? 'application/octet-stream';
       options.contentType = contentType;
     }
@@ -102,17 +111,89 @@ class FileService {
     }
   }
 
-  // /**
-  //  * Return a stream for downloading/piping to the user
-  //  * @param key
-  //  * @returns 
-  //  */
-  // async getFileStream(key: string): Promise<ReadableStream> {
-  //     return Promise.resolve(null);
-  // }
+  /**
+   * Will throw an error if the file does not exist
+   * @param key the file key
+   * @returns the file bytes
+   */
+  async getFileBytes(key: string): Promise<Buffer> {
+    if (mongoose.connection.readyState != 1) {
+      throw new Error("Database not connected");
+    }
+    const fullPath = path.join(this.STORAGE_DIR, key);
+    try {
+      return await fs.promises.readFile(fullPath);
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  /**
+   * Gets the file metadata
+   * Will throw an error if the file does not exist
+   * @param key 
+   * @returns 
+   */
+  async getFileMetadata(key: string): Promise<IFile> {
+    if (mongoose.connection.readyState != 1) {
+      throw new Error("Database not connected");
+    }
+    try {
+      let out = await FileModel.findOne({ fileKey: key });
+      if (!out) {
+        throw new Error(`File ${key} not found`);
+      } else {
+        return out;
+      }
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
+
+  /**
+   * Updates the file
+   * Throws an error if the file does not exist or if the update fails
+   * @param key the file key
+   * @param options the update options
+   * @returns the new file metadata
+   */
+  async updateFile(key: string, options: UpdateOptions): Promise<IFile> {
+    if (mongoose.connection.readyState != 1) {
+      throw new Error("Database not connected");
+    }
+    try {
+      const fullPath = path.join(this.STORAGE_DIR, key);
+
+      const optionalData: Record<string, any> = {}; //Use record to avoid type errors
+      if (options.ownerId) {
+        optionalData.ownerId = options.ownerId;
+      }
+      if (options.isActive !== undefined && options.isActive !== null) { //Important for booleans
+        optionalData.isActive = options.isActive;
+      }
+      if (options.data) {
+        optionalData.fileSize = options.data.length;
+      }
+      let out = await FileModel.findOneAndUpdate({ fileKey: key }, optionalData, { new: true });//you are instructing Mongoose to return the modified document (the version after the update has been applied) instead of the original version.
+      if (!out) {
+        throw new Error(`File ${key} not found`);
+      }
+      //if we want to change the bytes
+      if (options.data) {
+        await fs.promises.writeFile(fullPath, options.data);
+      }
+      return out;
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  }
 
   /**
    * Cloud storage uses "Keys" (identifiers), not OS file paths
+   * Returns an error if the delete fails
    * @param key 
    */
   async deleteFile(key: string): Promise<void> {
@@ -144,8 +225,8 @@ class FileService {
   //     return Promise.resolve("");
   //  }
 }
+
+
 //Export the singleton instance, not the class
-
-
 export const FileServiceInstance = new FileService();
 export default FileModel;
