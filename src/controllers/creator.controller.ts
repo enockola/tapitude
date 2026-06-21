@@ -7,20 +7,23 @@ import mongoose from "mongoose";
 import Busboy from "busboy";
 import multer from "multer";
 
+const MEDIA_FILE_FORM_FIELD_NAME = "media";
+
 export class CreatorController {
+
 
   registerRoutes(router: Router) {
     router.get("/dashboard", asyncHandler(this.dashboard));
     router.get("/content", asyncHandler(this.contentList));
     router.get("/profile", asyncHandler(this.profile));
-    
+
     //For previewing content
     router.get("/pages/preview", this.showNewContent);
-    
+
     //For creating/editing/deleting content
     const upload = multer({ storage: multer.memoryStorage() }); //This is needed for express to understand the multipart form
-    router.post("/pages/create", upload.single("media"), asyncHandler(this.post_createEditContent));
-    router.post("/pages/:id/update", upload.single("media"), asyncHandler(this.post_createEditContent));
+    router.post("/pages/create", upload.single(MEDIA_FILE_FORM_FIELD_NAME), asyncHandler(this.post_createEditContent));
+    router.post("/pages/:id/update", upload.single(MEDIA_FILE_FORM_FIELD_NAME), asyncHandler(this.post_createEditContent));
     router.delete("/pages/:id/delete", asyncHandler(this.deleteContent));
 
     //Page editor
@@ -90,22 +93,33 @@ export class CreatorController {
       scheduledFor,
       postID
     } = req.body;
-    console.log(req.headers["content-type"]);
-    console.log("UPDATE PAGE ",req.body);
+    // console.log(req.headers["content-type"]);
+    // console.log("UPDATE PAGE ", req.body);
 
-    //Stream the media field from our form as a Readable stream
-    // const busboy = Busboy({ headers: req.headers });
-    // busboy.on("media", (fieldname:any, file:any, info:any) => {
-    //   // file is a Readable stream
-    //   file.on("data", chunk => {
-    //     console.log("received chunk", chunk.length);
-    //   });
+    //TODO: Figure out why this doesn't work
+    // Stream the media field from our form as a Readable stream
+    const busboy = Busboy({ headers: req.headers });
+    busboy.on("file", (fieldname:any, file:any, info:any) => {
+      console.log("file:", fieldname, file, info);
+      file.on("data", (chunk) => {
+        console.log("received chunk", chunk.length);
+      });
 
-    //   file.on("end", () => {
-    //     console.log("upload finished");
-    //   });
-    // });
-    // req.pipe(busboy);
+      file.on("end", () => {
+        console.log("upload finished");
+      });
+    });
+    busboy.on("field", (name:any, value:any) => {
+      console.log("field:", name, value);
+    });
+    busboy.on("finish", () => {
+      console.log("ALL DONE");
+    });
+    busboy.on("error", (err:any) => {
+      console.error("Busboy error:", err);
+    });
+    req.pipe(busboy);
+
 
 
     const pageStatus = status || "published";
