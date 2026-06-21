@@ -11,44 +11,34 @@
 
 <section class="card">
   <% if (contentPages.length === 0) { %>
-    <p>No content pages yet.</p>
+  <p>No content pages yet.</p>
   <% } else { %>
-    <div class="table-list">
-      <% contentPages.forEach((page) => { %>
-        <article class="table-row">
-          <div class="content-summary">
-            <strong><%= page.title %></strong>
+  <div class="table-list">
+    <% contentPages.forEach((page) => { 
+        const pageTitle = "Page "+page._id; 
+        %>
+    <article class="table-row">
+      <div class="content-summary">
+        <strong><%= pageTitle %></strong>
 
-            <% if (page.status === "published") { %>
-              <a class="public-link" href="/p/<%= page.slug %>" target="_blank">
-                /p/<%= page.slug %>
-              </a>
+        <!-- Page status  -->
 
-              <small class="badge">
-                Published:
-                <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
-              </small>
-            <% } else if (page.status === "scheduled") { %>
-              <span>/p/<%= page.slug %></span>
+        <small class="badge">
+          <% if (page.status === "published") { %>Published: <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
+          <% } else if (page.status === "scheduled") { %>Scheduled: <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
+          <% } else { %>Draft
+          <% } %>
+        </small>
+      </div>
 
-              <small class="badge">
-                Scheduled:
-                <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
-              </small>
-            <% } else { %>
-              <span>/p/<%= page.slug %></span>
-              <small class="badge">Draft</small>
-            <% } %>
-          </div>
-
-          <div class="row-actions">
-            <a class="button button--small button--secondary" href="/content-pages/<%= page._id %>/edit">
-              Edit
-            </a>
-          </div>
-        </article>
-      <% }) %>
-    </div>
+      <div class="row-actions">
+        <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
+          Edit
+        </a>
+      </div>
+    </article>
+    <% }) %>
+  </div>
   <% } %>
 </section>
 
