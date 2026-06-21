@@ -11,21 +11,20 @@
   </div>
 
   <% if (publicUrl) { %>
-    <a class="button button--secondary" href="<%= publicUrl %>" target="_blank">Preview Public Page</a>
+  <a class="button button--secondary" href="<%= publicUrl %>" target="_blank">Preview Public Page</a>
   <% } %>
 </section>
 
 <section class="editor-layout">
   <article class="card">
     <% if (error) { %>
-      <p class="form-error"><%= error %></p>
+    <p class="form-error"><%= error %></p>
     <% } %>
 
-    <form
-      action="<%= contentPage ? `/content-pages/${contentPage._id}?_method=PATCH` : '/content-pages' %>"
-      method="POST"
-      class="form-stack"
-    >
+    <form action="<%= contentPage ? `/content-pages/${contentPage._id}?_method=PATCH` : '/content-pages' %>" method="POST" class="form-stack" enctype="multipart/form-data">
+
+      <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
+      <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
 
       <div class="media-upload">
@@ -38,29 +37,24 @@
             Browse Files
           </span>
 
-          <input
-            id="mediaUploadInput"
-            type="file"
-            name="media"
-            accept="image/*,video/*"
-          >
+          <input id="mediaUploadInput" type="file" name="media" accept="image/*,video/*">
         </label>
 
         <% if (contentPage?.mediaUrl) { %>
-          <div class="current-media">
-            <p class="eyebrow">Current Media</p>
+        <div class="current-media">
+          <p class="eyebrow">Current Media</p>
 
-            <% if (contentPage.mediaType?.startsWith("image")) { %>
-              <img src="<%= contentPage.mediaUrl %>" alt="Uploaded media preview">
-            <% } else if (contentPage.mediaType?.startsWith("video")) { %>
-              <video controls src="<%= contentPage.mediaUrl %>"></video>
-            <% } else { %>
-              <a href="<%= contentPage.mediaUrl %>" target="_blank">View uploaded media</a>
-            <% } %>
-          </div>
+          <% if (contentPage.mediaType?.startsWith("image")) { %>
+          <img src="<%= contentPage.mediaUrl %>" alt="Uploaded media preview">
+          <% } else if (contentPage.mediaType?.startsWith("video")) { %>
+          <video controls src="<%= contentPage.mediaUrl %>"></video>
+          <% } else { %>
+          <a href="<%= contentPage.mediaUrl %>" target="_blank">View uploaded media</a>
+          <% } %>
+        </div>
         <% } %>
       </div>
-        
+
 
       <label>
         Description
@@ -79,14 +73,10 @@
 
       <label id="scheduledForLabel">
         Schedule Time (<%= scheduleTimeZoneLabel %>)
-        <input
-          type="datetime-local"
-          name="scheduledFor"
-          id="scheduledFor"
-          value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>"
-        >
+        <input type="datetime-local" name="scheduledFor" id="scheduledFor" value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>">
         <small class="field-hint">
-         NOTE: All scheduled posts use Eastern Time. <!--The server saves this as UTC.-->
+          NOTE: All scheduled posts use Eastern Time.
+          <!--The server saves this as UTC.-->
         </small>
       </label>
 
@@ -94,23 +84,15 @@
         <button class="button" type="submit"><%= contentPage ? "Update Page" : "Publish" %></button>
 
         <% if (contentPage) { %>
-          <button
-            class="button button--danger"
-            type="submit"
-            form="delete-content-form"
-          >
-            Delete
-          </button>
+        <button class="button button--danger" type="submit" form="delete-content-form">
+          Delete
+        </button>
         <% } %>
       </div>
     </form>
 
     <% if (contentPage) { %>
-      <form
-        id="delete-content-form"
-        action="/content-pages/<%= contentPage._id %>?_method=DELETE"
-        method="POST"
-      ></form>
+    <form id="delete-content-form" action="/content-pages/<%= contentPage._id %>?_method=DELETE" method="POST"></form>
     <% } %>
   </article>
 
@@ -121,15 +103,17 @@
 </section>
 
 <script>
-// const inputElement = document.querySelector("textarea[name='body']");
-// const previewDescription = document.querySelector("#previewDescription");
-//   inputElement.addEventListener("change", () => {
-//     previewDescription.textContent = inputElement.value;
-//   });
+  // const inputElement = document.querySelector("textarea[name='body']");
+  // const previewDescription = document.querySelector("#previewDescription");
+  //   inputElement.addEventListener("change", () => {
+  //     previewDescription.textContent = inputElement.value;
+  //   });
 
-//When the media is uploaded, update the label to show the file size and name
+  //When the media is uploaded, update the label to show the file size and name
   const mediaUploadInput = document.querySelector("#mediaUploadInput");
+
   mediaUploadInput.addEventListener("change", () => {
+
     console.log(mediaUploadInput.files);
     const mediaLabel = document.querySelector("#mediaUploadLabel");
     if (mediaUploadInput.files.length > 0) {
@@ -137,39 +121,39 @@
       if (formattedSize > 1000000000) {
         formattedSize = (formattedSize / 1000000000).toFixed(2);
         mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} GB)`);
-      }else if (formattedSize > 1000000) {
+      } else if (formattedSize > 1000000) {
         formattedSize = (formattedSize / 1000000).toFixed(2);
         mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} MB)`);
-      }else if (formattedSize > 1000) {
+      } else if (formattedSize > 1000) {
         formattedSize = (formattedSize / 1000).toFixed(2);
         mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} KB)`);
-      }else {
+      } else {
         mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} bytes)`);
       }
-    } else  mediaLabel.innerText = ("No Media Selected");
+    } else mediaLabel.innerText = ("No Media Selected");
 
   });
 
 
-  const scheduledForInput  = document.querySelector("#scheduledFor");
+  const scheduledForInput = document.querySelector("#scheduledFor");
   const scheduleTimeZoneLabel = document.querySelector("#scheduledForLabel");
   const publishOption = document.querySelector("#publishOption");
-  
-    function updatePublishOption(){
-      if (publishOption.value === "scheduled") {
-          scheduledForInput.disabled = false;
-          scheduleTimeZoneLabel.classList.remove("disabled");
-          } else {
-          scheduledForInput.disabled = true;
-          scheduleTimeZoneLabel.classList.add("disabled");
-          }
-    }
 
-    updatePublishOption();
+  function updatePublishOption() {
+    if (publishOption.value === "scheduled") {
+      scheduledForInput.disabled = false;
+      scheduleTimeZoneLabel.classList.remove("disabled");
+    } else {
+      scheduledForInput.disabled = true;
+      scheduleTimeZoneLabel.classList.add("disabled");
+    }
+  }
+
+  updatePublishOption();
 
   publishOption.addEventListener("change", (event) => {
-     updatePublishOption();
-    });
+    updatePublishOption();
+  });
 </script>
 
 <%- include("../partials/dashboard-shell-end") %>

@@ -1,18 +1,19 @@
 import ContentPage from "../models/ContentPage";
-import createSlug from "../utils/createSlug";
-import generatePublicUrl from "../utils/generatePublicUrl";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
-import { etInputToUtcDate, SCHEDULE_TIME_ZONE} from "../utils/etDateTime";
-
+import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/etDateTime";
+import mongoose from "mongoose";
 
 export class CreatorContentController {
 
   registerRoutes(router: Router) {
+    //For previewing content
     router.get("/new", this.showNewContent);
-    router.post("/", asyncHandler(this.createContent));
+    //For creating/editing content
+    router.post("/", asyncHandler(this.createEditContent));
     router.get("/:id/edit", asyncHandler(this.showEditContent));
-    router.patch("/:id", asyncHandler(this.updateContent));
+    router.patch("/:id", asyncHandler(this.createEditContent));
+    //For deleting content
     router.delete("/:id", asyncHandler(this.deleteContent));
   }
 
@@ -25,45 +26,39 @@ export class CreatorContentController {
     });
   }
 
-  createContent = async (req: Request, res: Response): Promise<void> => {
+  createEditContent = async (req: Request, res: Response): Promise<void> => {
     const {
-      title,
       body,
-      buttonText,
-      externalLink,
-      embedUrl,
-      embedType,
       status,
-      scheduledFor
+      scheduledFor,
+      postID
     } = req.body;
 
-    if (!title || typeof title !== "string") {
-      return res.status(400).render("creator/content-editor", {
-        title: "New Content Page",
-        contentPage: null,
-        publicUrl: null,
-        error: "Title is required."
-      });
-    }
-
     const pageStatus = status || "published";
-
-    const contentPage = await ContentPage.create({
+    const pageData = {
       creatorId: req.user._id,
-      title,
-      slug: createSlug(title),
       body,
-      buttonText,
-      externalLink,
-      embedUrl,
-      embedType: embedType || "none",
+      media: Buffer,
       status: pageStatus,
       scheduledFor: pageStatus === "scheduled" ? etInputToUtcDate(scheduledFor) : null,
       scheduledTimeZone: pageStatus === "scheduled" ? SCHEDULE_TIME_ZONE : undefined,
       publishedAt: pageStatus === "published" ? new Date() : null
-    });
+    };
 
-    res.redirect(`/content-pages/${contentPage._id}/edit`);
+    if (postID == null) { //creating
+
+      let contentPage = await ContentPage.create(pageData);
+      console.log("NEW CONTENT PAGE", contentPage);
+
+      res.redirect(`/content-pages/${contentPage._id}/edit`);
+    } else if (postID && mongoose.Types.ObjectId.isValid(postID)) { //editing
+      
+      //Find one and update it with the fields we have specified, first param is the filter, second is the update, third is options
+      let contentPage = await ContentPage.findByIdAndUpdate(postID, pageData, { new: true });
+      console.log("EDITED CONTENT PAGE", postID,  contentPage);
+
+      res.redirect(`/content-pages/${postID}/edit`);
+    }
   }
 
   showEditContent = async (req: Request, res: Response): Promise<void> => {
@@ -81,54 +76,9 @@ export class CreatorContentController {
     res.render("creator/content-editor", {
       title: "Edit Content Page",
       contentPage,
-      publicUrl:
-        contentPage.status === "published"
-          ? generatePublicUrl(contentPage.slug)
-          : null,
+      publicUrl: null,
       error: null
     });
-  }
-
-  updateContent = async (req: Request, res: Response): Promise<void> => {
-    const {
-      title,
-      body,
-      buttonText,
-      externalLink,
-      embedUrl,
-      embedType,
-      status,
-      scheduledFor
-    } = req.body;
-
-    const updates: Record<string, any> = {
-      title,
-      body,
-      buttonText,
-      externalLink,
-      embedUrl,
-      embedType: embedType || "none",
-      status
-    };
-
-    if (status === "scheduled") {
-      updates.scheduledFor = etInputToUtcDate(scheduledFor);
-      updates.scheduledTimeZone = SCHEDULE_TIME_ZONE;
-      updates.publishedAt = null;
-    }
-
-    if (status === "published") {
-      updates.scheduledFor = null;
-      updates.publishedAt = new Date();
-    }
-
-    await ContentPage.findOneAndUpdate(
-      { _id: req.params.id, creatorId: req.user._id },
-      updates,
-      { runValidators: true }
-    );
-
-    res.redirect(`/content-pages/${req.params.id}/edit`);
   }
 
   deleteContent = async (req: Request, res: Response): Promise<void> => {
