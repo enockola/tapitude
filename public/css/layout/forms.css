@@ -63,6 +63,7 @@ textarea {
 .media-upload {
   display: grid;
   gap: var(--space-md);
+  user-select: none;
 }
 
 .media-dropzone {

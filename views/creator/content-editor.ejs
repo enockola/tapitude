@@ -29,10 +29,9 @@
 
 
       <div class="media-upload">
-        <label class="media-dropzone" for="mediaUpload">
-          <span class="media-dropzone__icon">▧</span>
-
-          <strong>Your Media</strong>
+        <label class="media-dropzone" for="mediaUploadInput">
+          <span class="media-dropzone__icon"><i class="ph ph-upload-simple"></i></span>
+          <strong id="mediaUploadLabel">Your Media</strong>
           <small>Upload your content video and images</small>
 
           <span class="button button--secondary button--small">
@@ -40,7 +39,7 @@
           </span>
 
           <input
-            id="mediaUpload"
+            id="mediaUploadInput"
             type="file"
             name="media"
             accept="image/*,video/*"
@@ -62,20 +61,10 @@
         <% } %>
       </div>
         
-      <label>
-        Title
-        <input
-          type="text"
-          name="title"
-          placeholder="Add a catchy title..."
-          value="<%= contentPage?.title || '' %>"
-          required
-        >
-      </label>
 
       <label>
-        Body
-        <textarea name="body" rows="8" placeholder="Tell your story..."><%= contentPage?.body || '' %></textarea>
+        Description
+        <textarea class="uploadInput" name="body" rows="8" placeholder="Tell your story..."><%= contentPage?.body || '' %></textarea>
       </label>
 
 
@@ -88,11 +77,12 @@
         </select>
       </label>
 
-      <label>
+      <label id="scheduledForLabel">
         Schedule Time (<%= scheduleTimeZoneLabel %>)
         <input
           type="datetime-local"
           name="scheduledFor"
+          id="scheduledFor"
           value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>"
         >
         <small class="field-hint">
@@ -124,28 +114,54 @@
     <% } %>
   </article>
 
-  <aside class="card preview-card">
-    <p class="eyebrow">Public Preview</p>
-    <h2><%= contentPage?.title || "Your title will appear here" %></h2>
-    <p><%= contentPage?.body || "Your content preview will appear here." %></p>
-
-    <% if (contentPage?.externalLink) { %>
-      <a class="button button--full" href="<%= contentPage.externalLink %>" target="_blank">
-        <%= contentPage.buttonText || "Open Link" %>
-      </a>
-    <% } %>
-  </aside>
+  <!-- <aside class="card preview-card">
+    <p class="eyebrow">Preview</p>
+    <p id="previewDescription"></p>
+  </aside> -->
 </section>
 
 <script>
-  const scheduledForLabel  = document.querySelector("#scheduledForLabel");
+// const inputElement = document.querySelector("textarea[name='body']");
+// const previewDescription = document.querySelector("#previewDescription");
+//   inputElement.addEventListener("change", () => {
+//     previewDescription.textContent = inputElement.value;
+//   });
+
+//When the media is uploaded, update the label to show the file size and name
+  const mediaUploadInput = document.querySelector("#mediaUploadInput");
+  mediaUploadInput.addEventListener("change", () => {
+    console.log(mediaUploadInput.files);
+    const mediaLabel = document.querySelector("#mediaUploadLabel");
+    if (mediaUploadInput.files.length > 0) {
+      let formattedSize = mediaUploadInput.files[0].size;
+      if (formattedSize > 1000000000) {
+        formattedSize = (formattedSize / 1000000000).toFixed(2);
+        mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} GB)`);
+      }else if (formattedSize > 1000000) {
+        formattedSize = (formattedSize / 1000000).toFixed(2);
+        mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} MB)`);
+      }else if (formattedSize > 1000) {
+        formattedSize = (formattedSize / 1000).toFixed(2);
+        mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} KB)`);
+      }else {
+        mediaLabel.innerText = (`${mediaUploadInput.files[0].name} (${formattedSize} bytes)`);
+      }
+    } else  mediaLabel.innerText = ("No Media Selected");
+
+  });
+
+
+  const scheduledForInput  = document.querySelector("#scheduledFor");
+  const scheduleTimeZoneLabel = document.querySelector("#scheduledForLabel");
   const publishOption = document.querySelector("#publishOption");
   
     function updatePublishOption(){
       if (publishOption.value === "scheduled") {
-          scheduledForLabel.style.display = "block";
+          scheduledForInput.disabled = false;
+          scheduleTimeZoneLabel.classList.remove("disabled");
           } else {
-          scheduledForLabel.style.display = "none";
+          scheduledForInput.disabled = true;
+          scheduleTimeZoneLabel.classList.add("disabled");
           }
     }
 
