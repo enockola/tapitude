@@ -3,6 +3,8 @@ import fs from 'fs';
 import path from 'path';
 const { randomUUID } = require('crypto');
 import mime from 'mime';
+//A buffer is an entire file in memory, a readable stream is a stream of chunks of data
+import { Readable } from "stream";
 
 //Purely for typescript to do type checking
 export interface IFile extends Document {
@@ -30,14 +32,14 @@ const FileSchema = new Schema<IFile>({
 const FileModel = mongoose.model<IFile>("File", FileSchema);
 
 interface UploadOptions {
-  data: Buffer;
+  data: Readable | Buffer;
   contentType?: string;
   ownerId: string;
   filename: string;
 }
 
 interface UpdateOptions {
-  data?: Buffer;
+  data?: Readable | Buffer;
   contentType?: string;
   ownerId?: string;
   isActive?: boolean;
@@ -81,6 +83,9 @@ class FileService {
 
       // 2. Write the bytes to the local filesystem (Throws an error if it fails)
       await fs.promises.writeFile(fullPath, options.data);
+      //Get the information after the write
+      const stats = await fs.promises.stat(fullPath);
+      const fileSize = stats.size;
       fileCreated = true;
 
       // 3. Save metadata to MongoDB IF successful
@@ -88,14 +93,14 @@ class FileService {
         fileKey: key,
         originalName: options.filename,
         contentType: options.contentType,
-        fileSize: options.data.length,
+        fileSize: fileSize,
         ownerId: options.ownerId,
         createdAt: new Date(),
         isActive: true
       });
       await fileMetadata.save();
 
-      console.log(`File saved: ${key}\ncontentType: ${options.contentType}\nsize: ${options.data.length} bytes`);
+      console.log(`File saved: ${key}\ncontentType: ${options.contentType}\nsize: ${fileSize} bytes`);
       return key; // Return the key to store in your main business logic
 
     } catch (e) {
@@ -165,24 +170,23 @@ class FileService {
     }
     try {
       const fullPath = path.join(this.STORAGE_DIR, key);
-
       const optionalData: Record<string, any> = {}; //Use record to avoid type errors
+      //if we want to change the bytes
+      if (options.data) { //rewrite the bytes
+        await fs.promises.writeFile(fullPath, options.data); //Throws an error if it fails
+        //Get the information after the write
+        const stats = await fs.promises.stat(fullPath);
+        optionalData.fileSize = stats.size; //update the size
+      }
       if (options.ownerId) {
-        optionalData.ownerId = options.ownerId;
+        optionalData.ownerId = options.ownerId; //update the owner
       }
       if (options.isActive !== undefined && options.isActive !== null) { //Important for booleans
-        optionalData.isActive = options.isActive;
-      }
-      if (options.data) {
-        optionalData.fileSize = options.data.length;
+        optionalData.isActive = options.isActive; //update the isActive
       }
       let out = await FileModel.findOneAndUpdate({ fileKey: key }, optionalData, { new: true });//you are instructing Mongoose to return the modified document (the version after the update has been applied) instead of the original version.
       if (!out) {
         throw new Error(`File ${key} not found`);
-      }
-      //if we want to change the bytes
-      if (options.data) {
-        await fs.promises.writeFile(fullPath, options.data);
       }
       return out;
     } catch (e) {

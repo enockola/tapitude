@@ -3,6 +3,7 @@ import connectDB from "./utils/db";
 
 
 const mockData = Buffer.from('hello');
+const mockData2 = Buffer.from('Hello world! Ring a ding ding!, The quick brown fox jumps over the lazy dog.');
 (async () => {
     await connectDB();
 
@@ -21,6 +22,7 @@ const mockData = Buffer.from('hello');
     console.log(meta.toString());
 
     await FileServiceInstance.updateFile(key, {
+        data: mockData2,
         ownerId: 'user456',
         isActive: false
     });

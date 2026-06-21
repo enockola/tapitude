@@ -34,11 +34,26 @@ export class CreatorContentController {
       postID
     } = req.body;
 
+//  const busboy = Busboy({ headers: req.headers });
+
+//   busboy.on("file", (fieldname, file, info) => {
+//     // file is a Readable stream
+//     file.on("data", chunk => {
+//       console.log("received chunk", chunk.length);
+//     });
+
+//     file.on("end", () => {
+//       console.log("upload finished");
+//     });
+//   });
+
+//   req.pipe(busboy);
+
+
     const pageStatus = status || "published";
     const pageData = {
       creatorId: req.user._id,
       body,
-      media: Buffer,
       status: pageStatus,
       scheduledFor: pageStatus === "scheduled" ? etInputToUtcDate(scheduledFor) : null,
       scheduledTimeZone: pageStatus === "scheduled" ? SCHEDULE_TIME_ZONE : undefined,
