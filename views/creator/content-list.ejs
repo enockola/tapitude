@@ -34,7 +34,7 @@
 
 
         <span><%= pageTitle %></span>
-        <label class="badge">
+        <label class="badge <%= page.status === "scheduled" ? "badge--warn" : "" %> ">
           <% if (page.status === "published") { %>Published: <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
           <% } else if (page.status === "scheduled") { %>Scheduled: <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
           <% } else { %>Draft

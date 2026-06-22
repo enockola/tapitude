@@ -78,6 +78,12 @@
   width: fit-content;
 }
 
+.badge--warn {
+  color: rgb(203, 85, 0);
+  border-color: rgb(203, 85, 0);
+  background: rgb(255, 237, 123);
+}
+
 .preview-card {
   position: sticky;
   top: calc(var(--topbar-height) + var(--space-md));
