@@ -62,6 +62,15 @@ class FileService {
     if (mongoose.connection.readyState != 1) {
       throw new Error("Database not connected");
     }
+    if(!options.filename) {
+      throw new Error("Filename required");
+    }
+    if(!options.data) {
+      throw new Error("Data required");
+    }
+    if(!options.ownerId) {
+      throw new Error("Owner ID required");
+    }
     //Generate the key
     const uuid = randomUUID().replace(/-/g, '');
     const extension = path.extname(options.filename);

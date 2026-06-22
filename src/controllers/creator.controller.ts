@@ -86,27 +86,29 @@ export class CreatorController {
   post_uploadMedia = async (req: Request, res: Response): Promise<void> => {
     // Stream the media field from our form as a Readable stream
     console.log("MEDIA UPLOAD POST REQUEST");
-    console.log(req.headers["content-type"]);
-    console.log(req.readableEnded); //Has the stream been read already?
-    console.log(req.complete);
+    // console.log(req.headers["content-type"]);
+    // console.log(req.readableEnded); //Has the stream been read already?
+    // console.log(req.complete);
     const fields: Record<string, string> = {};
+    let uploadPromise: any = null;
 
     const busboy = Busboy({ headers: req.headers });
     busboy.on("file", (fieldname: any, file: any, info: any) => {
-      // console.log("file:", fieldname, file, info);
-      const uploadPromise = FileServiceInstance.uploadFile({
+      console.log("file:", fieldname, info);
+
+      if (!info.filename) { //If the file doesn't have a name, ignore it
+        file.resume(); //Ignore the file
+        return;
+      }
+
+      uploadPromise = FileServiceInstance.uploadFile({
         data: file,
-        ownerId: 'user123',
+        ownerId: req.user._id,
         contentType: info.mimeType,
         filename: info.filename
       });
 
-      // file.on("data", (chunk) => {
-      //   console.log("received chunk", chunk.length);
-      // });
-
       file.on("end", async () => {
-        const fileKey = await uploadPromise;
         console.log("upload finished");
       });
     });
@@ -114,10 +116,30 @@ export class CreatorController {
       console.log("field:", name, value);
       fields[name] = value;
     });
-    busboy.on("finish", () => {
+    busboy.on("finish", async () => {
       console.log("request finished ", fields);
-      const postID = fields.postID;
-      res.redirect(`/creator/pages/${postID}/editor`);
+      let content;
+      if (uploadPromise) {
+        //Upload the file
+        content = {
+          fileKey: await uploadPromise
+        };
+      } else {
+        //Delete the file
+        content = {
+          fileKey: null
+        };
+        let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, { new: true });
+        //If the content page already has a file, delete it
+        if(contentPage?.fileKey) {
+          await FileServiceInstance.deleteFile(contentPage.fileKey);
+        }
+      }
+
+      //Update the database with the file key
+      let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, content, { new: true });
+      console.log("\nUPDATED CONTENT PAGE", fields.postID, contentPage);
+      res.redirect(`/creator/pages/${fields.postID}/editor`);
     });
     busboy.on("error", (err: any) => {
       console.error("Busboy error:", err);
@@ -127,7 +149,7 @@ export class CreatorController {
   }
 
   post_createEditContent = async (req: Request, res: Response): Promise<void> => {
-    const {postID, body, status, scheduledFor} = req.body;
+    const { postID, body, status, scheduledFor } = req.body;
     const pageStatus = status || "published";
 
     const pageData = {
