@@ -9,10 +9,6 @@
     <h1><%= contentPage ? "Edit Post" : "New Post" %></h1>
     <p>Create a simple public page for consumers to view from an NFC chip.</p>
   </div>
-
-  <% if (publicUrl) { %>
-  <a class="button button--secondary" href="<%= publicUrl %>" target="_blank">Preview Public Page</a>
-  <% } %>
 </section>
 
 <section class="editor-layout">
@@ -22,25 +18,28 @@
     <% } %>
 
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
-    <form action="<%= contentPage ? `/creator/pages/${contentPage._id}/update` : '/creator/pages/create' %>" method="POST" class="form-stack" id="contentForm">
+    <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
 
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
-
       <div class="media-upload">
         <label class="media-dropzone" for="mediaUploadInput">
           <span class="media-dropzone__icon"><i class="ph ph-upload-simple"></i></span>
-          <strong id="mediaUploadLabel">Your Media</strong>
-          <small>Upload your content video and images</small>
+          <strong id="mediaUploadLabel"><%= fileMetadata ? fileMetadata.originalName : "Your Media" %></strong>
+          <small id="mediaUploadHint"><%= fileMetadata ? "File Size: " + fileMetadata.fileSize +" bytes" : "Upload your content video and images" %></small>
 
           <span class="button button--secondary button--small">
             Browse Files
           </span>
 
-          <input id="mediaUploadInput" type="file" accept="image/*,video/*">
+          <input id="mediaUploadInput" type="file" name="media" accept="image/*,video/*">
         </label>
 
+        <div class="progress-container">
+          <span class="progress-text" id="upload-progress-text">0% Uploaded</span>
+          <div class="progress-fill" id="upload-progress-fill"></div>
+        </div>
         <% if (contentPage?.mediaUrl) { %>
         <div class="current-media">
           <p class="eyebrow">Current Media</p>
@@ -54,8 +53,21 @@
           <% } %>
         </div>
         <% } %>
-      </div>
+        <div>
 
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="button" type="submit"> <i class="ph ph-upload-simple"></i> Upload Media</button>
+        <button class="button button--danger" type="submit"> <i class="ph ph-trash"></i> Delete Media</button>
+      </div>
+    </form>
+
+    <div class="divider"></div>
+
+    <form action="<%= contentPage ? `/creator/pages/${contentPage._id}/update` : '/creator/pages/create' %>" method="POST" class="form-stack" id="contentForm">
+      <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
+      <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
       <label>
         Description
@@ -86,7 +98,7 @@
 
         <% if (contentPage) { %>
         <button class="button button--danger" type="submit" form="delete-content-form">
-          Delete
+          <i class="ph ph-trash"></i> Delete
         </button>
         <% } %>
       </div>
@@ -105,26 +117,13 @@
 
 <script>
   const form = document.getElementById("contentForm");
+  const mediaForm = document.getElementById("mediaForm");
   const fileInput = document.getElementById("mediaUploadInput");
-  
 
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const formData = new FormData(form);
-    formData.append("media", fileInput.files[0]);
-
-    console.log("FORM SUBMIT:");
-    console.log("FILE:", fileInput.files[0]);
-    for (let [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
-
-    const res = await fetch(form.action, {
-      method: "POST",
-      body: formData
-    });
-   
-  });
+  // mediaForm.addEventListener("submit", async (e) => {
+  //   e.preventDefault();
+  //   console.log("Form submitted");
+  // });
 
   // const inputElement = document.querySelector("textarea[name='body']");
   // const previewDescription = document.querySelector("#previewDescription");
@@ -135,24 +134,39 @@
   //When the media is uploaded, update the label to show the file size and name
   fileInput.addEventListener("change", () => {
     console.log(fileInput.files);
+    if (fileInput.files.length === 0) {
+      updateMediaLabel(null, null);
+      return;
+    }
+    const fileName = fileInput.files[0].name;
+    const fileSize = fileInput.files[0].size;
+    updateMediaLabel(fileName, fileSize);
+  });
+
+  function updateMediaLabel(fileName, fileSize) {
     const mediaLabel = document.querySelector("#mediaUploadLabel");
-    if (fileInput.files.length > 0) {
-      let formattedSize = fileInput.files[0].size;
+    const mediaHint = document.querySelector("#mediaUploadHint");
+    if (fileName && fileSize) {
+      let formattedSize = fileSize;
       if (formattedSize > 1000000000) {
         formattedSize = (formattedSize / 1000000000).toFixed(2);
-        mediaLabel.innerText = (`${fileInput.files[0].name} (${formattedSize} GB)`);
+        formattedSize = (`${formattedSize} GB`);
       } else if (formattedSize > 1000000) {
         formattedSize = (formattedSize / 1000000).toFixed(2);
-        mediaLabel.innerText = (`${fileInput.files[0].name} (${formattedSize} MB)`);
+        formattedSize = (`${formattedSize} MB`);
       } else if (formattedSize > 1000) {
         formattedSize = (formattedSize / 1000).toFixed(2);
-        mediaLabel.innerText = (`${fileInput.files[0].name} (${formattedSize} KB)`);
+        formattedSize = (`${formattedSize} KB`);
       } else {
-        mediaLabel.innerText = (`${fileInput.files[0].name} (${formattedSize} bytes)`);
+        formattedSize = (`${formattedSize} bytes`);
       }
-    } else mediaLabel.innerText = ("No Media Selected");
-
-  });
+      mediaLabel.innerText = (`${fileName}`);
+      mediaHint.innerText = (`File Size: ${formattedSize}`);
+    } else {
+      mediaLabel.innerText = ("No Media Selected");
+      mediaHint.innerText = (`Upload your content video and images`);
+    }
+  }
 
 
   const scheduledForInput = document.querySelector("#scheduledFor");

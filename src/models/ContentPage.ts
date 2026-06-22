@@ -3,7 +3,7 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 // Type for typechecking
 export interface IContentPage extends Document {
   creatorId: mongoose.Types.ObjectId;
-  themeId?: mongoose.Types.ObjectId;
+  fileKey?: string;
   body?: string;
   status: "draft" | "scheduled" | "published";
   scheduledFor?: Date;
@@ -22,10 +22,7 @@ const contentPageSchema = new Schema<IContentPage>(
       required: true,
       index: true
     },
-    themeId: {
-      type: Schema.Types.ObjectId,
-      ref: "Theme"
-    },
+    fileKey: { type: String, trim: true },
     body: { type: String, trim: true },
     status: {
       type: String,

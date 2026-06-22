@@ -7,11 +7,7 @@ import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
 
-const MEDIA_FILE_FORM_FIELD_NAME = "media";
-
 export class CreatorController {
-
-
   registerRoutes(router: Router) {
     router.get("/dashboard", asyncHandler(this.dashboard));
     router.get("/content", asyncHandler(this.contentList));
@@ -23,10 +19,11 @@ export class CreatorController {
     //For creating/editing/deleting content
     router.post("/pages/create", asyncHandler(this.post_createEditContent));
     router.post("/pages/:id/update", asyncHandler(this.post_createEditContent));
+    router.post("/pages/upload", asyncHandler(this.post_uploadMedia));
     router.delete("/pages/:id/delete", asyncHandler(this.deleteContent));
 
     //Page editor
-    router.get("/pages/:id/editor", asyncHandler(this.showEditContent));
+    router.get("/pages/:id/editor", asyncHandler(this.get_showEditContent));
   }
 
   dashboard = async (req: Request, res: Response): Promise<void> => {
@@ -85,28 +82,30 @@ export class CreatorController {
     });
   }
 
-  post_createEditContent = async (req: Request, res: Response): Promise<void> => {
+
+  post_uploadMedia = async (req: Request, res: Response): Promise<void> => {
     // Stream the media field from our form as a Readable stream
-    // console.log(req.headers["content-type"]);
-    // console.log(req.readableEnded); //Has the stream been read already?
-    // console.log(req.complete);
+    console.log("MEDIA UPLOAD POST REQUEST");
+    console.log(req.headers["content-type"]);
+    console.log(req.readableEnded); //Has the stream been read already?
+    console.log(req.complete);
     const fields: Record<string, string> = {};
 
     const busboy = Busboy({ headers: req.headers });
     busboy.on("file", (fieldname: any, file: any, info: any) => {
       // console.log("file:", fieldname, file, info);
       const uploadPromise = FileServiceInstance.uploadFile({
-              data: file,
-              ownerId: 'user123',
-              contentType: info.mimeType,
-              filename: info.filename
-          });
+        data: file,
+        ownerId: 'user123',
+        contentType: info.mimeType,
+        filename: info.filename
+      });
 
       // file.on("data", (chunk) => {
       //   console.log("received chunk", chunk.length);
       // });
 
-      file.on("end", async () => {   
+      file.on("end", async () => {
         const fileKey = await uploadPromise;
         console.log("upload finished");
       });
@@ -116,18 +115,20 @@ export class CreatorController {
       fields[name] = value;
     });
     busboy.on("finish", () => {
-      console.log("request finished ",fields);
+      console.log("request finished ", fields);
+      const postID = fields.postID;
+      res.redirect(`/creator/pages/${postID}/editor`);
     });
     busboy.on("error", (err: any) => {
       console.error("Busboy error:", err);
     });
     req.pipe(busboy);
 
+  }
 
-    const postID = fields.postID;
-    const body = fields.body;
-    const pageStatus = fields.status || "published";
-    const scheduledFor = fields.scheduledFor;
+  post_createEditContent = async (req: Request, res: Response): Promise<void> => {
+    const {postID, body, status, scheduledFor} = req.body;
+    const pageStatus = status || "published";
 
     const pageData = {
       creatorId: req.user._id,
@@ -142,30 +143,37 @@ export class CreatorController {
       //Find one and update it with the fields we have specified, first param is the filter, second is the update, third is options
       let contentPage = await ContentPage.findByIdAndUpdate(postID, pageData, { new: true });
       console.log("\nEDITED CONTENT PAGE", postID, contentPage);
-      // res.redirect(`/creator/pages/${postID}/editor`);
+      res.redirect(`/creator/pages/${postID}/editor`);
     } else { //creating
       let contentPage = await ContentPage.create(pageData);
       console.log("\nNEW CONTENT PAGE", contentPage);
-      // res.redirect(`/creator/content`);
+      res.redirect(`/creator/content`);
     }
   }
 
-  showEditContent = async (req: Request, res: Response): Promise<void> => {
-    const contentPage = await ContentPage.findOne({
-      _id: req.params.id,
-      creatorId: req.user._id
-    });
+  get_showEditContent = async (req: Request, res: Response): Promise<void> => {
+    let contentPage = null;
 
+    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) { //Get the ID parameter from the URL
+      contentPage = await ContentPage.findOne({
+        _id: req.params.id,
+        creatorId: req.user._id
+      });
+    }
     if (!contentPage) {
       return res.status(404).render("errors/404", {
         title: "Content page not found"
       });
     }
 
+    let fileMetadata = null;
+    if (contentPage.fileKey) {
+      fileMetadata = await FileServiceInstance.getFileMetadata(contentPage.fileKey);
+    }
     res.render("creator/content-editor", {
       title: "Edit Content Page",
       contentPage,
-      publicUrl: null,
+      fileMetadata: fileMetadata,
       error: null
     });
   }
