@@ -75,6 +75,7 @@
   padding: 0.25rem 0.6rem;
   font-size: 0.8rem;
   font-weight: 700;
+  width: fit-content;
 }
 
 .preview-card {
@@ -84,7 +85,7 @@
 
 .content-summary {
   display: grid;
-  gap: 0.25rem;
+  gap: 1rem;
 }
 
 .content-summary a {

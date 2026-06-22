@@ -18,7 +18,7 @@
     <p class="form-error"><%= error %></p>
     <% } %>
 
-  
+
 
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
@@ -106,7 +106,7 @@
         <button class="button" type="submit"><%= contentPage ? "Update Page" : "Publish" %></button>
 
         <% if (contentPage) { %>
-        <button class="button button--danger" type="submit" form="delete-content-form">
+        <button class="button button--danger" type="button" id="delete-content-btn">
           <i class="ph ph-trash"></i> Delete
         </button>
         <% } %>
@@ -114,37 +114,47 @@
     </form>
 
     <% if (contentPage) { %>
-    <form id="delete-content-form" action="/content-pages/<%= contentPage._id %>?_method=DELETE" method="POST"></form>
+    <form id="delete-content-form" action="<%= `/creator/pages/${contentPage._id}/delete` %>" method="POST"></form>
     <% } %>
   </article>
 
-<aside class="card preview-card">
+  <aside class="card preview-card">
     <p class="eyebrow">Preview</p>
-     <button class="button">  <i class="ph ph-eye"></i> Preview Page</button>
-  </aside> 
+    <button class="button"> <i class="ph ph-eye"></i> Preview Page</button>
+  </aside>
 </section>
 
 <script>
   const form = document.getElementById("contentForm");
   const mediaForm = document.getElementById("mediaForm");
+  const deleteForm = document.getElementById("delete-content-form");
+
   const fileInput = document.getElementById("mediaUploadInput");
   const mediaDropzone = document.getElementById("mediaUploadDropzone");
   const mediaLabel = document.querySelector("#mediaUploadLabel");
   const mediaHint = document.querySelector("#mediaUploadHint");
   const mediaInput = document.querySelector("#mediaUploadInput");
-  const deleteBtn = document.getElementById("deleteAttatchmentBtn");
+
   const uploadBtn = document.getElementById("uploadAttatchmentBtn");
+  const deleteMediaBtn = document.getElementById("deleteAttatchmentBtn");
+  const deletePostBtn = document.getElementById("delete-content-btn");
+
   const uploadProgressContainer = document.getElementById("upload-progress-container");
   const uploadProgressText = document.getElementById("upload-progress-text");
   const uploadProgressFill = document.getElementById("upload-progress-fill");
 
-  deleteBtn.addEventListener("click", () => {
+  deleteMediaBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to delete this media? This action cannot be undone!") === true) {
-      console.log("Deleting media");
       mediaInput.value = "";
       uploadProgressContainer.style.display = "none";
       submitMediaForm();
       updateMediaLabel(null, null);
+    }
+  });
+
+  deletePostBtn.addEventListener("click", () => {
+    if (confirm("Are you sure you want to delete this post? This action cannot be undone!") === true) {
+      deleteForm.submit();
     }
   });
 

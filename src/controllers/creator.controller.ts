@@ -20,13 +20,23 @@ export class CreatorController {
     router.post("/pages/create", asyncHandler(this.post_createEditContent));
     router.post("/pages/:id/update", asyncHandler(this.post_createEditContent));
     router.post("/pages/upload", asyncHandler(this.post_uploadMedia));
-    router.delete("/pages/:id/delete", asyncHandler(this.deleteContent));
+    router.post("/pages/:id/delete", asyncHandler(this.post_deleteContent));
 
     //Page editor
     router.get("/pages/:id/editor", asyncHandler(this.get_showEditContent));
 
     router.get("/profile", asyncHandler(this.get_profile));
     router.post("/profile/update", asyncHandler(this.post_updateProfile));
+  }
+
+
+  post_deleteContent = async (req: Request, res: Response): Promise<void> => {
+    console.log("\nDELETING CONTENT PAGE", req.params.id);
+    await ContentPage.findOneAndDelete({
+      _id: req.params.id,
+      creatorId: req.user._id
+    });
+    res.redirect(`/creator/content`);
   }
 
   dashboard = async (req: Request, res: Response): Promise<void> => {
@@ -98,7 +108,7 @@ export class CreatorController {
       brandColor, bio } = req.body;
 
     let updatedDate = new Date();
-    let content:any = {
+    let content: any = {
       displayName,
       brandName,
       brandColor,
@@ -106,7 +116,7 @@ export class CreatorController {
       updatedAt: updatedDate
     };
 
-    if(logo){
+    if (logo) {
       content.profileImageKey = logo;
     }
 
@@ -115,7 +125,7 @@ export class CreatorController {
       return res.status(404).render("errors/404", {
         title: "Profile not found"
       });
-    }else{
+    } else {
       console.log(profile);
       res.redirect("/creator/profile");
     }
@@ -240,15 +250,6 @@ export class CreatorController {
     });
   }
 
-  deleteContent = async (req: Request, res: Response): Promise<void> => {
-
-    await ContentPage.findOneAndDelete({
-      _id: req.params.id,
-      creatorId: req.user._id
-    });
-
-    res.redirect("/creator/content");
-  }
 
 }
 export default new CreatorController();

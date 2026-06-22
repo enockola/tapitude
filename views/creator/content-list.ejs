@@ -15,25 +15,38 @@
   <% } else { %>
   <div class="table-list">
     <% contentPages.forEach((page) => { 
-        const pageTitle = "Page "+page._id; 
+        let pageTitle = ""; 
+        let updatedAt = "";
+
+        if (page.body) {
+          pageTitle =
+            "\""+(page.body.length > 50
+              ? page.body.slice(0, 50) + "..."
+              : page.body)+"\"";
+        } 
+         if(page.fileKey) {
+          pageTitle += " (1 attachment)";
+        }
         %>
     <article class="table-row">
       <div class="content-summary">
-        <strong><%= pageTitle %></strong>
+        <label>Updated: <%= page.updatedAt ? formatEtDateTime(page.updatedAt) : "No date" %></label>
 
-        <!-- Page status  -->
 
-        <small class="badge">
+        <span><%= pageTitle %></span>
+        <label class="badge">
           <% if (page.status === "published") { %>Published: <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
           <% } else if (page.status === "scheduled") { %>Scheduled: <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
           <% } else { %>Draft
           <% } %>
-        </small>
+        </label>
+
+
       </div>
 
       <div class="row-actions">
         <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
-          Edit
+          <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
         </a>
       </div>
     </article>
