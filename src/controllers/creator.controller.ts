@@ -11,7 +11,7 @@ export class CreatorController {
   registerRoutes(router: Router) {
     router.get("/dashboard", asyncHandler(this.dashboard));
     router.get("/content", asyncHandler(this.contentList));
-    router.get("/profile", asyncHandler(this.profile));
+
 
     //For previewing content
     router.get("/pages/preview", this.showNewContent);
@@ -24,6 +24,9 @@ export class CreatorController {
 
     //Page editor
     router.get("/pages/:id/editor", asyncHandler(this.get_showEditContent));
+
+    router.get("/profile", asyncHandler(this.get_profile));
+    router.post("/profile/update", asyncHandler(this.post_updateProfile));
   }
 
   dashboard = async (req: Request, res: Response): Promise<void> => {
@@ -63,14 +66,6 @@ export class CreatorController {
     });
   }
 
-  profile = async (req: Request, res: Response): Promise<void> => {
-    const profile = await CreatorProfile.findOne({ userId: req.user._id });
-
-    res.render("creator/profile", {
-      title: "Profile",
-      profile
-    });
-  }
 
 
   showNewContent = async (req: Request, res: Response): Promise<void> => {
@@ -82,6 +77,49 @@ export class CreatorController {
     });
   }
 
+
+  get_profile = async (req: Request, res: Response): Promise<void> => {
+    const profile = await CreatorProfile.findOne({ userId: req.user._id });
+    if (!profile) {
+      return res.status(404).render("errors/404", {
+        title: "Profile not found"
+      });
+    }
+
+    res.render("creator/profile", {
+      title: "Profile",
+      profile
+    });
+  }
+
+  post_updateProfile = async (req: Request, res: Response): Promise<void> => {
+    const { displayName, brandName,
+      logo, clearLogo,
+      brandColor, bio } = req.body;
+
+    let updatedDate = new Date();
+    let content:any = {
+      displayName,
+      brandName,
+      brandColor,
+      bio,
+      updatedAt: updatedDate
+    };
+
+    if(logo){
+      content.profileImageKey = logo;
+    }
+
+    const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
+    if (!profile) {
+      return res.status(404).render("errors/404", {
+        title: "Profile not found"
+      });
+    }else{
+      console.log(profile);
+      res.redirect("/creator/profile");
+    }
+  }
 
   post_uploadMedia = async (req: Request, res: Response): Promise<void> => {
     // Stream the media field from our form as a Readable stream
@@ -134,7 +172,7 @@ export class CreatorController {
       //If the content page already has a file, delete it
       let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, { new: true });
       //If the content page already has a file, delete it
-      if(contentPage?.fileKey) {
+      if (contentPage?.fileKey) {
         await FileServiceInstance.deleteFile(contentPage.fileKey);
       }
 

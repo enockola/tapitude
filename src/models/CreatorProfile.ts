@@ -4,8 +4,9 @@ export interface ICreatorProfile {
   userId: mongoose.Types.ObjectId;
   displayName: string;
   brandName?: string; 
-  bio?: string;       
-  profileImageUrl?: string; 
+  brandColor?: string;
+  bio?: string;
+  profileImageKey?: string; 
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -27,11 +28,15 @@ const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
       type: String,
       trim: true
     },
+    brandColor: {
+      type: String,
+      trim: true
+    },
     bio: {
       type: String,
       trim: true
     },
-    profileImageUrl: {
+    profileImageKey: {
       type: String,
       trim: true
     }

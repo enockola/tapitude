@@ -101,6 +101,12 @@ dialog[open] {
   transform: translateY(0);
 }
 
+input[type="color"] {
+  min-height:45px;
+  padding: 5px !important;
+  display:inline-block;
+}
+
 @starting-style {
   dialog[open] {
     opacity: 0;

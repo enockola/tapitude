@@ -9,9 +9,50 @@
 </section>
 
 <section class="card">
-  <p><strong>Display Name:</strong> <%= profile?.displayName || currentUser.name %></p>
-  <p><strong>Brand Name:</strong> <%= profile?.brandName || "Not set yet" %></p>
-  <p><strong>Bio:</strong> <%= profile?.bio || "Not set yet" %></p>
+  <form class="form-stack" method="post" action="/creator/profile/update">
+
+    <label>Display Name:
+      <input type="text" name="displayName" value="<%= profile?.displayName || currentUser.name %>" />
+    </label>
+
+    <label>Brand Name:
+      <input type="text" name="brandName" value="<%= profile?.brandName || "Not set yet" %>" />
+    </label>
+
+    <label>Logo</label>
+    <label class="media-dropzone" for="mediaUploadInput" id="mediaUploadDropzone">
+
+      <span class="media-dropzone__icon">
+        <i class="ph ph-file-image"></i>
+      </span>
+      <strong id="mediaUploadLabel">Logo</strong>
+      <small id="mediaUploadHint">Upload a logo for your brand</small>
+
+      <span class="button button--secondary button--small">
+        Browse Files
+      </span>
+
+      <input id="mediaUploadInput" type="file" name="logo" accept="image/*">
+      <!-- We need to determine if the user wants to clear the logo or if they just arent uploading a new one -->
+      <input type="hidden" name="clearLogo" value="false">
+    </label>
+
+    <div>
+      <label>Brand Color:</label>
+      <input type="color" name="brandColor" value="<%= profile?.brandColor || "#000" %>" />
+    </div>
+
+
+    <label>Bio:
+      <textarea name="bio"><%= profile?.bio || "Not set yet" %></textarea>
+    </label>
+
+    <div class="form-actions">
+      <button class="button" type="submit" id="uploadAttatchmentBtn"> <i class="ph ph-pencil"></i> Update</button>
+    </div>
+
+  </form>
+
 </section>
 
 <%- include("../partials/dashboard-shell-end") %>
