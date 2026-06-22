@@ -129,15 +129,17 @@ export class CreatorController {
         content = {
           fileKey: null
         };
-        let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, { new: true });
-        //If the content page already has a file, delete it
-        if(contentPage?.fileKey) {
-          await FileServiceInstance.deleteFile(contentPage.fileKey);
-        }
+      }
+
+      //If the content page already has a file, delete it
+      let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, { new: true });
+      //If the content page already has a file, delete it
+      if(contentPage?.fileKey) {
+        await FileServiceInstance.deleteFile(contentPage.fileKey);
       }
 
       //Update the database with the file key
-      let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, content, { new: true });
+      contentPage = await ContentPage.findByIdAndUpdate(fields.postID, content, { new: true });
       console.log("\nUPDATED CONTENT PAGE", fields.postID, contentPage);
       res.redirect(`/creator/pages/${fields.postID}/editor`);
     });
