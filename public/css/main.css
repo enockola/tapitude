@@ -1,3 +1,5 @@
+
+
 @layer reset, tokens, base, layout, components, utilities;
 
 @import url("./base/reset.css") layer(reset);
@@ -14,3 +16,6 @@
 @import url("./components/nav.css") layer(components);
 @import url("./components/sidebar.css") layer(components);
 @import url("./utilities/utilities.css") layer(utilities);
+body{
+    overflow-x: hidden;
+}

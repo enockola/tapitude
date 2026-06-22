@@ -18,6 +18,8 @@
     <p class="form-error"><%= error %></p>
     <% } %>
 
+  
+
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
 
@@ -116,10 +118,10 @@
     <% } %>
   </article>
 
-  <!-- <aside class="card preview-card">
+<aside class="card preview-card">
     <p class="eyebrow">Preview</p>
-    <p id="previewDescription"></p>
-  </aside> -->
+     <button class="button">  <i class="ph ph-eye"></i> Preview Page</button>
+  </aside> 
 </section>
 
 <script>
