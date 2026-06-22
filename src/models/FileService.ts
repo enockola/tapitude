@@ -219,9 +219,9 @@ class FileService {
 
       const result = await FileModel.deleteOne({ fileKey: key });
       if (result.deletedCount === 0) {
-        console.warn(`File deleted from disk, but no metadata found in DB for key: ${key}`);
+        console.warn(`File deleted from disk, but no metadata found for key: ${key}`);
       } else {
-        console.log(`Deleted from MongoDB for key: ${key}`);
+        console.log(`Deleted file (key: ${key})`);
       }
     } catch (e) {
       console.error(e);
