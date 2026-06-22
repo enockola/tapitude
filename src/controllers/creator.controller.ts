@@ -5,7 +5,7 @@ import asyncHandler from "../utils/asyncHandler";
 import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/etDateTime";
 import mongoose from "mongoose";
 import Busboy from "busboy";
-import multer from "multer";
+import { FileServiceInstance } from '../models/FileService';
 
 const MEDIA_FILE_FORM_FIELD_NAME = "media";
 
@@ -21,9 +21,8 @@ export class CreatorController {
     router.get("/pages/preview", this.showNewContent);
 
     //For creating/editing/deleting content
-    const upload = multer({ storage: multer.memoryStorage() }); //This is needed for express to understand the multipart form
-    router.post("/pages/create", upload.single(MEDIA_FILE_FORM_FIELD_NAME), asyncHandler(this.post_createEditContent));
-    router.post("/pages/:id/update", upload.single(MEDIA_FILE_FORM_FIELD_NAME), asyncHandler(this.post_createEditContent));
+    router.post("/pages/create", asyncHandler(this.post_createEditContent));
+    router.post("/pages/:id/update", asyncHandler(this.post_createEditContent));
     router.delete("/pages/:id/delete", asyncHandler(this.deleteContent));
 
     //Page editor
@@ -87,42 +86,49 @@ export class CreatorController {
   }
 
   post_createEditContent = async (req: Request, res: Response): Promise<void> => {
-    const {
-      body,
-      status,
-      scheduledFor,
-      postID
-    } = req.body;
-    // console.log(req.headers["content-type"]);
-    // console.log("UPDATE PAGE ", req.body);
-
-    //TODO: Figure out why this doesn't work
     // Stream the media field from our form as a Readable stream
-    const busboy = Busboy({ headers: req.headers });
-    busboy.on("file", (fieldname:any, file:any, info:any) => {
-      console.log("file:", fieldname, file, info);
-      file.on("data", (chunk) => {
-        console.log("received chunk", chunk.length);
-      });
+    // console.log(req.headers["content-type"]);
+    // console.log(req.readableEnded); //Has the stream been read already?
+    // console.log(req.complete);
+    const fields: Record<string, string> = {};
 
-      file.on("end", () => {
+    const busboy = Busboy({ headers: req.headers });
+    busboy.on("file", (fieldname: any, file: any, info: any) => {
+      // console.log("file:", fieldname, file, info);
+      const uploadPromise = FileServiceInstance.uploadFile({
+              data: file,
+              ownerId: 'user123',
+              contentType: info.mimeType,
+              filename: info.filename
+          });
+
+      // file.on("data", (chunk) => {
+      //   console.log("received chunk", chunk.length);
+      // });
+
+      file.on("end", async () => {   
+        const fileKey = await uploadPromise;
         console.log("upload finished");
       });
     });
-    busboy.on("field", (name:any, value:any) => {
+    busboy.on("field", (name: any, value: any) => {
       console.log("field:", name, value);
+      fields[name] = value;
     });
     busboy.on("finish", () => {
-      console.log("ALL DONE");
+      console.log("request finished ",fields);
     });
-    busboy.on("error", (err:any) => {
+    busboy.on("error", (err: any) => {
       console.error("Busboy error:", err);
     });
     req.pipe(busboy);
 
 
+    const postID = fields.postID;
+    const body = fields.body;
+    const pageStatus = fields.status || "published";
+    const scheduledFor = fields.scheduledFor;
 
-    const pageStatus = status || "published";
     const pageData = {
       creatorId: req.user._id,
       body,
@@ -135,12 +141,12 @@ export class CreatorController {
     if (postID && mongoose.Types.ObjectId.isValid(postID)) { //editing
       //Find one and update it with the fields we have specified, first param is the filter, second is the update, third is options
       let contentPage = await ContentPage.findByIdAndUpdate(postID, pageData, { new: true });
-      console.log("EDITED CONTENT PAGE", postID, contentPage);
-      res.redirect(`/creator/pages/${postID}/editor`);
+      console.log("\nEDITED CONTENT PAGE", postID, contentPage);
+      // res.redirect(`/creator/pages/${postID}/editor`);
     } else { //creating
       let contentPage = await ContentPage.create(pageData);
-      console.log("NEW CONTENT PAGE", contentPage);
-      res.redirect(`/creator/content`);
+      console.log("\nNEW CONTENT PAGE", contentPage);
+      // res.redirect(`/creator/content`);
     }
   }
 
