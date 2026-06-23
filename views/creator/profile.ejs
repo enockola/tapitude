@@ -20,22 +20,12 @@
     </label>
 
     <label>Logo</label>
-    <label class="media-dropzone" for="mediaUploadInput" id="mediaUploadDropzone">
-
-      <span class="media-dropzone__icon">
-        <i class="ph ph-file-image"></i>
-      </span>
-      <strong id="mediaUploadLabel">Logo</strong>
-      <small id="mediaUploadHint">Upload a logo for your brand</small>
-
-      <span class="button button--secondary button--small">
-        Browse Files
-      </span>
-
-      <input id="mediaUploadInput" type="file" name="logo" accept="image/*">
-      <!-- We need to determine if the user wants to clear the logo or if they just arent uploading a new one -->
-      <input type="hidden" name="clearLogo" value="false">
-    </label>
+    <%- include("./partial_file_upload", {
+          title: "Upload Logo",
+          description: "Upload your brand logo",
+          maxSizeBytes: 10,
+          accept: "image/*"
+        }) %>
 
     <div>
       <label>Brand Color:</label>

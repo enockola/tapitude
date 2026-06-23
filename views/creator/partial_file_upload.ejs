@@ -27,6 +27,10 @@
     const uploadProgressText = document.getElementById("upload-progress-text");
     const uploadProgressFill = document.getElementById("upload-progress-fill");
     const fileInput = document.getElementById("mediaUploadInput");
+    const mediaLabel = document.querySelector("#mediaUploadLabel");
+    const mediaHint = document.querySelector("#mediaUploadHint");
+    const mediaInput = document.querySelector("#mediaUploadInput");
+    const mediaDropzone = document.getElementById("mediaUploadDropzone");
 
     fileInput.addEventListener("change", () => {
       console.log(fileInput.files);
