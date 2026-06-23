@@ -1,7 +1,7 @@
 <%- include("../partials/dashboard-shell-start", { title }) %>
 <script>
-  console.log("contentPage:", <%- JSON.stringify(contentPage) %>);
   const fileMetadata = <%- JSON.stringify(fileMetadata) %>;
+  const isNewPage = <%- contentPage ? "false" : "true" %>;
 </script>
 
 <section class="content-header">
@@ -90,6 +90,7 @@
           <% const currentStatus = contentPage?.status || "published"; %>
           <option value="published" <%= currentStatus === "published" ? "selected" : "" %>>Publish now</option>
           <option value="scheduled" <%= currentStatus === "scheduled" ? "selected" : "" %>>Schedule for later</option>
+          <option value="draft" <%= currentStatus === "draft" ? "selected" : "" %>>Save as draft</option>
         </select>
       </label>
 
@@ -103,10 +104,10 @@
       </label>
 
       <div class="form-actions">
-        <button class="button" type="submit"><%= contentPage ? "Update Page" : "Publish" %></button>
+        <button class="button" type="submit" id="save-content-btn">Publish</button>
 
         <% if (contentPage) { %>
-        <button class="button button--danger" type="button" id="delete-content-btn">
+        <button class="button button--danger" type="button" id="delete-content-btn" onclick="deletePost()">
           <i class="ph ph-trash"></i> Delete
         </button>
         <% } %>
@@ -134,10 +135,10 @@
   const mediaLabel = document.querySelector("#mediaUploadLabel");
   const mediaHint = document.querySelector("#mediaUploadHint");
   const mediaInput = document.querySelector("#mediaUploadInput");
+  const saveContentBtn = document.querySelector("#save-content-btn");
 
   const uploadBtn = document.getElementById("uploadAttatchmentBtn");
   const deleteMediaBtn = document.getElementById("deleteAttatchmentBtn");
-  const deletePostBtn = document.getElementById("delete-content-btn");
 
   const uploadProgressContainer = document.getElementById("upload-progress-container");
   const uploadProgressText = document.getElementById("upload-progress-text");
@@ -152,11 +153,11 @@
     }
   });
 
-  deletePostBtn.addEventListener("click", () => {
+  function deletePost() {
     if (confirm("Are you sure you want to delete this post? This action cannot be undone!") === true) {
       deleteForm.submit();
     }
-  });
+  }
 
   uploadBtn.addEventListener("click", () => {
     if (mediaInput.value) {
@@ -269,10 +270,17 @@
   const publishOption = document.querySelector("#publishOption");
 
   function updatePublishOption() {
+    saveContentBtn.innerText = "Save";
     if (publishOption.value === "scheduled") {
+      if (isNewPage) saveContentBtn.innerText = "Schedule";
       scheduledForInput.disabled = false;
       scheduleTimeZoneLabel.classList.remove("disabled");
     } else {
+      if (publishOption.value === "draft") {
+        if (isNewPage) saveContentBtn.innerText = "Save as draft";
+      } else {
+        if (isNewPage) saveContentBtn.innerText = "Publish";
+      }
       scheduledForInput.disabled = true;
       scheduleTimeZoneLabel.classList.add("disabled");
     }

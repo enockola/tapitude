@@ -23,7 +23,8 @@ export class CreatorController {
     router.post("/pages/:id/delete", asyncHandler(this.post_deleteContent));
 
     //Page editor
-    router.get("/pages/:id/editor", asyncHandler(this.get_showEditContent));
+    router.get("/pages/:id/editor", asyncHandler(this.get_createEditContent));
+    router.get("/pages/editor", asyncHandler(this.get_createEditContent));
 
     router.get("/profile", asyncHandler(this.get_profile));
     router.post("/profile/update", asyncHandler(this.post_updateProfile));
@@ -223,31 +224,39 @@ export class CreatorController {
     }
   }
 
-  get_showEditContent = async (req: Request, res: Response): Promise<void> => {
-    let contentPage = null;
+  get_createEditContent = async (req: Request, res: Response): Promise<void> => {
 
+    //edit document
     if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) { //Get the ID parameter from the URL
-      contentPage = await ContentPage.findOne({
+      let contentPage = await ContentPage.findOne({
         _id: req.params.id,
         creatorId: req.user._id
       });
-    }
-    if (!contentPage) {
-      return res.status(404).render("errors/404", {
-        title: "Content page not found"
+
+      if (!contentPage) {
+        return res.status(404).render("errors/404", {
+          title: "Content not found"
+        });
+      }
+      //Get the file metadata, because the frontend needs it
+      let fileMetadata = null;
+      if (contentPage.fileKey) {
+        fileMetadata = await FileServiceInstance.getFileMetadata(contentPage.fileKey);
+      }
+      res.render("creator/content-editor", {
+        title: "Edit Content Page",
+        contentPage: contentPage,
+        fileMetadata: fileMetadata,
+        error: null
+      });
+    } else { //new document
+      res.render("creator/content-editor", {
+        title: "New Content Page",
+        fileMetadata: null,
+        contentPage: null,
+        error: null
       });
     }
-
-    let fileMetadata = null;
-    if (contentPage.fileKey) {
-      fileMetadata = await FileServiceInstance.getFileMetadata(contentPage.fileKey);
-    }
-    res.render("creator/content-editor", {
-      title: "Edit Content Page",
-      contentPage,
-      fileMetadata: fileMetadata,
-      error: null
-    });
   }
 
 
