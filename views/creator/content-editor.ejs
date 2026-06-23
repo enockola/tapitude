@@ -26,46 +26,13 @@
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
-      <div class="media-upload">
-        <label class="media-dropzone" for="mediaUploadInput" id="mediaUploadDropzone">
-          <span class="media-dropzone__icon">
-            <% if (fileMetadata) { %>
-            <i class="ph ph-file-image"></i>
-            <% } else { %>
-            <i class="ph ph-upload-simple"></i>
-            <% } %>
-          </span>
-          <strong id="mediaUploadLabel">Your Media</strong>
-          <small id="mediaUploadHint">Upload your content video and images</small>
+      <%- include("./partial_file_upload", {
+          title: "Upload File",
+          description: "Upload your content video and images",
+          maxSizeBytes: 10,
+          accept: "image/*,video/*"
+        }) %>
 
-          <span class="button button--secondary button--small">
-            Browse Files
-          </span>
-
-          <input id="mediaUploadInput" type="file" name="media" accept="image/*,video/*">
-        </label>
-
-        <div class="progress-container" id="upload-progress-container" style="display: none;">
-          <span class="progress-text" id="upload-progress-text">0% Uploaded</span>
-          <div class="progress-fill" id="upload-progress-fill"></div>
-        </div>
-        <% if (contentPage?.mediaUrl) { %>
-        <div class="current-media">
-          <p class="eyebrow">Current Media</p>
-
-          <% if (contentPage.mediaType?.startsWith("image")) { %>
-          <img src="<%= contentPage.mediaUrl %>" alt="Uploaded media preview">
-          <% } else if (contentPage.mediaType?.startsWith("video")) { %>
-          <video controls src="<%= contentPage.mediaUrl %>"></video>
-          <% } else { %>
-          <a href="<%= contentPage.mediaUrl %>" target="_blank">View uploaded media</a>
-          <% } %>
-        </div>
-        <% } %>
-        <div>
-
-        </div>
-      </div>
       <div class="form-actions">
         <button class="button" type="button" id="uploadAttatchmentBtn"> <i class="ph ph-upload-simple"></i> Upload Media</button>
         <button class="button button--danger" type="button" id="deleteAttatchmentBtn"> <i class="ph ph-trash"></i> Delete Media</button>
@@ -130,7 +97,6 @@
   const mediaForm = document.getElementById("mediaForm");
   const deleteForm = document.getElementById("delete-content-form");
 
-  const fileInput = document.getElementById("mediaUploadInput");
   const mediaDropzone = document.getElementById("mediaUploadDropzone");
   const mediaLabel = document.querySelector("#mediaUploadLabel");
   const mediaHint = document.querySelector("#mediaUploadHint");
@@ -140,15 +106,11 @@
   const uploadBtn = document.getElementById("uploadAttatchmentBtn");
   const deleteMediaBtn = document.getElementById("deleteAttatchmentBtn");
 
-  const uploadProgressContainer = document.getElementById("upload-progress-container");
-  const uploadProgressText = document.getElementById("upload-progress-text");
-  const uploadProgressFill = document.getElementById("upload-progress-fill");
-
   deleteMediaBtn.addEventListener("click", () => {
     if (confirm("Are you sure you want to delete this media? This action cannot be undone!") === true) {
       mediaInput.value = "";
       uploadProgressContainer.style.display = "none";
-      submitMediaForm();
+      submitMediaForm(mediaForm);
       updateMediaLabel(null, null);
     }
   });
@@ -161,7 +123,7 @@
 
   uploadBtn.addEventListener("click", () => {
     if (mediaInput.value) {
-      submitMediaForm();
+      submitMediaForm(mediaForm);
     } else {
       alert("Please select a file to upload");
     }
@@ -169,7 +131,7 @@
 
   mediaForm.addEventListener("submit", async (e) => {
     e.preventDefault(); // stop normal page reload
-    submitMediaForm();
+    submitMediaForm(mediaForm);
   });
 
   // form.addEventListener("submit", async (e) => {
@@ -177,61 +139,11 @@
   //   submitForm();
   // });
 
-  function uploadProgress(percent, loaded, total) {
 
-    if (percent === 100) {
-      uploadProgressFill.style.width = "100%";
-      // uploadProgressContainer.style.display = "none";
-      uploadProgressText.textContent = "Upload successful";
-      console.log("Upload successful");
-    } else {
-      uploadProgressContainer.style.display = "block";
-      uploadProgressFill.style.width = `${percent}%`;
-      uploadProgressText.textContent = `${percent.toFixed(2)}% loaded: ${ formatBytes(loaded)} of ${formatBytes(total)}`;
-      console.log(`Upload: ${percent.toFixed(2)}% loaded: ${ formatBytes(loaded)} of ${formatBytes(total)}`);
-    }
-  }
-
-  function submitMediaForm() {
-    return new Promise((resolve, reject) => {
-      const formData = new FormData(mediaForm);
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", mediaForm.action);
-
-      // 📊 THIS is what you need
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const percent = (event.loaded / event.total) * 100;
-          uploadProgress(percent, event.loaded, event.total);
-        }
-      };
-
-      xhr.onload = () => {
-        if (xhr.status >= 200 && xhr.status < 300) {
-          uploadProgress(100, event.loaded, event.total);
-          resolve(xhr.response);
-        } else {
-          reject("Upload failed 💥");
-        }
-      };
-
-      xhr.onerror = () => reject("Network error");
-
-      xhr.send(formData);
-    });
-  }
+ 
 
   //When the media is uploaded, update the label to show the file size and name
-  fileInput.addEventListener("change", () => {
-    console.log(fileInput.files);
-    if (fileInput.files.length === 0) {
-      updateMediaLabel(null, null);
-      return;
-    }
-    const fileName = fileInput.files[0].name;
-    const fileSize = fileInput.files[0].size;
-    updateMediaLabel(fileName, fileSize);
-  });
+
 
   function formatBytes(bytes, decimals = 2) {
     if (bytes === 0) return "0 bytes";
@@ -245,18 +157,6 @@
     const value = bytes / Math.pow(k, i);
 
     return `${parseFloat(value.toFixed(decimals))} ${sizes[i]}`;
-  }
-
-  function updateMediaLabel(fileName, fileSize) {
-    if (fileName && fileSize) {
-      mediaDropzone.style.backgroundColor = "#eeeeee30";
-      mediaLabel.innerText = (`${fileName}`);
-      mediaHint.innerText = (`File Size: ${formatBytes(fileSize)}`);
-    } else {
-      mediaDropzone.style.backgroundColor = "inherit";
-      mediaLabel.innerText = ("No Media Selected");
-      mediaHint.innerText = (`Upload your content video and images`);
-    }
   }
 
   if (fileMetadata) {
