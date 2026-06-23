@@ -26,7 +26,14 @@
           maxSizeBytes: 10,
           accept: "image/*"
         }) %>
-
+        
+    <% if (profileImageMetadata) { %>
+    <script>
+      const name = "<%=profileImageMetadata.originalName%>";
+      const size = <%=profileImageMetadata.fileSize%>;
+      updateMediaLabel(name,size);
+    </script>
+    <% } %>
     <div>
       <label>Brand Color:</label>
       <input type="color" name="brandColor" value="<%= profile?.brandColor || "#000" %>" />

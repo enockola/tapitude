@@ -43,6 +43,10 @@
       updateMediaLabel(fileName, fileSize);
     });
 
+    function updateMediaLabel(metadata) {
+      updateMediaLabel(metadata.originalName, metadata.fileSize);
+    }
+
     function updateMediaLabel(fileName, fileSize) {
       if (fileName && fileSize) {
         mediaDropzone.style.backgroundColor = "#eeeeee30";

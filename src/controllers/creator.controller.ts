@@ -96,9 +96,15 @@ export class CreatorController {
         title: "Profile not found"
       });
     }
+    let profileImageMetadata = null;
+    if(profile.profileImageKey){
+      profileImageMetadata = await FileServiceInstance.getFileMetadata(profile.profileImageKey);
+      console.log("PROFILE IMAGE METADATA", profileImageMetadata);
+    }
 
     res.render("creator/profile", {
       title: "Profile",
+      profileImageMetadata,
       profile
     });
   }
