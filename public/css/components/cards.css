@@ -84,6 +84,24 @@
   background: rgb(255, 237, 123);
 }
 
+.badge--success {
+  color: rgb(0, 128, 0);
+  border-color: rgb(0, 128, 0);
+  background: rgb(204, 255, 204);
+}
+
+.badge--danger {
+  color: rgb(255, 0, 0);
+  border-color: rgb(255, 0, 0);
+  background: rgb(255, 204, 204);
+}
+
+.badge--info {
+  color: rgb(0, 0, 255);
+  border-color: rgb(0, 0, 255);
+  background: rgb(204, 204, 255);
+}
+
 .preview-card {
   position: sticky;
   top: calc(var(--topbar-height) + var(--space-md));
