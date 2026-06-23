@@ -1,7 +1,7 @@
 import ContentPage from "../models/ContentPage";
 import CreatorProfile from "../models/CreatorProfile";
 import { Request, Response, Router } from 'express';
-import asyncHandler from "../utils/asyncHandler";
+import { asyncHandler, busboy_getRequest } from "../utils/asyncHandler";
 import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/etDateTime";
 import mongoose from "mongoose";
 import Busboy from "busboy";
@@ -103,33 +103,43 @@ export class CreatorController {
     });
   }
 
-  post_updateProfile = async (req: Request, res: Response): Promise<void> => {
-    const { displayName, brandName,
-      logo, clearLogo,
-      brandColor, bio } = req.body;
 
+  post_updateProfile = async (req: Request, res: Response): Promise<void> => {
     let updatedDate = new Date();
     let content: any = {
-      displayName,
-      brandName,
-      brandColor,
-      bio,
       updatedAt: updatedDate
     };
 
-    if (logo) {
-      content.profileImageKey = logo;
-    }
+    busboy_getRequest(req, res,
+      async (fieldname, data, filename, mimeType) => { //On file
+        console.log("FILE", fieldname);
+        // console.log("FILENAME", filename);
+        // console.log("DATA", data);
+        // console.log("MIMETYPE", mimeType);
+        content.profileImageKey = await FileServiceInstance.uploadFile({
+          data: data,
+          ownerId: req.user._id,
+          filename: filename,
+          contentType: mimeType
+        });
+      },
+      async (fields) => { //On finish
+        console.log("FIELDS", fields);
+        content.displayName = fields.displayName;
+        content.brandName = fields.brandName;
+        content.brandColor = fields.brandColor;
+        content.bio = fields.bio;
 
-    const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
-    if (!profile) {
-      return res.status(404).render("errors/404", {
-        title: "Profile not found"
+        const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
+        if (!profile) {
+          return res.status(404).render("errors/404", {
+            title: "Profile not found"
+          });
+        } else {
+          console.log(profile);
+          res.redirect("/creator/profile");
+        }
       });
-    } else {
-      console.log(profile);
-      res.redirect("/creator/profile");
-    }
   }
 
   post_uploadMedia = async (req: Request, res: Response): Promise<void> => {

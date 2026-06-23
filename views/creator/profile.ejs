@@ -9,7 +9,7 @@
 </section>
 
 <section class="card">
-  <form class="form-stack" method="post" action="/creator/profile/update">
+  <form class="form-stack" method="post" action="/creator/profile/update" enctype="multipart/form-data">
 
     <label>Display Name:
       <input type="text" name="displayName" value="<%= profile?.displayName || currentUser.name %>" />
