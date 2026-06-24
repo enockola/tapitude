@@ -21,12 +21,16 @@
     /> -->
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css" />
   <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+
+  <script src="/js/socket.io/socket.io.min.js"></script>
   <script>
     const currentPath = "<%= currentPath %>";
-    console.log("Current path is: ", currentPath);
+    const creatorSlug = "<%= creatorProfile.creatorSlug %>";
+    const creatorId = "<%= creatorProfile.userId %>";
+    console.log("Current path = ", currentPath);
+    console.log("Creator slug = ", creatorSlug);
+    console.log("Creator user id = ", creatorId);
   </script>
-  <script src="/js/socket.io/socket.io.min.js"></script>
-  <script src="/js/content-hub.js" defer></script>
 </head>
 
 <body></body>

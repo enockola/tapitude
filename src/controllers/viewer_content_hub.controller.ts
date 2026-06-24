@@ -16,10 +16,19 @@ export class ViewerContentHubController {
 
     // Join a specific room for this "page" or "hub"
     socket.join('viewer_hub');
+    const client = io.to('viewer_hub');
 
-    socket.on('chat message', (msg) => {
-      // Only emit to users in this specific hub/room
-      io.to('viewer_hub').emit('chat message', msg);
+    socket.on('requestContent', async (data: any) => {
+      //Get all the content for this creator
+      const history = data.history;
+      const creatorId = data.creatorId;
+      const contentPages = await ContentPage.find({ creatorId: creatorId, status: "published" })
+        .sort({ updatedAt: -1 })
+        .limit(25);
+      console.log("REQUEST CONTENT: ", data, contentPages);
+      if (contentPages) {
+        client.emit('requestContent', contentPages);
+      }
     });
 
     socket.on('disconnect', () => {
@@ -30,18 +39,11 @@ export class ViewerContentHubController {
   home = async (req: Request, res: Response): Promise<void> => {
     if (req.params.slug) {
       console.log("CREATOR HUB SLUG: " + req.params.slug);
-
       const creatorProfile = await CreatorProfile.findOne({ creatorSlug: req.params.slug });
       if (creatorProfile) {
-
-        const contentPages = await ContentPage.find({ creatorId: creatorProfile.userId })
-          .sort({ updatedAt: -1 })
-          .limit(1);
-
         return res.render("content_hub/index", {
           slug: req.params.slug,
-          creatorProfile: creatorProfile,
-          contentPages
+          creatorProfile: creatorProfile
         });
       }
     }
