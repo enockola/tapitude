@@ -9,6 +9,18 @@
 </section>
 
 <section class="card">
+
+  <h2>Creator Profile Information</h2>
+  <div >
+    <label for="name">Content Hub Link</label>
+    <a href="/content-hub/<%= creatorProfile.creatorSlug %>">/content-hub/<%= creatorProfile.creatorSlug %></a>
+    <br/><br/>
+    <label for="name">Brand Name</label>
+    <span><%= creatorProfile.brandName %></span>
+  </div>
+
+  <!-- <div class="divider"></div> -->
+
   <h2>Account Settings</h2>
   <form action="/admin/edit-creator-account/<%= creator._id %>" method="POST">
     <!-- <input type="hidden" name="id" value="<%= creator._id %>"> -->
@@ -26,8 +38,8 @@
     <div class="form-group">
       <label for="status">Account Status</label>
       <select id="status" name="status">
-        <option value="active"  <%= creator.status === "active" ? "selected" : "" %> >Active</option>
-        <option value="disabled" <%= creator.status === "disabled" ? "selected" : "" %> >Disabled</option>
+        <option value="active" <%= creator.status === "active" ? "selected" : "" %>>Active</option>
+        <option value="disabled" <%= creator.status === "disabled" ? "selected" : "" %>>Disabled</option>
       </select>
     </div>
 
@@ -40,7 +52,7 @@
   <h2>Danger Zone</h2>
   <p>Permanently delete this creator account and all associated data. This action cannot be undone!
   </p>
-  
+
   <button type="button" class="button danger" onclick="confirmDelete('<%= creator._id %>')">
     Delete Account
   </button>

@@ -1,15 +1,23 @@
 import mongoose from "mongoose";
+import crypto from "crypto";
+
+//for typechecking
 
 export interface ICreatorProfile {
   userId: mongoose.Types.ObjectId;
+  creatorSlug?: string;
   displayName: string;
-  brandName?: string; 
+  brandName?: string;
   brandColor?: string;
   bio?: string;
-  profileImageKey?: string; 
+  profileImageKey?: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
+
+interface ICreatorModel extends mongoose.Model<ICreatorProfile> {
+}
+
 
 const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
   {
@@ -18,6 +26,12 @@ const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
       ref: "User",
       required: true,
       unique: true
+    },
+    creatorSlug: {
+      type: String,
+      required: false,
+      unique: true,
+      trim: true
     },
     displayName: {
       type: String,
@@ -44,6 +58,16 @@ const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
   { timestamps: true }
 );
 
-const CreatorProfile = mongoose.model<ICreatorProfile>("CreatorProfile", creatorProfileSchema);
+// Generate creatorSlug before saving
+creatorProfileSchema.pre('save', function (next) {
+  if (!this.creatorSlug && this.userId) {
+    // Generate slug from userId (or any other logic you prefer)
+    const hash = crypto.createHash('md5').update(this.userId.toString()).digest('hex');
+    this.creatorSlug = hash.substring(0, 24);
+  }
+  next();
+});
+
+const CreatorProfile = mongoose.model<ICreatorProfile, ICreatorModel>("CreatorProfile", creatorProfileSchema);
 
 export default CreatorProfile;

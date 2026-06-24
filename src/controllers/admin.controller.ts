@@ -20,7 +20,7 @@ export class AdminController {
   getDashboardView = async (req: Request, res: Response): Promise<void> => {
     const creatorCount = await User.countDocuments({ role: "creator" });
     const contentCount = await ContentPage.countDocuments();
-    
+
     res.render("admin/dashboard", {
       title: "Admin Dashboard",
       creatorCount,
@@ -43,14 +43,16 @@ export class AdminController {
       ///edit-creator-account/:id
       //We get the ID parameter, the routes makes it easy for us to get the ID
       const creator = await User.findById(req.params.id);
+      const creatorProfile = await CreatorProfile.findOne({ userId: req.params.id });
 
-      if (!creator) {
+      if (!creator || !creatorProfile) {
         res.status(404).send("Creator not found");
         return;
       }
       res.render("admin/edit-creator-account", {
         title: "Edit Creator Account",
-        creator
+        creator,
+        creatorProfile
       });
     } catch (error) {
       res.status(500).send("Error loading creator profile");

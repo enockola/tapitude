@@ -4,6 +4,8 @@ Tapitude Creator Hub is a web dashboard that allows approved content creators to
 
 This repository is currently in the MVP planning and early build stage.
 
+## Wireframes
+https://www.figma.com/design/W1BkkZE7PTu8sxLuJfRDy4/Taptitude-Content-Hub?t=3r912hp1jZ2P1sw1-0
 
 ## Quick Start
 

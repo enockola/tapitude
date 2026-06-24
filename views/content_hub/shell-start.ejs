@@ -1,7 +1,10 @@
 <%- include("../partials/head", { title }) %>
 <header class="topbar">
-  <a class="brand" href="/">Tapitude</a>
+  <span>
+    <a class="brand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
+    <span class="eyebrow"> <%= creatorProfile.displayName %>'s Content Hub</span>
 
-  <div class="topbar__menu" id="site-navigation" data-menu>   
-  </div>
+  </span>
+      <div class="topbar__menu" id="site-navigation" data-menu> </div>
+  <a class="brand logo" href="/">Tapitude</a>
 </header>

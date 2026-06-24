@@ -41,7 +41,6 @@ export class CreatorController {
   }
 
   dashboard = async (req: Request, res: Response): Promise<void> => {
-
     const contentPages = await ContentPage.find({ creatorId: req.user._id })
       .sort({ updatedAt: -1 })
       .limit(5);
