@@ -27,7 +27,12 @@ import creatorRoutes from "./routes/creator.routes.js";
 import publicRoutes from "./routes/public.routes.js";
 import viewerContentHubRoutes from "./routes/viewer_content_hub.routes.js";
 
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+
 const app = express();
+const httpServer = createServer(app);
+const io = new Server(httpServer); //websocket
 const useMockData = process.env.USE_MOCK_DATA === "true";
 
 app.set("view engine", "ejs");
@@ -91,26 +96,46 @@ app.use(attachUser);
 
 //Routes
 app.use("/", indexRoutes);
+
 app.use("/auth", authRoutes);
+
 app.use("/admin", adminRoutes);
+
 app.use("/creator", creatorRoutes);
+
 app.use("/p", publicRoutes);
+
 app.use("/content-hub", viewerContentHubRoutes);
+const viewerNamespace = io.of('/content-hub'); //register websocket
+viewerNamespace.on('connection', (socket) => {
+  viewerContentHubRoutes.handleSocketConnection(viewerNamespace, socket);
+});
+
+
 
 app.use(notFound);
 app.use(errorHandler);
+
+// // Handle new connections
+// io.on('connection', (socket) => {
+//   console.log('A user connected:', socket.id);
+
+//   socket.on('disconnect', () => {
+//     console.log('User disconnected:', socket.id);
+//   });
+// });
 
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   await connectDB();
 
-  if (process.env.MONGODB_URI && process.env.USE_MOCK_DATA !== "true") {
+  if (process.env.MONGODB_URI) {
     startContentScheduler();
   }
 
-  app.listen(PORT, () => {
-    console.log(`Tapitude Creator Hub running on http://localhost:${PORT}`);
+  httpServer.listen(PORT, () => {
+    console.log(`Tapitude Creator Hub running on port ${PORT}`);
   });
 }
 

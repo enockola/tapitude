@@ -6,6 +6,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title><%= title ? `${title} | Tapitude` : "Tapitude" %></title>
   <link rel="stylesheet" href="/css/main.css" />
+  <style>
+    :root {
+      --brand-color-primary: <%=creatorProfile.brandColor %>;
+    }
+  </style>
   <link rel="stylesheet" href="/css/layout/content-hub.css" />
   <!-- https://github.com/phosphor-icons/homepage#phosphor-icons -->
   <!-- Select icons in https://phosphoricons.com/ -->
@@ -20,11 +25,8 @@
     const currentPath = "<%= currentPath %>";
     console.log("Current path is: ", currentPath);
   </script>
-  <style>
-    :root {
-      --brand-color-primary: <%=creatorProfile.brandColor %>;
-    }
-  </style>
+  <script src="/js/socket.io/socket.io.min.js"></script>
+  <script src="/js/content-hub.js" defer></script>
 </head>
 
 <body></body>
@@ -35,13 +37,13 @@
 <header class="topbar creator-topbar">
   <div class="left-group" style="display: flex; gap: 10px;">
     <% if(creatorProfile.profileImageKey ) { %>
-      <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
+    <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
     <% } else { %>
-      <a class="brand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
+    <a class="brand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
     <% } %>
-    
+
   </div>
-<!-- <span class="eyebrow"> <%= creatorProfile.displayName %>'s Content Hub</span> -->
+  <!-- <span class="eyebrow"> <%= creatorProfile.displayName %>'s Content Hub</span> -->
   <!-- <div class="topbar__menu" id="site-navigation" data-menu> </div> -->
 
   <a class="brand" href="/">Tapitude</a>

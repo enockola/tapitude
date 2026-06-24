@@ -11,6 +11,22 @@ export class ViewerContentHubController {
     router.get("/:slug", asyncHandler(this.home));
   }
 
+  handleSocketConnection = (io: any, socket: any) => {
+    console.log(`Viewer hub socket connected: ${socket.id}`);
+
+    // Join a specific room for this "page" or "hub"
+    socket.join('viewer_hub');
+
+    socket.on('chat message', (msg) => {
+      // Only emit to users in this specific hub/room
+      io.to('viewer_hub').emit('chat message', msg);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Viewer hub disconnected: ' + socket.id);
+    });
+  }
+
   home = async (req: Request, res: Response): Promise<void> => {
     if (req.params.slug) {
       console.log("CREATOR HUB SLUG: " + req.params.slug);
@@ -29,7 +45,7 @@ export class ViewerContentHubController {
         });
       }
     }
-    
+
     return res.status(404).render("errors/404", {
       title: "Content Hub page not found"
     });

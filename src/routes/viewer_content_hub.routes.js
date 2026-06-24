@@ -6,5 +6,6 @@ import viewerController from "../controllers/viewer_content_hub.controller";
 
 const router = express.Router();
 viewerController.registerRoutes(router);
+router.handleSocketConnection = viewerController.handleSocketConnection;
 
 module.exports = router;
