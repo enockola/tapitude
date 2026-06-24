@@ -22,12 +22,16 @@ export class ViewerContentHubController {
       //Get all the content for this creator
       const history = data.history;
       const creatorId = data.creatorId;
-      const contentPages = await ContentPage.find({ creatorId: creatorId, status: "published" })
+
+      const contentPages = await ContentPage.findOne({ creatorId: creatorId, status: "published" })
         .sort({ updatedAt: -1 })
-        .limit(25);
+        .skip(history);
+
       console.log("REQUEST CONTENT: ", data, contentPages);
       if (contentPages) {
-        client.emit('requestContent', contentPages);
+        client.emit('requestContent', [contentPages]);
+      }else{
+        client.emit('requestContent', []);
       }
     });
 
