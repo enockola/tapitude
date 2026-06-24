@@ -30,9 +30,14 @@ export class ViewerContentHubController {
       console.log("REQUEST CONTENT: ", data, contentPages);
       if (contentPages) {
         client.emit('requestContent', [contentPages]);
-      }else{
+      } else {
         client.emit('requestContent', []);
       }
+    });
+
+    socket.on('likePost', async (data: any) => {
+      const contentPage = await ContentPage.findOneAndUpdate({ _id: data.postId }, { $inc: { likes: data.liked ? 1 : -1 } }, { new: true });
+      if (contentPage) console.log("LIKE POST: ", contentPage);
     });
 
     socket.on('disconnect', () => {

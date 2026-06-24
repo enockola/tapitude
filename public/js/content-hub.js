@@ -1,11 +1,37 @@
 //Session storage to identify a user that doesnt have an account
-let sessionId = sessionStorage.getItem("sessionId");
+let sessionId = localStorage.getItem("sessionId");
+
+//Store the posts that have been liked by the user
+let likedPosts = [];
+if (localStorage.getItem("likedPosts")) likedPosts = JSON.parse(localStorage.getItem("likedPosts"));
+console.log("Liked posts: ", likedPosts.length);
 
 if (!sessionId) {
     sessionId = crypto.randomUUID();
-    sessionStorage.setItem("sessionId", sessionId);
+    localStorage.setItem("sessionId", sessionId);
 }
 
+function likeTogglePost(postId, postElement, heartIcon) {
+    if (likedPosts.includes(postId)) {
+        //remove it
+        likedPosts = likedPosts.filter((id) => id !== postId);
+        // console.log("Like button clicked, ", post._id);
+        socket.emit("likePost", { postId, sessionId, liked: false });
+        postElement.innerText = parseInt(postElement.innerText) - 1;
+        heartIcon.classList.remove("ph-fill");
+    } else {
+        // Add the post ID to the likedPosts array
+        likedPosts = [...likedPosts, postId];
+        // console.log("Like button unclicked, ", post._id);
+        socket.emit("likePost", { postId, sessionId, liked: true });
+        postElement.innerText = parseInt(postElement.innerText) + 1;
+        heartIcon.classList.add("ph-fill");
+    }
+    localStorage.setItem(
+        "likedPosts",
+        JSON.stringify(likedPosts)
+    );
+}
 
 // Connect to your Express server (ensure the URL matches your server address)
 const socket = io("http://localhost:3000/content-hub");
@@ -53,13 +79,16 @@ function createPost(parentElement, post, index) {
     <div class="post-media"></div>
     <div class="post-text">${post.body ?? ""}</div>
     <div class="actions">
-        <button class="like-button"><i class="ph ph-heart"></i> 0 Likes</button>
+        <button class="like-button"><i class="ph ph-heart ${likedPosts.includes(post._id) ? "ph-fill" : ""}"></i>
+         <span class="like-count">${post.likes}</span> Likes</button>
     </div>
 `;
 
     const likeButton = postChildContent.querySelector(".like-button");
+    const likeCount = postChildContent.querySelector(".like-count");
+    const heartIcon = postChildContent.querySelector(".ph-heart");
     likeButton.addEventListener("click", () => {
-        console.log("Like button clicked, ", post._id, sessionId);
+        likeTogglePost(post._id, likeCount, heartIcon);
     });
 
     parentElement.appendChild(postChild);
