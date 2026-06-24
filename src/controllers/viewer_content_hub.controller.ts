@@ -17,9 +17,15 @@ export class ViewerContentHubController {
 
       const creatorProfile = await CreatorProfile.findOne({ creatorSlug: req.params.slug });
       if (creatorProfile) {
+
+        const contentPages = await ContentPage.find({ creatorId: creatorProfile.userId })
+          .sort({ updatedAt: -1 })
+          .limit(1);
+
         return res.render("content_hub/index", {
           slug: req.params.slug,
-          creatorProfile: creatorProfile
+          creatorProfile: creatorProfile,
+          contentPages
         });
       }
     }

@@ -9,6 +9,13 @@
 </section>
 
 <section class="card">
+
+  <h2> Creator Profile Information</h2>
+  <label>Content Hub Link: </label>
+  <a href="/content-hub/<%= profile.creatorSlug %>" target="_blank" rel="noopener noreferrer">/content-hub/<%= profile.creatorSlug %></a>
+  <br>
+
+  <h2>Edit Profile</h2>
   <form class="form-stack" method="post" action="/creator/profile/update" enctype="multipart/form-data">
 
     <label>Display Name:
@@ -26,12 +33,12 @@
           maxSizeBytes: 10,
           accept: "image/*"
         }) %>
-        
+
     <% if (profileImageMetadata) { %>
     <script>
       const name = "<%=profileImageMetadata.originalName%>";
       const size = <%=profileImageMetadata.fileSize%>;
-      updateMediaLabel(name,size);
+      updateMediaLabel(name, size);
     </script>
     <% } %>
     <div>

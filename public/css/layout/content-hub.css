@@ -68,3 +68,12 @@
   padding: 20px;
   color: gray;
 }
+
+.creator-topbar{
+  background-color: var(--brand-color-primary);
+}
+
+.creator-topbar .brand-logo{
+  max-height: 50px;
+  display: inline;
+}

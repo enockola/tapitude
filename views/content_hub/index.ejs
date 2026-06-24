@@ -1,11 +1,11 @@
 <%- include("./shell-start", { "title": "Tapitude Content Hub" }) %>
 
-<div class="feed" id="feed">
 
-  <!-- Sample Post -->
+
+<div class="feed" id="feed">
+  <% for (contentPage in contentPages) { %>
   <div class="post">
-    <div class="post-header">Post Header</div>
-    <div class="post-text">Just discovered cereal tastes better at 2am. Science confirmed.</div>
+    <div class="post-text"><%= contentPage.body %></div>
     <img src="https://images.landscapingnetwork.com/pictures/images/331x255Exact/walkway-and-path_4/front-flagstone-walkway-entrance-walls-belknap-landscape-co-inc_10019.jpg" />
     <div class="reactions" onclick="showReactions(1)">
       👍 12 ❤️ 5 😂 3 · View reactions
@@ -16,35 +16,10 @@
       <button onclick="react('share')">↗ Share</button>
     </div>
   </div>
-
-  <div class="post">
-    <div class="post-header">Post Header</div>
-    <div class="post-text">This is the test content, here is a cool video</div>
-    <video controls>
-      <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-    </video>
-    <div class="reactions" onclick="showReactions(2)">
-      👍 8 ❤️ 2 😂 11 · View reactions
-    </div>
-    <div class="actions">
-      <button onclick="react('like')">👍 Like</button>
-      <button onclick="react('comment')">💬 Comment</button>
-      <button onclick="react('share')">↗ Share</button>
-    </div>
-  </div>
-
+  <% } %>
 </div>
 
 <div id="loadMore"><i class="ph ph-circle-notch ph-spin" style="padding-bottom: 1.5px;"></i> Loading...</div>
-
-<div id="reactionModal" onclick="this.style.display='none'">
-  <strong>Reactions</strong>
-  <p>👍 Like: 123</p>
-  <p>❤️ Love: 45</p>
-  <p>😂 Haha: 77</p>
-  <p>😮 Wow: 12</p>
-  <p>😢 Sad: 3</p>
-</div>
 
 
 <%- include("./shell-end") %>

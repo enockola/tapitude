@@ -55,7 +55,18 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride("_method"));
 
+
+//Serve local directories to static files
 app.use(express.static(path.join(__dirname, "..", "public")));
+
+//----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+//for uploaded files (TODO: Change this to a CDN when storage gets switched to an S3 bucket)
+app.use("/storage", express.static(path.join(__dirname, '..', 'storage')));
+//----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
 const sessionOptions = {
   name: "tapitude.sid",
