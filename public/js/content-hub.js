@@ -1,3 +1,12 @@
+//Session storage to identify a user that doesnt have an account
+let sessionId = sessionStorage.getItem("sessionId");
+
+if (!sessionId) {
+    sessionId = crypto.randomUUID();
+    sessionStorage.setItem("sessionId", sessionId);
+}
+
+
 // Connect to your Express server (ensure the URL matches your server address)
 const socket = io("http://localhost:3000/content-hub");
 /* CONSTANTS: 
@@ -23,6 +32,13 @@ function requestNextPost() {
     history += 1;
 }
 
+async function getMimeType(url) {
+    const response = await fetch(url, {
+        method: "HEAD"
+    });
+    return response.headers.get("content-type");
+}
+
 function createPost(parentElement, post, index) {
     const postChild = document.createElement("div");
     postChild.classList.add("post");
@@ -32,19 +48,36 @@ function createPost(parentElement, post, index) {
     postChildContent.classList.add("post-content");
     postChild.appendChild(postChildContent);
 
+    postChildContent.innerHTML = `
+    <p class="post-date">${post.publishedAt}</p>
+    <div class="post-media"></div>
+    <div class="post-text">${post.body ?? ""}</div>
+    <div class="actions">
+        <button class="like-button"><i class="ph ph-heart"></i> 0 Likes</button>
+    </div>
+`;
+
+    const likeButton = postChildContent.querySelector(".like-button");
+    likeButton.addEventListener("click", () => {
+        console.log("Like button clicked, ", post._id, sessionId);
+    });
+
     parentElement.appendChild(postChild);
     //Important for unloading content not in viewport
-    const postObserver = new IntersectionObserver(([entry]) => {
+    const postObserver = new IntersectionObserver(async ([entry]) => {
+        const postChildMedia = postChildContent.querySelector(".post-media");
         if (entry.isIntersecting) {
-            postChildContent.innerHTML = `
-                        <div class="post-text">${post.body ? post.body : ""}</div>
-                        <img src="" />
-                        <div class="actions">
-                            <button><i class="ph ph-heart"></i> Like</button>
-                        </div>
-                    `;
+            if (post.fileKey) {
+                const fileURL = `/storage/${post.fileKey}`;
+                const mimeType = await getMimeType(fileURL);
+                if (mimeType.startsWith("image/")) {
+                    postChildMedia.innerHTML = `<image src="${fileURL}" alt="Post Media" />`;
+                } else {
+                    postChildMedia.innerHTML = `<video src="${fileURL}" alt="Post Media" autoplay controls />`;
+                }
+            }
         } else {
-            postChildContent.innerHTML = "";
+            postChildMedia.innerHTML = "";
         }
     }, { threshold: 0 });
     postObserver.observe(postChild);

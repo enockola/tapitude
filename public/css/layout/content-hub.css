@@ -3,14 +3,41 @@
   margin: auto;
   padding: 10px;
 }
+html,
+body {
+  height: 100%;
+  scroll-snap-type: y mandatory;
+}
+
+body {
+  margin: 0;
+}
+
+/*TODO: We can remove this if we want the header to be conditionally visible*/
+header {
+  position: fixed;
+  width: 100%;
+}
 
 .post {
+  height: 100vh;
+  scroll-snap-align: start;
+  margin: 0;
+}
+
+.post-content {
   background: white;
   border-radius: 10px;
   padding: 12px;
-  margin-bottom: 12px;
+  position: relative;
+  top: 100px;
+  margin: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  min-height: calc(100vh - 120px);
+  max-height: calc(100vh - 100px);
+}
+
+.post_media {
+  /* min-height: 50vh; */
 }
 
 .post-header {
@@ -34,14 +61,33 @@
   justify-content: space-around;
   margin-top: 10px;
   border-top: 1px solid #eee;
-  padding-top: 8px;
 }
 
 .actions button {
+  position: relative;
+  overflow: hidden;
+
   border: none;
   background: none;
   cursor: pointer;
-  font-size: 14px;
+
+  font-size: 1em;
+  padding: 16px;
+  width: 100%;
+}
+.actions button {
+  transition:
+    transform 0.15s ease,
+    background-color 0.8s ease-out,
+    color 0.8s ease-out;
+}
+
+.actions button:active {
+  transition: none;
+
+  transform: scale(0.96);
+  background: rgba(255, 188, 188, 0.586);
+  color: rgb(190, 29, 0);
 }
 
 .reactions {
@@ -68,13 +114,14 @@
   text-align: center;
   padding: 20px;
   color: gray;
+  height:200px;
 }
 
-.creator-topbar{
+.creator-topbar {
   background-color: var(--brand-color-primary);
 }
 
-.creator-topbar .brand-logo{
+.creator-topbar .brand-logo {
   max-height: 50px;
   display: inline;
 }
