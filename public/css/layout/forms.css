@@ -64,6 +64,7 @@ textarea {
   display: grid;
   gap: var(--space-md);
   user-select: none;
+  /* grid-template-columns: 1fr 1fr; */
 }
 
 .media-dropzone {
@@ -83,6 +84,29 @@ textarea {
     border-color 160ms ease,
     box-shadow 160ms ease,
     transform 160ms ease;
+}
+
+#media-preview {
+  display: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: #ddd;
+  place-items: center;
+  text-align: center;
+  padding: var(--space-xs);
+  gap: var(--space-xs);
+  font-weight: 400;
+  color: var(--color-text);
+  max-height: 250px;
+}
+
+#media-preview img {
+  margin: auto;
+  height: 100%;
+}
+#media-preview video {
+  margin: auto;
+  height: 100%;
 }
 
 .media-dropzone:hover,
@@ -142,6 +166,12 @@ textarea {
   object-fit: cover;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
+}
+
+@media (max-width: 1000px) {
+  .media-upload {
+    grid-template-columns: initial;
+  }
 }
 
 @media (max-width: 700px) {

@@ -19,12 +19,15 @@
   <form class="form-stack" method="post" action="/creator/profile/update" enctype="multipart/form-data">
 
     <label>Display Name:
-      <input type="text" name="displayName" value="<%= profile?.displayName || currentUser.name %>" />
+
     </label>
+    <input type="text" name="displayName" value="<%= profile?.displayName || currentUser.name %>" />
 
     <label>Brand Name:
-      <input type="text" name="brandName" value="<%= profile?.brandName || "Not set yet" %>" />
+
     </label>
+    <p>Leave this blank if your logo already has your brand name printed on it</p>
+    <input type="text" name="brandName" value="<%= profile?.brandName %>" />
 
     <label>Logo</label>
     <p>For best results, it is recommended to upload a logo as a .png in just black or white.</p>
@@ -39,19 +42,23 @@
     <script>
       const name = "<%=profileImageMetadata.originalName%>";
       const size = <%=profileImageMetadata.fileSize%>;
-      updateMediaLabel(name, size);
+      const fileKey = "<%=profileImageMetadata.fileKey%>";
+      const mimeType = "<%=profileImageMetadata.contentType%>";
+      updateMediaLabel(name, size, mimeType, fileKey);
     </script>
     <% } %>
     <div>
       <label>Brand Color:</label>
-      <p>Choose a brand color to use for your brand, For best results, it is recommended to use a color from <a href="https://coolors.co/" target="_blank">coolors.co</a></p>
-      <input type="color" name="brandColor" value="<%= profile?.brandColor || "#000" %>" />
+      
     </div>
+    <p>Choose a brand color to use for your brand, For best results, it is recommended to use a color from <a href="https://coolors.co/" target="_blank">coolors.co</a></p>
+      <input type="color" name="brandColor" value="<%= profile?.brandColor || "#000" %>" />
 
 
     <label>Bio:
-      <textarea name="bio"><%= profile?.bio || "Not set yet" %></textarea>
+     
     </label>
+     <textarea name="bio"><%= profile?.bio ? profile.bio : "" %></textarea>
 
     <div class="form-actions">
       <button class="button" type="submit" id="uploadAttatchmentBtn"> <i class="ph ph-pencil"></i> Update</button>

@@ -123,9 +123,10 @@ socket.on("requestContent", (contentPage) => {
     console.log("Received content:", contentPage);
     if (contentPage) {
         createPost(feed, contentPage);
-    } else { //If there is no more content
-        target.style.display = "none";
     }
+    //  else { //If there is no more content
+    //     target.style.display = "none";
+    // }
 });
 
 const observer = new IntersectionObserver(

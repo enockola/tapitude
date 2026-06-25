@@ -1,4 +1,6 @@
   <div class="media-upload">
+
+
     <label class="media-dropzone" for="mediaUploadInput" id="mediaUploadDropzone">
       <span class="media-dropzone__icon">
         <i class="ph ph-file-image"></i>
@@ -14,6 +16,10 @@
       <input id="mediaUploadInput" type="file" name="media" accept="<%= accept ? accept: "image/*" %>">
     </label>
 
+    <label id="media-preview">
+    </label>
+
+
     <div class="progress-container" id="upload-progress-container" style="display: none;">
       <span class="progress-text" id="upload-progress-text">0% Uploaded</span>
       <div class="progress-fill" id="upload-progress-fill"></div>
@@ -21,6 +27,7 @@
     <div>
     </div>
   </div>
+
 
   <script>
     const uploadProgressContainer = document.getElementById("upload-progress-container");
@@ -31,6 +38,7 @@
     const mediaHint = document.querySelector("#mediaUploadHint");
     const mediaInput = document.querySelector("#mediaUploadInput");
     const mediaDropzone = document.getElementById("mediaUploadDropzone");
+    const mediaPreview = document.querySelector("#media-preview");
 
     fileInput.addEventListener("change", () => {
       console.log(fileInput.files);
@@ -44,10 +52,26 @@
     });
 
     function updateMediaLabel(metadata) {
-      updateMediaLabel(metadata.originalName, metadata.fileSize);
+      updateMediaLabel(metadata.originalName, metadata.fileSize, metadata.contentType, metadata.fileKey);
     }
 
-    function updateMediaLabel(fileName, fileSize) {
+    function updateMediaLabel(fileName, fileSize, mimeType, fileKey) {
+
+      console.log("MEDIA METATADATA ", fileName, fileSize, mimeType, fileKey);
+      if (mimeType && fileKey) {
+        if (fileKey.trim() === "") {
+          mediaPreview.style.display = "none";
+        }
+        if (mimeType.startsWith("image/")) {
+          mediaPreview.style.display = "block";
+          mediaPreview.innerHTML = `<img src="/storage/${fileKey}" alt="${fileName}" />`;
+        } else if (mimeType.startsWith("video/")) {
+          mediaPreview.style.display = "block";
+          mediaPreview.innerHTML = `<video src="/storage/${fileKey}" alt="${fileName}" />`;
+        }
+      } else {
+        mediaPreview.style.display = "none";
+      }
       if (fileName && fileSize) {
         mediaDropzone.style.backgroundColor = "#eeeeee30";
         mediaLabel.innerText = (`${fileName}`);
@@ -77,9 +101,9 @@
       uploadProgressContainer.style.display = "block";
       if (percent === 100) {
         uploadProgressFill.style.width = "100%";
-        // uploadProgressContainer.style.display = "none";
-        uploadProgressText.textContent = "Upload successful";
-        console.log("Upload successful");
+        uploadProgressContainer.style.display = "none";
+        // uploadProgressText.textContent = "Upload successful";
+        console.log("Media upload successful");
       } else {
         uploadProgressFill.style.width = `${percent}%`;
         uploadProgressText.textContent = `${percent.toFixed(2)}% loaded: ${ formatBytes(loaded)} of ${formatBytes(total)}`;
@@ -105,6 +129,7 @@
           if (xhr.status >= 200 && xhr.status < 300) {
             uploadProgress(100, event.loaded, event.total);
             resolve(xhr.response);
+            location.reload(); //Reload so we can see the new media
           } else {
             reject("Upload failed 💥");
           }

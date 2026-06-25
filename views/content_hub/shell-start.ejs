@@ -42,9 +42,12 @@
 <header class="topbar creator-topbar">
   <div class="left-group" style="display: flex; gap: 10px;">
     <% if(creatorProfile.profileImageKey ) { %>
-    <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
-    <% } %>
+    <!-- <a  href="/content-hub/<%= creatorProfile.creatorSlug %>"> -->
+      <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
+    <!-- </a> -->
+    <% } if(creatorProfile.brandName) { %>
     <a class="creatorBrand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
+    <% } %>
 
 
   </div>
