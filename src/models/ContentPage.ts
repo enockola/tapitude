@@ -12,6 +12,7 @@ export interface IContentPage extends Document {
   createdAt: Date;
   updatedAt: Date;
   likes: number;
+  viewedBy: String[];
 }
 
 // 2. Define the schema
@@ -37,7 +38,8 @@ const contentPageSchema = new Schema<IContentPage>(
       default: "America/New_York"
     },
     publishedAt: { type: Date },
-    likes: { type: Number, default: 0 }
+    likes: { type: Number, default: 0 },
+    viewedBy: { type: [String], default: [] }
   },
   { timestamps: true }
 );

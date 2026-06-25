@@ -13,6 +13,8 @@ export interface ICreatorProfile {
   profileImageKey?: string;
   createdAt?: Date;
   updatedAt?: Date;
+  totalViews?: number;
+  totalLikes?: number;
 }
 
 interface ICreatorModel extends mongoose.Model<ICreatorProfile> {
@@ -53,6 +55,14 @@ const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
     profileImageKey: {
       type: String,
       trim: true
+    },
+    totalViews: {
+      type: Number,
+      default: 0
+    },
+    totalLikes: {
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }

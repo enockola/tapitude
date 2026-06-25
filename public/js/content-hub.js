@@ -1,29 +1,30 @@
 //Session storage to identify a user that doesnt have an account
-let sessionId = localStorage.getItem("sessionId");
+let userId = localStorage.getItem("userId");
+if (!userId) {
+    userId = crypto.randomUUID();
+    localStorage.setItem("userId", userId);
+}
 
 //Store the posts that have been liked by the user
 let likedPosts = [];
 if (localStorage.getItem("likedPosts")) likedPosts = JSON.parse(localStorage.getItem("likedPosts"));
 console.log("Liked posts: ", likedPosts.length);
 
-if (!sessionId) {
-    sessionId = crypto.randomUUID();
-    localStorage.setItem("sessionId", sessionId);
-}
+
 
 function likeTogglePost(postId, postElement, heartIcon) {
     if (likedPosts.includes(postId)) {
         //remove it
         likedPosts = likedPosts.filter((id) => id !== postId);
         // console.log("Like button clicked, ", post._id);
-        socket.emit("likePost", { postId, sessionId, liked: false });
+        socket.emit("likePost", { postId, userId, liked: false });
         postElement.innerText = parseInt(postElement.innerText) - 1;
         heartIcon.classList.remove("ph-fill");
     } else {
         // Add the post ID to the likedPosts array
         likedPosts = [...likedPosts, postId];
         // console.log("Like button unclicked, ", post._id);
-        socket.emit("likePost", { postId, sessionId, liked: true });
+        socket.emit("likePost", { postId, userId, liked: true });
         postElement.innerText = parseInt(postElement.innerText) + 1;
         heartIcon.classList.add("ph-fill");
     }
@@ -51,7 +52,8 @@ requestNextPost();
 function requestNextPost() {
     const req = {
         creatorId,
-        history: history
+        history: history,
+        userId: userId
     };
     console.log(req);
     socket.emit("requestContent", req);
@@ -65,10 +67,9 @@ async function getMimeType(url) {
     return response.headers.get("content-type");
 }
 
-function createPost(parentElement, post, index) {
+function createPost(parentElement, post) {
     const postChild = document.createElement("div");
     postChild.classList.add("post");
-    postChild.id = "post_" + index;
 
     const postChildContent = document.createElement("div");
     postChildContent.classList.add("post-content");
@@ -115,14 +116,13 @@ function createPost(parentElement, post, index) {
 const feed = document.getElementById("feed");
 const target = document.querySelector('#loadMore');
 
-socket.on("requestContent", (contentPages) => {
-    console.log("Received content:", contentPages);
-    if (contentPages.length === 0) {
+socket.on("requestContent", (contentPage) => {
+    console.log("Received content:", contentPage);
+    if (contentPage) {
+        createPost(feed, contentPage);
+    } else { //If there is no more content
         target.style.display = "none";
     }
-    contentPages.forEach((post, index) => {
-        createPost(feed, post, index);
-    })
 });
 
 const observer = new IntersectionObserver(
