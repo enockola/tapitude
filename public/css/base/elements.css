@@ -64,7 +64,10 @@ a {
   /* text-decoration: none; */
 }
 
-header a {
+header a,
+footer a,
+.sidebar a,
+.button {
   color: inherit;
   text-decoration: none;
 }

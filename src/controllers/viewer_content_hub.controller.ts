@@ -24,26 +24,28 @@ export class ViewerContentHubController {
       const creatorId = data.creatorId;
 
       //Get the content
-      const contentPages = await ContentPage.findOne(
+      const contentPage = await ContentPage.findOne(
         { creatorId: creatorId, status: "published" }
       )
-        .sort({ updatedAt: -1 })
+        .sort({ publishedAt: -1 })
         .skip(history);
 
-      if (contentPages) {
-        //Update analytics
+      if (contentPage) {//Update analytics
+        client.emit('requestContent', contentPage);
+        console.log("GIVING CONTENT: ", contentPage);
+
         const updatedContentPage = await ContentPage.findOneAndUpdate(
-          { creatorId: creatorId, status: "published" },
+          { creatorId: creatorId, viewedBy: { $ne: data.userId } },
           { $addToSet: { viewedBy: data.userId } },
           { new: true }
         );
-        if (updatedContentPage) {
-          client.emit('requestContent', contentPages);
-          return;
+        if (updatedContentPage) { //If the user has not viewed this before, update profile analytics
+          await CreatorProfile.findOneAndUpdate(
+            { userId: updatedContentPage.creatorId },
+            { $inc: { totalViews: 1 } }
+          );
         }
-      }
-
-      client.emit('requestContent', null);
+      } else client.emit('requestContent', null);
     });
 
     socket.on('likePost', async (data: any) => {

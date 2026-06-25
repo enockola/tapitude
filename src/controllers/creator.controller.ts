@@ -41,10 +41,18 @@ export class CreatorController {
   }
 
   dashboard = async (req: Request, res: Response): Promise<void> => {
+    const creatorProfile = await CreatorProfile.findOne({ userId: req.user._id });
+    if (!creatorProfile) {
+      return res.status(404).render("errors/404", {
+        title: "Dashboard not found"
+      });
+    }
+
     const contentPages = await ContentPage.find({ creatorId: req.user._id })
       .sort({ updatedAt: -1 })
       .limit(5);
 
+    //Analytics
     const totalPages = await ContentPage.countDocuments({ creatorId: req.user._id });
     const publishedPages = await ContentPage.countDocuments({
       creatorId: req.user._id,
@@ -55,13 +63,19 @@ export class CreatorController {
       status: "scheduled"
     });
 
+    //Some analytics should exist independently of the posts that are created since the posts will be deleted
+    const totalViews =  creatorProfile.totalViews ? creatorProfile.totalViews : 0;
+    const totalLikes =  creatorProfile.totalLikes ? creatorProfile.totalLikes : 0;
+
     res.render("creator/dashboard", {
       title: "Creator Dashboard",
       contentPages,
       stats: {
         totalPages,
         publishedPages,
-        scheduledPages
+        scheduledPages,
+        totalLikes,
+        totalViews
       }
     });
   }
@@ -96,7 +110,7 @@ export class CreatorController {
       });
     }
     let profileImageMetadata = null;
-    if(profile.profileImageKey){
+    if (profile.profileImageKey) {
       profileImageMetadata = await FileServiceInstance.getFileMetadata(profile.profileImageKey);
       console.log("PROFILE IMAGE METADATA", profileImageMetadata);
     }

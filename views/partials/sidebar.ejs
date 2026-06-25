@@ -17,6 +17,6 @@
   </nav>
 
   <% if (currentUser && currentUser.role !== "admin") { %>
-    <a class="button button--full sidebar__cta" href="/content-pages/new">+ New Post</a>
+    <%- include("../creator/partial-create-button") %>
   <% } %>
 </aside>

@@ -6,23 +6,23 @@
     <h1>Your Performance</h1>
     <p>Quick overview of your content pages.</p>
   </div>
-  <%- include("./create-button") %>
+  <%- include("./partial-create-button") %>
 </section>
 
 <section class="stats-grid">
   <article class="stat-card">
-    <span>Total Pages</span>
-    <strong><%= stats.totalPages %></strong>
-  </article>
-
-  <article class="stat-card">
-    <span>Published</span>
+    <span>Published Posts</span>
     <strong><%= stats.publishedPages %></strong>
   </article>
 
   <article class="stat-card">
-    <span>Scheduled</span>
-    <strong><%= stats.scheduledPages %></strong>
+    <span>Total Likes</span>
+    <strong><%= stats.totalLikes %></strong>
+  </article>
+
+  <article class="stat-card">
+    <span>Total Views</span>
+    <strong><%= stats.totalViews %></strong>
   </article>
 </section>
 
@@ -39,30 +39,30 @@
     </div>
 
     <% if (publishedContent.length === 0) { %>
-      <p>No published content yet.</p>
+    <p>No published content yet.</p>
     <% } else { %>
-      <div class="mini-list">
-        <% publishedContent.forEach((page) => { %>
-          <div class="mini-list__item">
-            <div class="content-summary">
-              <a href="/content-pages/<%= page._id %>/edit">
-                <strong><%= page.title %></strong>
-              </a>
+    <div class="mini-list">
+      <% publishedContent.forEach((page) => { %>
+      <div class="mini-list__item">
+        <div class="content-summary">
+          <a href="/content-pages/<%= page._id %>/edit">
+            <strong><%= page.title %></strong>
+          </a>
 
-              <a class="public-link" href="/p/<%= page.slug %>" target="_blank">
-                /p/<%= page.slug %>
-              </a>
-            </div>
+          <a class="public-link" href="/p/<%= page.slug %>" target="_blank">
+            /p/<%= page.slug %>
+          </a>
+        </div>
 
-            <div class="item-meta">
-              <small class="badge">
-                Published:
-                <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
-              </small>
-            </div>
-          </div>
-        <% }) %>
+        <div class="item-meta">
+          <small class="badge">
+            Published:
+            <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
+          </small>
+        </div>
       </div>
+      <% }) %>
+    </div>
     <% } %>
   </article>
 
@@ -73,31 +73,31 @@
     </div>
 
     <% if (scheduledContent.length === 0) { %>
-      <p>No scheduled content yet.</p>
+    <p>No scheduled content yet.</p>
     <% } else { %>
-      <div class="mini-list">
-        <% scheduledContent.forEach((page) => { %>
-          <div class="mini-list__item">
-            <div class="content-summary">
-              <a href="/content-pages/<%= page._id %>/edit">
-                <strong><%= page.title %></strong>
-              </a>
+    <div class="mini-list">
+      <% scheduledContent.forEach((page) => { %>
+      <div class="mini-list__item">
+        <div class="content-summary">
+          <a href="/content-pages/<%= page._id %>/edit">
+            <strong><%= page.title %></strong>
+          </a>
 
-              <span class="muted-link">/p/<%= page.slug %></span>
-            </div>
+          <span class="muted-link">/p/<%= page.slug %></span>
+        </div>
 
-            <div class="item-meta">
-              <small class="badge">
+        <div class="item-meta">
+          <small class="badge">
 
-                Scheduled:
+            Scheduled:
 
-                <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
+            <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
 
-              </small>
-            </div>
-          </div>
-        <% }) %>
+          </small>
+        </div>
       </div>
+      <% }) %>
+    </div>
     <% } %>
   </article>
 </section>

@@ -19,6 +19,10 @@ header {
   width: 100%;
 }
 
+footer{
+  bottom: 80px;
+}
+
 .post {
   height: 100vh;
   scroll-snap-align: start;
