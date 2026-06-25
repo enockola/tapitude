@@ -13,6 +13,64 @@ if (menuToggle && menu) {
 }
 
 /*
+UTILS
+*/
+
+
+async function showDialog({
+  description,
+  confirmText = "Ok",
+  danger = false,
+  onConfirm = null
+}) {
+  const dialog = document.createElement("dialog");
+
+  if (onConfirm) {//Confirmation box
+    dialog.innerHTML = `
+    <p>${description}</p>
+
+    <form method="dialog" class="button_panel">
+      <button value="cancel">Cancel</button>
+      <button
+        value="confirm"
+        class="${danger ? "danger" : ""}"
+      >
+        ${confirmText}
+      </button>
+    </form>
+  `;
+  } else { //Simple alert
+    dialog.innerHTML = `
+    <p>${description}</p>
+    <form method="dialog" class="button_panel">
+      <button value="cancel"> ${confirmText}</button>
+    </form>
+  `;
+  }
+
+  document.body.appendChild(dialog);
+
+  const result = await new Promise(resolve => {
+    dialog.addEventListener(
+      "close",
+      () => resolve(dialog.returnValue),
+      { once: true }
+    );
+
+    dialog.showModal();
+  });
+
+  dialog.remove();
+
+  if (result === "confirm") {
+    await onConfirm();
+    return true;
+  }
+
+  return false;
+}
+
+/*
 ==========================================
 ==========================================
 == TIMEZONE UTILS

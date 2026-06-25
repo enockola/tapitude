@@ -48,6 +48,15 @@
       }
       const fileName = fileInput.files[0].name;
       const fileSize = fileInput.files[0].size;
+
+      if (fileSize > <%=maxSizeBytes %>) {
+        showDialog({
+          description: `File is too large. Please select a file less than ${formatBytes(<%= maxSizeBytes %>)}`
+        });
+        fileInput.value = "";
+        return;
+      }
+
       updateMediaLabel(fileName, fileSize);
     });
 

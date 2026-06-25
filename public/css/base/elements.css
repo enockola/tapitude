@@ -100,7 +100,7 @@ dialog {
     transform 0.3s ease,
     overlay 0.3s allow-discrete,
     display 0.3s allow-discrete;
-  opacity: 0;
+  opacity: 1;
   transform: translateY(10px);
 }
 
