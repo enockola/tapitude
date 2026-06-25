@@ -27,6 +27,7 @@
     const currentPath = "<%= currentPath %>";
     const creatorSlug = "<%= creatorProfile.creatorSlug %>";
     const creatorId = "<%= creatorProfile.userId %>";
+    const brandColor = "<%= creatorProfile.brandColor %>";
     console.log("Current path = ", currentPath);
     console.log("Creator slug = ", creatorSlug);
     console.log("Creator user id = ", creatorId);
@@ -42,13 +43,13 @@
   <div class="left-group" style="display: flex; gap: 10px;">
     <% if(creatorProfile.profileImageKey ) { %>
     <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
-    <% } else { %>
-    <a class="brand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
     <% } %>
+    <a class="creatorBrand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
+
 
   </div>
   <!-- <span class="eyebrow"> <%= creatorProfile.displayName %>'s Content Hub</span> -->
   <!-- <div class="topbar__menu" id="site-navigation" data-menu> </div> -->
 
-  <a class="brand" href="/">Tapitude</a>
+  <a class="powered-by-logo" href="/"> <img src="/assets/icons/tapitude_logo.png" alt="Tapitude Logo" /> <span>Powered by Tapitude</span> </a>
 </header>

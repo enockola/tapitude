@@ -5,14 +5,14 @@ export interface IContentPage extends Document {
   creatorId: mongoose.Types.ObjectId;
   fileKey?: string;
   body?: string;
-  status: "draft" | "scheduled" | "published";
-  scheduledFor?: Date;
-  scheduledTimeZone?: string;
-  publishedAt?: Date;
+  status: "draft" | "published";
+  publishDate?: Date;
   createdAt: Date;
   updatedAt: Date;
   likes: number;
   viewedBy: String[];
+  isPublished(): boolean;
+  isScheduled(): boolean;
 }
 
 // 2. Define the schema
@@ -28,21 +28,24 @@ const contentPageSchema = new Schema<IContentPage>(
     body: { type: String, trim: true },
     status: {
       type: String,
-      enum: ["draft", "scheduled", "published"],
+      enum: ["draft", "published"],
       default: "draft",
       index: true
     },
-    scheduledFor: { type: Date },
-    scheduledTimeZone: {
-      type: String,
-      default: "America/New_York"
-    },
-    publishedAt: { type: Date },
+    publishDate: { type: Date },
     likes: { type: Number, default: 0 },
     viewedBy: { type: [String], default: [] }
   },
   { timestamps: true }
 );
+
+contentPageSchema.methods.isPublished = function () {
+  return this.status === "published" && this.publishDate < new Date();
+}
+
+contentPageSchema.methods.isScheduled = function () {
+  return this.status === "published" && this.publishDate > new Date();
+}
 
 const ContentPage = mongoose.model<IContentPage>("ContentPage", contentPageSchema);
 export default ContentPage;

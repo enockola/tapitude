@@ -19,6 +19,11 @@ export function etInputToUtcDate(value?: string): Date | null {
   return etDateTime.toUTC().toJSDate();
 }
 
+/**
+ * Convert Time in UTC to eastern time
+ * @param value
+ * @returns 
+ */
 export function toEtDateTimeInputValue(value?: Date | string | null): string {
   const dateTime = value
     ? DateTime.fromJSDate(new Date(value)).setZone(SCHEDULE_TIME_ZONE)
@@ -27,6 +32,11 @@ export function toEtDateTimeInputValue(value?: Date | string | null): string {
   return dateTime.toFormat("yyyy-MM-dd'T'HH:mm");
 }
 
+/**
+ * Convert Time in UTC to eastern time
+ * @param value 
+ * @returns 
+ */
 export function formatEtDateTime(value?: Date | string | null): string {
   if (!value) {
     return "No date";

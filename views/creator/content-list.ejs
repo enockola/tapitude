@@ -6,27 +6,30 @@
     <h1>My Content</h1>
     <p>Manage public content pages.</p>
   </div>
-   <%- include("./partial-create-button") %>
+  <%- include("./partial-create-button") %>
 </section>
 
 <section class="card">
   <% if (contentPages.length === 0) { %>
-  <p>No content pages yet.</p>
+  <p><i class="ph ph-pen"></i> No content pages yet. Create one to get started!</p>
   <% } else { %>
   <div class="table-list">
-    <% contentPages.forEach((page) => { 
-        let pageTitle = ""; 
+    <% contentPages.forEach((page) => {     
         let updatedAt = "";
-
-        if (page.body) {
-          pageTitle =
-            "\""+(page.body.length > 50
-              ? page.body.slice(0, 50) + "..."
-              : page.body)+"\"";
-        } 
-         if(page.fileKey) {
-          pageTitle += " (1 attachment)";
+        function makePageDescription(page) {
+          let pageTitle = ""; 
+          if (page.body) {
+            pageTitle =
+              "\""+(page.body.length > 50
+                ? page.body.slice(0, 50) + "..."
+                : page.body)+"\"";
+          } 
+          if(page.fileKey) {
+            pageTitle += " (1 attachment)";
+          }
+          return pageTitle;
         }
+        let pageTitle = makePageDescription(page);
         %>
     <article class="table-row">
       <div class="content-summary">
@@ -35,9 +38,14 @@
 
         <span><%= pageTitle %></span>
 
-        <% if (page.status === "published") { %><label class="badge badge--success">Published: <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %></label>
-        <% } else if (page.status === "scheduled") { %><label class="badge badge--warn">Scheduled: <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %></label>
-        <% } else { %><label class="badge">Draft</label>
+        <% 
+        if (page.status === "published") { 
+          if(page.publishDate < new Date()) { %>
+        <label class="badge badge--success">Published: <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %></label>
+        <% } else {  %>
+        <label class="badge badge--warn">Scheduled: <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %></label>
+        <% }} else { %>
+        <label class="badge">Draft</label>
         <% } %>
 
       </div>

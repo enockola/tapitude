@@ -67,6 +67,9 @@ async function getMimeType(url) {
     return response.headers.get("content-type");
 }
 
+
+
+
 function createPost(parentElement, post) {
     const postChild = document.createElement("div");
     postChild.classList.add("post");
@@ -76,7 +79,7 @@ function createPost(parentElement, post) {
     postChild.appendChild(postChildContent);
 
     postChildContent.innerHTML = `
-    <p class="post-date">${post.publishedAt}</p>
+    <p class="post-date">${formatEtDateTime(post.publishDate)}</p>
     <div class="post-media"></div>
     <div class="post-text">${post.body ?? ""}</div>
     <div class="actions">
@@ -139,3 +142,43 @@ const observer = new IntersectionObserver(
 
 observer.observe(target);
 
+
+
+
+///Update styliing
+function getBrightness(color) {
+    const el = document.createElement('div');
+    el.style.color = color;
+    document.body.appendChild(el);
+
+    const rgb = getComputedStyle(el).color;
+    document.body.removeChild(el);
+
+    const [r, g, b] = rgb.match(/\d+/g).map(Number);
+
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+function tintColor(color, amount = 0.95) {
+  const div = document.createElement("div");
+  div.style.color = color;
+  document.body.appendChild(div);
+
+  const rgb = getComputedStyle(div).color;
+  document.body.removeChild(div);
+
+  const [r, g, b] = rgb.match(/\d+/g).map(Number);
+
+  const mix = c => Math.round(c + (255 - c) * amount);
+
+  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
+if (getBrightness(brandColor) < 128) {
+    document.documentElement.style.setProperty(
+        '--color-heading',
+        'white'
+    );
+    document.body.style.backgroundColor = tintColor(brandColor);
+    document.querySelector(".powered-by-logo").style.filter = "invert(1)";
+}

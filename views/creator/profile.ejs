@@ -27,6 +27,7 @@
     </label>
 
     <label>Logo</label>
+    <p>For best results, it is recommended to upload a logo as a .png in just black or white.</p>
     <%- include("./partial_file_upload", {
           title: "Upload Logo",
           description: "Upload your brand logo",
@@ -43,6 +44,7 @@
     <% } %>
     <div>
       <label>Brand Color:</label>
+      <p>Choose a brand color to use for your brand, For best results, it is recommended to use a color from <a href="https://coolors.co/" target="_blank">coolors.co</a></p>
       <input type="color" name="brandColor" value="<%= profile?.brandColor || "#000" %>" />
     </div>
 

@@ -54,7 +54,11 @@
       <label>
         Publish Option
         <select name="status" id="publishOption">
-          <% const currentStatus = contentPage?.status || "published"; %>
+          <%  let currentStatus = contentPage?.status || "published";
+              if (contentPage?.publishDate && contentPage.publishDate > new Date()) {
+                currentStatus = "scheduled";
+              }
+          %>
           <option value="published" <%= currentStatus === "published" ? "selected" : "" %>>Publish now</option>
           <option value="scheduled" <%= currentStatus === "scheduled" ? "selected" : "" %>>Schedule for later</option>
           <option value="draft" <%= currentStatus === "draft" ? "selected" : "" %>>Save as draft</option>
@@ -62,10 +66,10 @@
       </label>
 
       <label id="scheduledForLabel">
-        Schedule Time (<%= scheduleTimeZoneLabel %>)
-        <input type="datetime-local" name="scheduledFor" id="scheduledFor" value="<%= toEtDateTimeInputValue(contentPage?.scheduledFor) %>">
+        Schedule Time (<%= scheduleTimeZone %>)
+        <input type="datetime-local" name="scheduledFor" id="scheduledFor" value="<%= toEtDateTimeInputValue(contentPage?.publishDate) %>">
         <small class="field-hint">
-          NOTE: All scheduled posts use Eastern Time.
+          NOTE: All scheduled posts use <%= scheduleTimeZoneLabel %>.
           <!--The server saves this as UTC.-->
         </small>
       </label>

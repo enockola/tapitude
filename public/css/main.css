@@ -3,8 +3,7 @@
 @layer reset, tokens, base, layout, components, utilities;
 
 @import url("./base/reset.css") layer(reset);
-@import url("./tokens/colors.css") layer(tokens);
-@import url("./tokens/variables.css") layer(tokens);
+@import url("./base/variables.css") layer(tokens);
 @import url("./base/elements.css") layer(base);
 @import url("./layout/home.css") layer(layout);
 @import url("./layout/dashboard.css") layer(layout);
@@ -15,7 +14,7 @@
 @import url("./components/cards.css") layer(components);
 @import url("./components/nav.css") layer(components);
 @import url("./components/sidebar.css") layer(components);
-@import url("./utilities/utilities.css") layer(utilities);
+
 body{
     overflow-x: hidden;
 }

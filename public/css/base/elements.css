@@ -194,3 +194,29 @@ dialog::backdrop {
   z-index: 1;
   pointer-events: none;
 }
+
+.eyebrow {
+  color: var(--color-muted);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.prose {
+  max-width: 70ch;
+}
+
+.footer {
+  padding: var(--space-lg);
+  text-align: center;
+}
+
+
+.mock-hint {
+  background: var(--color-surface-soft);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-sm);
+  font-size: 0.9rem;
+}

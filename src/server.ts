@@ -12,8 +12,9 @@ import { startContentScheduler } from "./services/contentScheduler.service";
 import {
   formatEtDateTime,
   toEtDateTimeInputValue,
+  SCHEDULE_TIME_ZONE,
   SCHEDULE_TIME_ZONE_LABEL
-} from "./utils/etDateTime";
+} from "./utils/timezoneUtils.js";
 
 import notFound from "./middleware/notFound.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -38,9 +39,11 @@ const useMockData = process.env.USE_MOCK_DATA === "true";
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
 
+//App globals for use by views
 app.locals.formatEtDateTime = formatEtDateTime;
 app.locals.toEtDateTimeInputValue = toEtDateTimeInputValue;
 app.locals.scheduleTimeZoneLabel = SCHEDULE_TIME_ZONE_LABEL;
+app.locals.scheduleTimeZone = SCHEDULE_TIME_ZONE;
 
 app.use(helmet({
   contentSecurityPolicy: false

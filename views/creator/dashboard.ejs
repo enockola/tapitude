@@ -10,10 +10,6 @@
 </section>
 
 <section class="stats-grid">
-  <article class="stat-card">
-    <span>Published Posts</span>
-    <strong><%= stats.publishedPages %></strong>
-  </article>
 
   <article class="stat-card">
     <span>Total Likes</span>
@@ -28,37 +24,43 @@
 
 <%
   const publishedContent = contentPages.filter((page) => page.status === "published");
-  const scheduledContent = contentPages.filter((page) => page.status === "scheduled");
+  const draftContent = contentPages.filter((page) => page.status === "draft");
+  function makePageDescription(page) {
+  let pageTitle = ""; 
+  if (page.body) {
+    pageTitle =
+      "\""+(page.body.length > 50
+        ? page.body.slice(0, 50) + "..."
+        : page.body)+"\"";
+  } 
+  if(page.fileKey) {
+    pageTitle += " (1 attachment)";
+  }
+  return pageTitle;
+}
 %>
 
 <section class="dashboard-grid">
+
+
   <article class="card">
     <div class="card-header">
-      <h2>Published Content</h2>
+      <h2>Drafts (<%= draftContent.length %>)</h2>
       <a href="/creator/content">View all</a>
     </div>
 
-    <% if (publishedContent.length === 0) { %>
-    <p>No published content yet.</p>
+    <% if (draftContent.length === 0) { %>
+    <p>No drafted content.</p>
     <% } else { %>
     <div class="mini-list">
-      <% publishedContent.forEach((page) => { %>
+      <% draftContent.forEach((page) => { %>
       <div class="mini-list__item">
-        <div class="content-summary">
-          <a href="/content-pages/<%= page._id %>/edit">
-            <strong><%= page.title %></strong>
-          </a>
-
-          <a class="public-link" href="/p/<%= page.slug %>" target="_blank">
-            /p/<%= page.slug %>
-          </a>
-        </div>
+        <div class="content-summary"><%= makePageDescription(page) %></div>
 
         <div class="item-meta">
-          <small class="badge">
-            Published:
-            <%= page.publishedAt ? formatEtDateTime(page.publishedAt) : "No date" %>
-          </small>
+          <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
+            <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
+          </a>
         </div>
       </div>
       <% }) %>
@@ -68,33 +70,28 @@
 
   <article class="card">
     <div class="card-header">
-      <h2>Scheduled Content</h2>
+      <h2>Published Content (<%= publishedContent.length %>)</h2>
       <a href="/creator/content">View all</a>
     </div>
 
-    <% if (scheduledContent.length === 0) { %>
-    <p>No scheduled content yet.</p>
+    <% if (publishedContent.length === 0) { %>
+    <p>No published content yet.</p>
     <% } else { %>
     <div class="mini-list">
-      <% scheduledContent.forEach((page) => { %>
+      <% publishedContent.forEach((page) => { %>
       <div class="mini-list__item">
-        <div class="content-summary">
-          <a href="/content-pages/<%= page._id %>/edit">
-            <strong><%= page.title %></strong>
-          </a>
-
-          <span class="muted-link">/p/<%= page.slug %></span>
-        </div>
+        <div class="content-summary"><%= makePageDescription(page) %></div>
 
         <div class="item-meta">
           <small class="badge">
-
-            Scheduled:
-
-            <%= page.scheduledFor ? formatEtDateTime(page.scheduledFor) : "No date" %>
-
+            Published:
+            <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %>
           </small>
+          <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
+            <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
+          </a>
         </div>
+
       </div>
       <% }) %>
     </div>

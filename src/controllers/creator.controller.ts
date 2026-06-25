@@ -2,7 +2,7 @@ import ContentPage from "../models/ContentPage";
 import CreatorProfile from "../models/CreatorProfile";
 import { Request, Response, Router } from 'express';
 import { asyncHandler, busboy_getRequest } from "../utils/asyncHandler";
-import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/etDateTime";
+import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/timezoneUtils";
 import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
@@ -58,14 +58,9 @@ export class CreatorController {
       creatorId: req.user._id,
       status: "published"
     });
-    const scheduledPages = await ContentPage.countDocuments({
-      creatorId: req.user._id,
-      status: "scheduled"
-    });
-
     //Some analytics should exist independently of the posts that are created since the posts will be deleted
-    const totalViews =  creatorProfile.totalViews ? creatorProfile.totalViews : 0;
-    const totalLikes =  creatorProfile.totalLikes ? creatorProfile.totalLikes : 0;
+    const totalViews = creatorProfile.totalViews ? creatorProfile.totalViews : 0;
+    const totalLikes = creatorProfile.totalLikes ? creatorProfile.totalLikes : 0;
 
     res.render("creator/dashboard", {
       title: "Creator Dashboard",
@@ -73,7 +68,6 @@ export class CreatorController {
       stats: {
         totalPages,
         publishedPages,
-        scheduledPages,
         totalLikes,
         totalViews
       }
@@ -209,6 +203,10 @@ export class CreatorController {
         };
       }
 
+      if (!fields.postID || !mongoose.Types.ObjectId.isValid(fields.postID)) {
+        return res.status(500).send("Invalid post ID");
+      }
+
       //If the content page already has a file, delete it
       let contentPage = await ContentPage.findByIdAndUpdate(fields.postID, { new: true });
       //If the content page already has a file, delete it
@@ -230,15 +228,15 @@ export class CreatorController {
 
   post_createEditContent = async (req: Request, res: Response): Promise<void> => {
     const { postID, body, status, scheduledFor } = req.body;
-    const pageStatus = status || "published";
+    //Convert scheduled status to published
+    const pageStatus = status === "scheduled" ? "published" : status;
 
     const pageData = {
       creatorId: req.user._id,
       body,
+      //Status can only be "published" or "scheduled"
       status: pageStatus,
-      scheduledFor: pageStatus === "scheduled" ? etInputToUtcDate(scheduledFor) : null,
-      scheduledTimeZone: pageStatus === "scheduled" ? SCHEDULE_TIME_ZONE : undefined,
-      publishedAt: pageStatus === "published" ? new Date() : null
+      publishDate: scheduledFor ? etInputToUtcDate(scheduledFor) : new Date()
     };
 
     if (postID && mongoose.Types.ObjectId.isValid(postID)) { //editing

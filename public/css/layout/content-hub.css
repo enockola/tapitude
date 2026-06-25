@@ -1,7 +1,6 @@
 .feed {
   max-width: 600px;
   margin: auto;
-  padding: 10px;
 }
 html,
 body {
@@ -13,13 +12,43 @@ body {
   margin: 0;
 }
 
+.creatorBrand {
+  font-family: var(--font-body);
+  font-size: clamp(1.2rem, 1vw, 1.8rem);
+  color: var(--color-heading);
+  white-space: nowrap;
+  font-weight: 800;
+  opacity: 0.8;
+  margin-left: 15px;
+}
+
+.powered-by-logo {
+  opacity: 0.4;
+  font-size: 0.9rem;
+  margin-left: 15px;
+  display: flex;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.powered-by-logo img {
+  max-height: 20px;
+  width: auto;
+}
+
 /*TODO: We can remove this if we want the header to be conditionally visible*/
 header {
   position: fixed;
   width: 100%;
 }
+header .left-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
 
-footer{
+footer {
+  position: relative;
   bottom: 80px;
 }
 
@@ -118,7 +147,7 @@ footer{
   text-align: center;
   padding: 20px;
   color: gray;
-  height:200px;
+  height: 200px;
 }
 
 .creator-topbar {
@@ -128,4 +157,22 @@ footer{
 .creator-topbar .brand-logo {
   max-height: 50px;
   display: inline;
+}
+
+@media (max-width: 600px) {
+  .powered-by-logo span {
+    display: none;
+  }
+
+  .powered-by-logo img {
+    max-height: 28px;
+  }
+
+  .post-content {
+    margin: 10px;
+  }
+}
+
+.powered-by-logo:hover {
+  opacity: 0.8;
 }
