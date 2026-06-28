@@ -36,9 +36,6 @@
 }
 
 .editor-layout {
-  display: grid;
-  grid-template-columns: minmax(700px, 1.5fr) minmax(20rem, 0.8fr);
-  gap: var(--space-lg);
   align-items: start;
 }
 .editor-layout .card{
