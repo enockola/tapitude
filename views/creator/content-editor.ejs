@@ -61,7 +61,6 @@
           %>
           <option value="published" <%= currentStatus === "published" ? "selected" : "" %>>Publish now</option>
           <option value="scheduled" <%= currentStatus === "scheduled" ? "selected" : "" %>>Schedule for later</option>
-          <option value="draft" <%= currentStatus === "draft" ? "selected" : "" %>>Save as draft</option>
         </select>
       </label>
 
@@ -189,11 +188,6 @@
       scheduledForInput.disabled = false;
       scheduleTimeZoneLabel.classList.remove("disabled");
     } else {
-      if (publishOption.value === "draft") {
-        if (isNewPage) saveContentBtn.innerText = "Save as draft";
-      } else {
-        if (isNewPage) saveContentBtn.innerText = "Publish";
-      }
       scheduledForInput.disabled = true;
       scheduleTimeZoneLabel.classList.add("disabled");
     }

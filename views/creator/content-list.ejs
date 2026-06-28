@@ -38,14 +38,10 @@
 
         <span><%= pageTitle %></span>
 
-        <% 
-        if (page.status === "published") { 
-          if(page.publishDate < new Date()) { %>
+        <% if(page.publishDate < new Date()) { %>
         <label class="badge badge--success">Published: <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %></label>
         <% } else {  %>
         <label class="badge badge--warn">Scheduled: <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %></label>
-        <% }} else { %>
-        <label class="badge">Draft</label>
         <% } %>
 
       </div>

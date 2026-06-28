@@ -23,8 +23,8 @@
 </section>
 
 <%
-  const publishedContent = contentPages.filter((page) => page.status === "published");
-  const draftContent = contentPages.filter((page) => page.status === "draft");
+  const publishedContent = contentPages.filter((page) => page.publishDate < new Date());
+  const scheduledContent = contentPages.filter((page) => page.publishDate > new Date());
   function makePageDescription(page) {
   let pageTitle = ""; 
   if (page.body) {
@@ -45,19 +45,23 @@
 
   <article class="card">
     <div class="card-header">
-      <h2>Drafts (<%= draftContent.length %>)</h2>
+      <h2>Scheduled Content (<%= scheduledContent.length %>)</h2>
       <a href="/creator/content">View all</a>
     </div>
 
-    <% if (draftContent.length === 0) { %>
-    <p>No drafted content.</p>
+    <% if (scheduledContent.length === 0) { %>
+    <p>No scheduled content.</p>
     <% } else { %>
     <div class="mini-list">
-      <% draftContent.forEach((page) => { %>
+      <% scheduledContent.forEach((page) => { %>
       <div class="mini-list__item">
         <div class="content-summary"><%= makePageDescription(page) %></div>
 
         <div class="item-meta">
+                <small class="badge">
+            Scheduled:
+            <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %>
+          </small>
           <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
             <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
           </a>

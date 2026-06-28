@@ -5,7 +5,6 @@ export interface IContentPage extends Document {
   creatorId: mongoose.Types.ObjectId;
   fileKey?: string;
   body?: string;
-  status: "draft" | "published";
   publishDate?: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -26,12 +25,6 @@ const contentPageSchema = new Schema<IContentPage>(
     },
     fileKey: { type: String, trim: true },
     body: { type: String, trim: true },
-    status: {
-      type: String,
-      enum: ["draft", "published"],
-      default: "draft",
-      index: true
-    },
     publishDate: { type: Date },
     likes: { type: Number, default: 0 },
     viewedBy: { type: [String], default: [] }
@@ -40,11 +33,11 @@ const contentPageSchema = new Schema<IContentPage>(
 );
 
 contentPageSchema.methods.isPublished = function () {
-  return this.status === "published" && this.publishDate < new Date();
+  return this.publishDate < new Date();
 }
 
 contentPageSchema.methods.isScheduled = function () {
-  return this.status === "published" && this.publishDate > new Date();
+  return this.publishDate > new Date();
 }
 
 const ContentPage = mongoose.model<IContentPage>("ContentPage", contentPageSchema);
