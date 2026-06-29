@@ -30,6 +30,22 @@ import viewerContentHubRoutes from "./routes/viewer_content_hub.routes.js";
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 
+const cookieParser = require('cookie-parser');
+import {generateCsrfToken} from './utils/securityUtils.js';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer); //websocket
@@ -93,7 +109,7 @@ if (process.env.MONGODB_URI) {
 }
 
 app.use(session(sessionOptions));
-
+app.use(cookieParser());
 app.use(attachUser);
 
 //----------------------------------------------------------------------------------------------
@@ -116,23 +132,24 @@ viewerNamespace.on('connection', (socket) => {
   viewerContentHubRoutes.handleSocketConnection(viewerNamespace, socket);
 });
 
-app.use(notFound);
+//The client asske the server for a CSRF token, and the server responds with the token
+app.get("/csrf-token", (req:any, res:any) => {
+  const csrfToken = generateCsrfToken(req, res);
+  // You could also pass the token into the context of a HTML response.
+  res.json({ csrfToken });
+});
 
+
+//Error handlers (these come last)
+app.use(notFound);
 app.use(errorHandler);
 
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 
-// // Handle new connections
-// io.on('connection', (socket) => {
-//   console.log('A user connected:', socket.id);
 
-//   socket.on('disconnect', () => {
-//     console.log('User disconnected:', socket.id);
-//   });
-// });
-
+//Start the server
 const PORT = process.env.PORT || 3000;
 
 async function startServer() {

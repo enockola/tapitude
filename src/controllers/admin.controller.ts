@@ -4,6 +4,7 @@ import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
+import { doubleCsrfProtection, generateCsrfToken,manualCsrfCheck } from '../utils/securityUtils.js';
 
 export class AdminController {
 
@@ -11,10 +12,11 @@ export class AdminController {
     router.get("/dashboard", asyncHandler(this.getDashboardView));
     router.get("/creators", asyncHandler(this.getCreatorsView));
     router.get("/creators/new", asyncHandler(this.getNewCreatorView));
-    router.post("/creators/new", asyncHandler(this.postNewCreator));
     router.get("/edit-creator-account/:id", asyncHandler(this.getEditCreatorsView));
-    router.post("/edit-creator-account/:id", asyncHandler(this.postEditCreator));
-    router.get("/delete-creator-account/:id", asyncHandler(this.getDeleteCreator));
+
+    router.post("/creators/new", manualCsrfCheck, asyncHandler(this.postNewCreator));
+    router.post("/edit-creator-account/:id", manualCsrfCheck, asyncHandler(this.postEditCreator));
+    router.post("/delete-creator-account/:id", manualCsrfCheck, asyncHandler(this.postDeleteCreator));
   }
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {
@@ -43,25 +45,32 @@ export class AdminController {
       ///edit-creator-account/:id
       //We get the ID parameter, the routes makes it easy for us to get the ID
       const creator = await User.findById(req.params.id);
+      // console.log("The creator is: ", creator);
       const creatorProfile = await CreatorProfile.findOne({ userId: req.params.id });
+      // console.log("The creator profile is: ", creatorProfile);
 
       if (!creator || !creatorProfile) {
-        res.status(404).send("Creator not found");
-        return;
+        return res.status(404).render("errors/404", {
+          title: "Creator profile not found"
+        });
       }
+
       res.render("admin/edit-creator-account", {
         title: "Edit Creator Account",
         creator,
-        creatorProfile
+        creatorProfile,
+        _csrf: generateCsrfToken(req, res)
       });
     } catch (error) {
-      res.status(500).send("Error loading creator profile");
+      res.status(500).render("Error loading creator profile");
+      console.error(error);
     }
   }
 
   getNewCreatorView = async (req: Request, res: Response): Promise<void> => {
     res.render("admin/new-creator-account", {
       title: "Create Creator Account",
+       _csrf: generateCsrfToken(req, res),
       error: null
     });
   }
@@ -102,7 +111,7 @@ export class AdminController {
     // res.redirect(req.originalUrl);
   }
 
-  getDeleteCreator = async (req: Request, res: Response): Promise<void> => {
+  postDeleteCreator = async (req: Request, res: Response): Promise<void> => {
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -128,7 +137,7 @@ export class AdminController {
       // Abort transaction on error
       await session.abortTransaction();
       console.error("Deletion failed:", error);
-      res.status(500).send("Error deleting creator.");
+      res.status(500).render("Error deleting creator.");
     } finally {
       session.endSession();
     }

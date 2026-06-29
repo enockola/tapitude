@@ -4,6 +4,7 @@
   padding: var(--space-xl) var(--space-lg);
   display: flex;
   flex-direction: column;
+  grid-row: 1 / 3;
   gap: var(--space-xl);
 }
 

@@ -2,6 +2,7 @@
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
   min-height: calc(100vh - var(--topbar-height));
+  grid-template-rows: 1fr;
 }
 
 .dashboard-main {
@@ -38,14 +39,22 @@
 .editor-layout {
   align-items: start;
 }
-.editor-layout .card{
+.editor-layout .card {
   /* max-width: 800px; */
+}
+
+.footer {
+  padding: var(--space-lg);
+  text-align: center;
+  grid-column: 2;
+  align-self: end;
 }
 
 @media (max-width: 1400px) {
   .editor-layout {
     grid-template-columns: 1fr;
-  }}
+  }
+}
 
 @media (max-width: 900px) {
   .app-shell {
