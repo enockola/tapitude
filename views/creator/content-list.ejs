@@ -9,6 +9,14 @@
   <%- include("./partial-create-button") %>
 </section>
 
+<% if (contentPageLimit?.atLimit) { %>
+<section class="form-warning">
+  <strong>Post limit reached.</strong>
+  You have <%= contentPageLimit.currentCount %> active posts. Creating another post will permanently delete your
+  <%= contentPageLimit.postsToDeleteOnCreate === 1 ? "oldest post and its media" : `${contentPageLimit.postsToDeleteOnCreate} oldest posts and their media` %>.
+</section>
+<% } %>
+
 <section class="card">
   <% if (contentPages.length === 0) { %>
   <p><i class="ph ph-pen"></i> No content pages yet. Create one to get started!</p>
