@@ -1,14 +1,7 @@
 <header class="topbar">
   <a class="brand" href="/">Tapitude</a>
 
-  <button
-    class="topbar__toggle"
-    type="button"
-    aria-label="Open navigation menu"
-    aria-expanded="false"
-    aria-controls="site-navigation"
-    data-menu-toggle
-  >
+  <button class="topbar__toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="site-navigation" data-menu-toggle>
     <span></span>
     <span></span>
     <span></span>
@@ -17,24 +10,23 @@
   <div class="topbar__menu" id="site-navigation" data-menu>
     <nav class="topbar__nav" aria-label="Main navigation">
       <% if (currentUser) { %>
-        <% if (currentUser.role === "admin") { %>
-          <a href="/admin/dashboard" class="<%= currentPath === '/admin/dashboard' ? 'is-active' : '' %>">Dashboard</a>
-          <a href="/admin/creators" class="<%= currentPath === '/admin/creators' ? 'is-active' : '' %>" >Creators</a>
-        <% } else { %>
-          <a href="/creator/dashboard" class="<%= currentPath === '/creator/dashboard' ? 'is-active' : '' %>">Dashboard</a>
-          <a href="/creator/content" class="<%= currentPath === '/creator/content' ? 'is-active' : '' %>">Content</a>
-        <% } %>
+      <% if (currentUser.role === "admin") { %>
+      <a href="/admin/dashboard" class="<%= currentPath === '/admin/dashboard' ? 'is-active' : '' %>">Dashboard</a>
+      <a href="/admin/creators" class="<%= currentPath === '/admin/creators' ? 'is-active' : '' %>">Creators</a>
       <% } else { %>
-        <a href="/about" class="<%= currentPath === '/about' ? 'is-active' : '' %>">About</a>
-        <a href="/auth/login" class="<%= currentPath === '/auth/login' ? 'is-active' : '' %>"><i class="ph ph-user"></i> Log in</a>
+      <a href="/creator/dashboard" class="<%= currentPath === '/creator/dashboard' ? 'is-active' : '' %>">Dashboard</a>
+      <a href="/creator/content" class="<%= currentPath === '/creator/content' ? 'is-active' : '' %>">Content</a>
+       <a href="/creator/profile" class="<%= currentPath === '/creator/profile' ? 'is-active' : '' %>">Settings</a>
+      <% } %>
+      <% } else { %>
+      <a href="/about" class="<%= currentPath === '/about' ? 'is-active' : '' %>">About</a>
+      <a href="/auth/login" class="<%= currentPath === '/auth/login' ? 'is-active' : '' %>"><i class="ph ph-user"></i> Log in</a>
       <% } %>
       <% if (currentUser) { %>
-        <form action="/auth/logout" method="POST">
-          <button type="submit"><i class="ph ph-user"></i> Log out</button>
-        </form>
+      <a type="submit" href="/auth/logout"><i class="ph ph-user"></i> Log out</a>
       <% } %>
     </nav>
 
-   
+
   </div>
 </header>

@@ -1,19 +1,97 @@
-
-
 @layer reset, tokens, base, layout, components, utilities;
 
 @import url("./base/reset.css") layer(reset);
 @import url("./base/variables.css") layer(tokens);
 @import url("./base/elements.css") layer(base);
+@import url("./components/sidebar.css") layer(components);
 @import url("./layout/home.css") layer(layout);
+
 @import url("./layout/dashboard.css") layer(layout);
 @import url("./layout/forms.css") layer(layout);
 @import url("./layout/public-page.css") layer(layout);
 @import url("./components/buttons.css") layer(components);
 @import url("./components/cards.css") layer(components);
 @import url("./components/nav.css") layer(components);
-@import url("./components/sidebar.css") layer(components);
 
-body{
-    overflow-x: hidden;
+
+.app-shell {
+  display: grid;
+  grid-template-columns: var(--sidebar-width) 1fr;
+  min-height: calc(100vh - var(--topbar-height));
+  grid-template-rows: 1fr;
+}
+
+.dashboard-main {
+  padding: var(--space-2xl);
+}
+
+.content-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-xl);
+}
+
+.content-header > div {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+.editor-layout {
+  align-items: start;
+}
+.editor-layout .card {
+  /* max-width: 800px; */
+}
+
+.footer {
+  padding: var(--space-lg);
+  text-align: center;
+  grid-column: 2;
+  align-self: end;
+}
+
+@media (max-width: 1400px) {
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 800px) {
+  .content-header {
+    flex-direction: column;
+  }
+
+  .app-shell {
+    display: block;
+  }
+
+  .sidebar {
+    display: none !important;
+  }
+
+  .stats-grid,
+  .dashboard-grid,
+  .editor-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-main {
+    padding: var(--space-lg);
+  }
 }

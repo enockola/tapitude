@@ -1,5 +1,3 @@
-
-
 @layer reset, tokens, base, layout, components, utilities;
 
 @import url("./base/reset.css") layer(reset);
@@ -8,12 +6,188 @@
 @import url("./layout/home.css") layer(layout);
 @import url("./layout/forms.css") layer(layout);
 @import url("./layout/public-page.css") layer(layout);
-@import url("./layout/content-hub.css") layer(layout);
 @import url("./components/buttons.css") layer(components);
 @import url("./components/cards.css") layer(components);
 @import url("./components/nav.css") layer(components);
 @import url("./components/sidebar.css") layer(components);
 
-body{
-    overflow-x: hidden;
+
+.feed {
+  max-width: 600px;
+  margin: auto;
 }
+html,
+body {
+  height: 100%;
+  scroll-snap-type: y mandatory;
+}
+
+body {
+  margin: 0;
+}
+
+.creatorBrand {
+  font-family: var(--font-body);
+  font-size: clamp(1.2rem, 1vw, 1.8rem);
+  color: var(--color-heading);
+  white-space: nowrap;
+  font-weight: 800;
+  opacity: 0.8;
+  margin-left: 15px;
+}
+
+.powered-by-logo {
+  opacity: 0.4;
+  font-size: 0.9rem;
+  margin-left: 15px;
+  display: flex;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.powered-by-logo img {
+  max-height: 20px;
+  width: auto;
+}
+
+/*TODO: We can remove this if we want the header to be conditionally visible*/
+header {
+  position: fixed;
+  width: 100%;
+}
+header .left-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+footer {
+  position: relative;
+  bottom: 80px;
+}
+
+.post {
+  height: 100vh;
+  scroll-snap-align: start;
+  margin: 0;
+}
+
+.post-content {
+  background: white;
+  border-radius: 10px;
+  padding: 12px;
+  position: relative;
+  top: 100px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 100px);
+}
+
+.post_media {
+  /* min-height: 50vh; */
+}
+
+.post-header {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.post img,
+.post video {
+  width: 100%;
+  border-radius: 8px;
+  margin-top: 8px;
+}
+
+.post-text {
+  margin-top: 6px;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.actions button {
+  position: relative;
+  overflow: hidden;
+
+  border: none;
+  background: none;
+  cursor: pointer;
+
+  font-size: 1em;
+  padding: 16px;
+  width: 100%;
+}
+.actions button {
+  transition:
+    transform 0.15s ease,
+    background-color 0.8s ease-out,
+    color 0.8s ease-out;
+}
+
+.actions button:active {
+  transition: none;
+
+  transform: scale(0.96);
+  background: rgba(255, 188, 188, 0.586);
+  color: rgb(190, 29, 0);
+}
+
+.reactions {
+  font-size: 12px;
+  color: #555;
+  margin-top: 6px;
+  cursor: pointer;
+}
+
+#reactionModal {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  display: none;
+}
+
+#loadMore {
+  text-align: center;
+  padding: 20px;
+  color: gray;
+  height: 200px;
+}
+
+.creator-topbar {
+  background-color: var(--brand-color-primary);
+}
+
+.creator-topbar .brand-logo {
+  max-height: 50px;
+  display: inline;
+}
+
+@media (max-width: 600px) {
+  .powered-by-logo span {
+    display: none;
+  }
+
+  .powered-by-logo img {
+    max-height: 28px;
+  }
+
+  .post-content {
+    margin: 10px;
+  }
+}
+
+.powered-by-logo:hover {
+  opacity: 0.8;
+}
+

@@ -22,3 +22,12 @@
   width: min(64rem, 100%);
   margin-inline: auto;
 }
+
+@media (max-width: 800px) {
+  .landing,
+  .page,
+  .auth-page,
+  .error-page {
+    padding: var(--space-sm);
+  }
+}

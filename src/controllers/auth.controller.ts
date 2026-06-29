@@ -6,6 +6,7 @@ export class AuthController {
   registerRoutes(router: Router) {
     router.get("/login", this.showLogin);
     router.post("/login", asyncHandler(this.login));
+    router.get("/logout", this.logout);
     router.post("/logout", this.logout);
   }
 

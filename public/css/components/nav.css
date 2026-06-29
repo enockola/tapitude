@@ -83,7 +83,7 @@
   border-radius: 999px;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
   .topbar {
     min-height: auto;
     padding: var(--space-md);
@@ -103,8 +103,7 @@
   }
 
   .topbar__menu.is-open {
-    display: grid;
-    gap: var(--space-md);
+    display: block;
   }
 
   .topbar__nav {
@@ -112,12 +111,8 @@
     gap: var(--space-sm);
   }
 
-  .topbar__nav a,
-  .topbar__menu .button {
-    width: 100%;
-    justify-content: flex-start;
+  .topbar__nav a {
     padding: 0.75rem;
-    border-radius: var(--radius-sm);
   }
 
   .topbar__nav a:hover {
