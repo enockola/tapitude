@@ -60,6 +60,15 @@ textarea {
   font-weight: 700;
 }
 
+.form-success {
+  color: rgb(0, 109, 45);
+  background: rgb(224, 248, 233);
+  border: 1px solid rgb(74, 163, 103);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  font-weight: 700;
+}
+
 .form-warning {
   color: rgb(132, 77, 0);
   background: rgb(255, 246, 215);
