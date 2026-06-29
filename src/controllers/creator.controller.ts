@@ -172,6 +172,7 @@ export class CreatorController {
       fileMetadata: null,
       contentPageLimit,
       publicUrl: null,
+      success: null,
       error: null
     });
   }
@@ -322,9 +323,17 @@ export class CreatorController {
 
     if (postID && mongoose.Types.ObjectId.isValid(postID)) { //editing
       //Find one and update it with the fields we have specified, first param is the filter, second is the update, third is options
-      let contentPage = await ContentPage.findByIdAndUpdate(postID, pageData, { new: true });
+      let contentPage = await ContentPage.findOneAndUpdate({
+        _id: postID,
+        creatorId: req.user._id
+      }, pageData, { new: true });
+      if (!contentPage) {
+        return res.status(404).render("errors/404", {
+          title: "Content not found"
+        });
+      }
       console.log("\nEDITED CONTENT PAGE", postID, contentPage);
-      res.redirect(`/creator/pages/${postID}/editor`);
+      res.redirect(`/creator/pages/${postID}/editor?saved=1`);
     } else { //creating
       let contentPage = await ContentPage.create(pageData);
       const deletedContentPages = await enforceContentPageLimit(req.user._id, contentPage._id);
@@ -360,6 +369,7 @@ export class CreatorController {
         contentPage: contentPage,
         fileMetadata: fileMetadata,
         contentPageLimit: await getContentPageLimitInfo(req.user._id),
+        success: req.query.saved === "1" ? "Post saved." : null,
         error: null
       });
     } else { //new document
@@ -370,6 +380,7 @@ export class CreatorController {
         fileMetadata: null,
         contentPage: null,
         contentPageLimit,
+        success: null,
         error: null
       });
     }

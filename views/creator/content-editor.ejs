@@ -18,6 +18,10 @@
     <p class="form-error"><%= error %></p>
     <% } %>
 
+    <% if (success) { %>
+    <p class="form-success"><%= success %></p>
+    <% } %>
+
     <% if (!contentPage && contentPageLimit?.atLimit) { %>
     <div class="form-warning">
       <strong>Post limit reached.</strong>
