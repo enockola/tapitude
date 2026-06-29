@@ -46,8 +46,7 @@ const mockContentPages = [
     embedUrl: "https://youtube.com/example",
     embedType: "youtube",
     status: "published",
-    scheduledFor: null,
-    publishedAt: new Date()
+    publishDate: new Date()
   },
   {
     _id: "content-2",
@@ -59,9 +58,8 @@ const mockContentPages = [
     externalLink: "https://example.com/guide",
     embedUrl: "",
     embedType: "none",
-    status: "scheduled",
-    scheduledFor: new Date(Date.now() + 1000 * 60 * 60 * 24),
-    publishedAt: null
+    status: "published",
+    publishDate: new Date(Date.now() + 1000 * 60 * 60 * 24)
   }
 ];
 

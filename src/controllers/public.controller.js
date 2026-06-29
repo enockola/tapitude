@@ -2,9 +2,13 @@ import ContentPage from "../models/ContentPage";
 import mockData from "../data/mockData";
 
 async function showPublicContent(req, res) {
+  const now = new Date();
+
   if (process.env.USE_MOCK_DATA === "true") {
     const contentPage = mockData.mockContentPages.find((page) => {
-      return page.slug === req.params.slug && page.status === "published";
+      return page.slug === req.params.slug
+        && page.status === "published"
+        && (!page.publishDate || new Date(page.publishDate) <= now);
     });
 
     if (!contentPage) {
@@ -21,7 +25,11 @@ async function showPublicContent(req, res) {
 
   const contentPage = await ContentPage.findOne({
     slug: req.params.slug,
-    status: "published"
+    status: "published",
+    $or: [
+      { publishDate: { $lte: now } },
+      { publishDate: null }
+    ]
   });
 
   if (!contentPage) {

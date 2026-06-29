@@ -8,7 +8,6 @@ import methodOverride from "method-override";
 import helmet from "helmet";
 import morgan from "morgan";
 import connectDB from "./utils/db.js";
-import { startContentScheduler } from "./services/contentScheduler.service";
 import {
   formatEtDateTime,
   toEtDateTimeInputValue,
@@ -138,10 +137,6 @@ const PORT = process.env.PORT || 3000;
 
 async function startServer() {
   await connectDB();
-
-  if (process.env.MONGODB_URI) {
-    startContentScheduler();
-  }
 
   httpServer.listen(PORT, () => {
     console.log(`Tapitude Creator Hub running on port ${PORT}`);

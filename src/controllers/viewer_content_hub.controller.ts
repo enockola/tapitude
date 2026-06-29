@@ -22,12 +22,20 @@ export class ViewerContentHubController {
       //Get all the content for this creator
       const history = data.history;
       const creatorId = data.creatorId;
+      const now = new Date();
 
       //Get the content
       const contentPage = await ContentPage.findOne(
-        { creatorId: creatorId, status: "published" }
+        {
+          creatorId: creatorId,
+          status: "published",
+          $or: [
+            { publishDate: { $lte: now } },
+            { publishDate: null }
+          ]
+        }
       )
-        .sort({ publishedAt: -1 })
+        .sort({ publishDate: -1 })
         .skip(history);
 
       if (contentPage) {//Update analytics
