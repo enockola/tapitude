@@ -7,6 +7,79 @@ import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
 
+const MAX_CONTENT_PAGES_PER_CREATOR = 25;
+
+function describeContentPage(contentPage: any): string {
+  if (!contentPage) {
+    return "";
+  }
+
+  const descriptionParts: string[] = [];
+  if (contentPage.body) {
+    const body = String(contentPage.body);
+    descriptionParts.push(body.length > 50 ? `${body.slice(0, 50)}...` : body);
+  }
+  if (contentPage.fileKey) {
+    descriptionParts.push("1 attachment");
+  }
+
+  return descriptionParts.length > 0 ? descriptionParts.join(" / ") : "Untitled post";
+}
+
+async function deleteContentPageWithMedia(contentPage: any): Promise<void> {
+  if (!contentPage) {
+    return;
+  }
+
+  if (contentPage.fileKey) {
+    try {
+      await FileServiceInstance.deleteFile(contentPage.fileKey);
+    } catch (error) {
+      console.error(`Failed to delete media for content page ${contentPage._id}:`, error);
+    }
+  }
+
+  await ContentPage.deleteOne({
+    _id: contentPage._id,
+    creatorId: contentPage.creatorId
+  });
+}
+
+async function enforceContentPageLimit(creatorId: any, newestContentPageId: any): Promise<any[]> {
+  const overflowCount = await ContentPage.countDocuments({ creatorId }) - MAX_CONTENT_PAGES_PER_CREATOR;
+  if (overflowCount <= 0) {
+    return [];
+  }
+
+  const oldestContentPages = await ContentPage.find({
+    creatorId,
+    _id: { $ne: newestContentPageId }
+  })
+    .sort({ createdAt: 1, _id: 1 })
+    .limit(overflowCount);
+
+  for (const contentPage of oldestContentPages) {
+    await deleteContentPageWithMedia(contentPage);
+  }
+
+  return oldestContentPages;
+}
+
+async function getContentPageLimitInfo(creatorId: any) {
+  const currentCount = await ContentPage.countDocuments({ creatorId });
+  const oldestContentPage = currentCount >= MAX_CONTENT_PAGES_PER_CREATOR
+    ? await ContentPage.findOne({ creatorId }).sort({ createdAt: 1, _id: 1 })
+    : null;
+
+  return {
+    max: MAX_CONTENT_PAGES_PER_CREATOR,
+    currentCount,
+    atLimit: currentCount >= MAX_CONTENT_PAGES_PER_CREATOR,
+    postsToDeleteOnCreate: Math.max(currentCount + 1 - MAX_CONTENT_PAGES_PER_CREATOR, 1),
+    oldestPostLabel: describeContentPage(oldestContentPage)
+  };
+}
+
 export class CreatorController {
   registerRoutes(router: Router) {
     router.get("/dashboard", asyncHandler(this.dashboard));
@@ -33,10 +106,12 @@ export class CreatorController {
 
   post_deleteContent = async (req: Request, res: Response): Promise<void> => {
     console.log("\nDELETING CONTENT PAGE", req.params.id);
-    await ContentPage.findOneAndDelete({
+    const contentPage = await ContentPage.findOne({
       _id: req.params.id,
       creatorId: req.user._id
     });
+
+    await deleteContentPageWithMedia(contentPage);
     res.redirect(`/creator/content`);
   }
 
@@ -77,19 +152,25 @@ export class CreatorController {
   contentList = async (req: Request, res: Response): Promise<void> => {
     const contentPages = await ContentPage.find({ creatorId: req.user._id })
       .sort({ updatedAt: -1 });
+    const contentPageLimit = await getContentPageLimitInfo(req.user._id);
 
     res.render("creator/content-list", {
       title: "My Content",
-      contentPages
+      contentPages,
+      contentPageLimit
     });
   }
 
 
 
   showNewContent = async (req: Request, res: Response): Promise<void> => {
+    const contentPageLimit = await getContentPageLimitInfo(req.user._id);
+
     res.render("creator/content-editor", {
       title: "New Content Page",
       contentPage: null,
+      fileMetadata: null,
+      contentPageLimit,
       publicUrl: null,
       error: null
     });
@@ -246,6 +327,10 @@ export class CreatorController {
       res.redirect(`/creator/pages/${postID}/editor`);
     } else { //creating
       let contentPage = await ContentPage.create(pageData);
+      const deletedContentPages = await enforceContentPageLimit(req.user._id, contentPage._id);
+      if (deletedContentPages.length > 0) {
+        console.log(`Deleted ${deletedContentPages.length} oldest content page(s) after creating ${contentPage._id}.`);
+      }
       console.log("\nNEW CONTENT PAGE", contentPage);
       res.redirect(`/creator/content`);
     }
@@ -274,13 +359,17 @@ export class CreatorController {
         title: "Edit Content Page",
         contentPage: contentPage,
         fileMetadata: fileMetadata,
+        contentPageLimit: await getContentPageLimitInfo(req.user._id),
         error: null
       });
     } else { //new document
+      const contentPageLimit = await getContentPageLimitInfo(req.user._id);
+
       res.render("creator/content-editor", {
         title: "New Content Page",
         fileMetadata: null,
         contentPage: null,
+        contentPageLimit,
         error: null
       });
     }

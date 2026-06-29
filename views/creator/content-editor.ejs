@@ -18,6 +18,17 @@
     <p class="form-error"><%= error %></p>
     <% } %>
 
+    <% if (!contentPage && contentPageLimit?.atLimit) { %>
+    <div class="form-warning">
+      <strong>Post limit reached.</strong>
+      You have <%= contentPageLimit.currentCount %> active posts. Saving this post will permanently delete your
+      <%= contentPageLimit.postsToDeleteOnCreate === 1 ? "oldest post and its media" : `${contentPageLimit.postsToDeleteOnCreate} oldest posts and their media` %>.
+      <% if (contentPageLimit.oldestPostLabel) { %>
+      Oldest post: <%= contentPageLimit.oldestPostLabel %>
+      <% } %>
+    </div>
+    <% } %>
+
 
 
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
@@ -146,13 +157,16 @@
     submitMediaForm(mediaForm);
   });
 
-  // form.addEventListener("submit", async (e) => {
-  //   e.preventDefault(); // stop normal page reload
-  //   submitForm();
-  // });
+  let isContentSubmitting = false;
+  form.addEventListener("submit", (e) => {
+    if (isContentSubmitting) {
+      e.preventDefault();
+      return;
+    }
 
-
-
+    isContentSubmitting = true;
+    saveContentBtn.disabled = true;
+  });
 
   //When the media is uploaded, update the label to show the file size and name
 
