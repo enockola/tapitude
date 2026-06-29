@@ -55,15 +55,13 @@
     <div class="mini-list">
       <% scheduledContent.forEach((page) => { %>
       <div class="mini-list__item">
-        <div class="content-summary"><%= makePageDescription(page) %></div>
+        <div class="content-summary"><%= makePageDescription(page) %>
+        <label class="badge"> Scheduled: <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %> </label></div>
+        
 
-        <div class="item-meta">
-                <small class="badge">
-            Scheduled:
-            <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %>
-          </small>
+        <div class="row-actions">
           <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
-            <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
+            <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> <span>Edit</span>
           </a>
         </div>
       </div>
@@ -84,18 +82,15 @@
     <div class="mini-list">
       <% publishedContent.forEach((page) => { %>
       <div class="mini-list__item">
-        <div class="content-summary"><%= makePageDescription(page) %></div>
+        <div class="content-summary"><%= makePageDescription(page) %>
+           <label class="badge">Published: <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %></label></div>
+     
 
-        <div class="item-meta">
-          <small class="badge">
-            Published:
-            <%= page.publishDate ? formatEtDateTime(page.publishDate) : "No date" %>
-          </small>
+        <div class="row-actions">
           <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
-            <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
+            <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> <span>Edit</span>
           </a>
         </div>
-
       </div>
       <% }) %>
     </div>

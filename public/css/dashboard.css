@@ -13,7 +13,6 @@
 @import url("./components/cards.css") layer(components);
 @import url("./components/nav.css") layer(components);
 
-
 .app-shell {
   display: grid;
   grid-template-columns: var(--sidebar-width) 1fr;
@@ -59,6 +58,10 @@
   /* max-width: 800px; */
 }
 
+.mini-list__item a{
+    background-color: whitesmoke;
+}
+
 .footer {
   padding: var(--space-lg);
   text-align: center;
@@ -75,8 +78,25 @@
 @media (max-width: 800px) {
   .content-header {
     flex-direction: column;
+    padding: 10px;
   }
 
+  .mini-list__item a span{
+    display: none;
+  }
+
+  .mini-list__item a{
+    padding: 15px;
+  }
+
+
+  .mini-list__item i{
+    font-size: 1.5em;
+  }
+
+  .card {
+    padding: var(--space-sm);
+  }
   .app-shell {
     display: block;
   }
@@ -92,6 +112,6 @@
   }
 
   .dashboard-main {
-    padding: var(--space-lg);
+    padding: var(--space-sm);
   }
 }

@@ -16,11 +16,6 @@
   background: var(--color-primary-hover);
 }
 
-.button--secondary {
-  background: var(--color-surface-soft);
-  color: var(--color-heading);
-  border: 1px solid var(--color-border);
-}
 
 .button--secondary:hover {
   background: var(--color-border);
@@ -36,9 +31,6 @@
   color: #ffffff;
 }
 
-.button--danger {
-  background: var(--color-danger);
-}
 
 .button--full {
   width: 100%;
@@ -65,4 +57,14 @@
 
 .danger:hover {
   background: #b52a37;
+}
+
+
+.button--danger {
+  background: var(--color-danger);
+}
+.button--secondary {
+  background: var(--color-surface-soft);
+  color: var(--color-heading);
+  border: 1px solid var(--color-border);
 }

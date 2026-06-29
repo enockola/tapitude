@@ -39,7 +39,7 @@
         }
         let pageTitle = makePageDescription(page);
         %>
-    <article class="table-row">
+    <article class="table-row mini-list__item">
       <div class="content-summary">
         <label>Updated: <%= page.updatedAt ? formatEtDateTime(page.updatedAt) : "No date" %></label>
 
@@ -56,7 +56,7 @@
 
       <div class="row-actions">
         <a class="button button--small button--secondary" href="/creator/pages/<%= page._id %>/editor">
-          <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> Edit
+          <i class="ph-fill ph-pencil-simple-line" style="margin-right: 5px;"></i> <span>Edit</span>
         </a>
       </div>
     </article>

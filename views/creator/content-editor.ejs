@@ -13,7 +13,9 @@
 </section>
 
 <section class="editor-layout">
+
   <article class="card">
+
     <% if (error) { %>
     <p class="form-error"><%= error %></p>
     <% } %>
@@ -89,6 +91,8 @@
       </label>
 
       <div class="form-actions">
+        <a class="button button--secondary" type="button" href="/creator/content"><i class="ph ph-arrow-left"></i> Back</a>
+
         <button class="button" type="submit" id="save-content-btn">Publish</button>
 
         <% if (contentPage) { %>
