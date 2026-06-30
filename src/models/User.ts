@@ -15,7 +15,16 @@ interface UserModel extends mongoose.Model<any, {}, IUserMethods> {
   createAccount(userData: CreateUserData): Promise<any>;
 }
 
-const userSchema = new mongoose.Schema(
+export interface IUser extends mongoose.Document {
+  name: string;
+  email: string;
+  passwordHash: string;
+  role: "admin" | "creator";
+  status: "active" | "disabled";
+  comparePassword(password: string): Promise<boolean>;
+}
+
+const userSchema = new mongoose.Schema<IUser>(
   {
     name: {
       type: String,

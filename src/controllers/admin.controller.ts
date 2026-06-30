@@ -4,19 +4,19 @@ import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
-import { doubleCsrfProtection, generateCsrfToken,manualCsrfCheck } from '../utils/securityUtils.js';
+import { doubleCsrfProtection, generateCsrfToken, csrfInject, manualCsrfCheck, adminCheck } from '../utils/securityUtils.js';
 
 export class AdminController {
 
   registerRoutes(router: Router) {
-    router.get("/dashboard", asyncHandler(this.getDashboardView));
-    router.get("/creators", asyncHandler(this.getCreatorsView));
-    router.get("/creators/new", asyncHandler(this.getNewCreatorView));
-    router.get("/edit-creator-account/:id", asyncHandler(this.getEditCreatorsView));
+    router.get("/dashboard", csrfInject, adminCheck, asyncHandler(this.getDashboardView));
+    router.get("/creators", csrfInject, adminCheck, asyncHandler(this.getCreatorsView));
+    router.get("/creators/new", csrfInject, adminCheck, asyncHandler(this.getNewCreatorView));
+    router.get("/edit-creator-account/:id", csrfInject, adminCheck, asyncHandler(this.getEditCreatorsView));
 
-    router.post("/creators/new", manualCsrfCheck, asyncHandler(this.postNewCreator));
-    router.post("/edit-creator-account/:id", manualCsrfCheck, asyncHandler(this.postEditCreator));
-    router.post("/delete-creator-account/:id", manualCsrfCheck, asyncHandler(this.postDeleteCreator));
+    router.post("/creators/new", manualCsrfCheck, adminCheck, asyncHandler(this.postNewCreator));
+    router.post("/edit-creator-account/:id", manualCsrfCheck, adminCheck, asyncHandler(this.postEditCreator));
+    router.post("/delete-creator-account/:id", manualCsrfCheck, adminCheck, asyncHandler(this.postDeleteCreator));
   }
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {
@@ -59,7 +59,7 @@ export class AdminController {
         title: "Edit Creator Account",
         creator,
         creatorProfile,
-        _csrf: generateCsrfToken(req, res)
+
       });
     } catch (error) {
       res.status(500).render("Error loading creator profile");
@@ -70,7 +70,6 @@ export class AdminController {
   getNewCreatorView = async (req: Request, res: Response): Promise<void> => {
     res.render("admin/new-creator-account", {
       title: "Create Creator Account",
-       _csrf: generateCsrfToken(req, res),
       error: null
     });
   }

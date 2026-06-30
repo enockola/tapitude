@@ -6,6 +6,7 @@ import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/timezoneUtils";
 import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
+import { manualCsrfCheck, creatorCheck, generateCsrfToken, csrfInject } from '../utils/securityUtils.js';
 
 const MAX_CONTENT_PAGES_PER_CREATOR = 25;
 
@@ -82,27 +83,27 @@ async function getContentPageLimitInfo(creatorId: any) {
 
 export class CreatorController {
   registerRoutes(router: Router) {
-    router.get("/dashboard", asyncHandler(this.dashboard));
-    router.get("/content", asyncHandler(this.contentList));
-
+    router.get("/dashboard", csrfInject, creatorCheck, asyncHandler(this.dashboard));
+    router.get("/content", csrfInject, creatorCheck, asyncHandler(this.contentList));
 
     //For previewing content
-    router.get("/pages/preview", this.showNewContent);
-
-    //For creating/editing/deleting content
-    router.post("/pages/create", asyncHandler(this.post_createEditContent));
-    router.post("/pages/:id/update", asyncHandler(this.post_createEditContent));
-    router.post("/pages/upload", asyncHandler(this.post_uploadMedia));
-    router.post("/pages/:id/delete", asyncHandler(this.post_deleteContent));
+    router.get("/pages/preview", csrfInject, creatorCheck, this.showNewContent);
 
     //Page editor
-    router.get("/pages/:id/editor", asyncHandler(this.get_createEditContent));
-    router.get("/pages/editor", asyncHandler(this.get_createEditContent));
+    router.get("/pages/:id/editor", csrfInject, creatorCheck, asyncHandler(this.get_createEditContent));
+    router.get("/pages/editor", csrfInject, creatorCheck, asyncHandler(this.get_createEditContent));
 
-    router.get("/profile", asyncHandler(this.get_profile));
-    router.post("/profile/update", asyncHandler(this.post_updateProfile));
+    router.get("/profile", csrfInject, creatorCheck, asyncHandler(this.get_profile));
+    router.post("/profile/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_updateProfile));
+
+    //For creating/editing/deleting content
+    router.post("/pages/create", creatorCheck, manualCsrfCheck, asyncHandler(this.post_createEditContent));
+    router.post("/pages/:id/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_createEditContent));
+    router.post("/pages/upload", creatorCheck, manualCsrfCheck, asyncHandler(this.post_uploadMedia));
+    router.post("/pages/:id/delete", creatorCheck, manualCsrfCheck, asyncHandler(this.post_deleteContent));
   }
 
+  
 
   post_deleteContent = async (req: Request, res: Response): Promise<void> => {
     console.log("\nDELETING CONTENT PAGE", req.params.id);
@@ -140,6 +141,7 @@ export class CreatorController {
     res.render("creator/dashboard", {
       title: "Creator Dashboard",
       contentPages,
+
       stats: {
         totalPages,
         publishedPages,
@@ -193,6 +195,7 @@ export class CreatorController {
 
     res.render("creator/profile", {
       title: "Profile",
+
       profileImageMetadata,
       profile
     });

@@ -1,13 +1,11 @@
 // types/express/index.d.ts
 import { Request } from 'express';
+import { IUser } from '../../models/User';
 
 declare global {
   namespace Express {
     interface Request {
-      user?: {
-        _id: string; // Add other properties your user object has
-        // email: string;
-      };
+      user?: IUser
     }
   }
 }

@@ -51,10 +51,21 @@ export class AuthController {
   }
 
   logout = async (req: Request, res: Response): Promise<void> => {
-    req.session.destroy(() => {
-      res.clearCookie("tapitude.sid");
-      res.redirect("/");
-    });
+    try {
+      await new Promise<void>((resolve, reject) => {// 1. Destroy the session in the database
+        req.session.destroy((err) => {
+          if (err) reject(err);
+          else resolve();
+        });
+      });
+
+      res.clearCookie("tapitude.sid");// 2. Clear the cookie from the browser
+
+      res.redirect("/"); // 3. Redirect
+    } catch (err) {
+      console.error("Logout error:", err);
+      res.status(500).render("Could not log out, please try again.");
+    }
   }
 }
 

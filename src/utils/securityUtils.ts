@@ -1,5 +1,6 @@
 import { doubleCsrf } from "csrf-csrf";
 import crypto from 'crypto';
+import User from '../models/User';
 
 const {
     invalidCsrfTokenError, // This is just for convenience if you plan on making your own middleware.
@@ -14,6 +15,29 @@ const {
 
 import { Request, Response, NextFunction } from 'express';
 
+
+export const adminCheck = async (req: Request, res: Response, next: NextFunction) => {
+    if (req.user && req.user.role === 'admin') {
+        return next();
+    }
+    return res.status(500).render("Forbidden: Unauthorized admin");
+}
+
+export const creatorCheck = async (req: Request, res: Response, next: NextFunction) => {
+    if (req.user && (req.user.role === 'admin' || req.user.role === 'creator')) {
+        if (req.user.status !== 'active') return res.status(500).render("Forbidden: Creator is disabled");
+        return next();
+    }
+    return res.status(500).render("Forbidden: Unauthorized creator");
+}
+
+export const csrfInject = (req: Request, res: Response, next: NextFunction) => {
+    const token = generateCsrfToken(req, res);
+
+    // Make it available in your EJS templates as <%= _csrf %>
+    res.locals._csrf = token;
+    next();
+};
 
 /**
  * Requres the csrf token to be in the header or the body of the request
