@@ -31,7 +31,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 const cookieParser = require('cookie-parser');
-import {generateCsrfToken} from './utils/securityUtils.js';
+import {generateCsrfToken,injectCsrfToken} from './utils/securityUtils.js';
 
 
 
@@ -87,9 +87,12 @@ app.use(express.static(path.join(__dirname, "..", "public")));
 //----------------------------------------------------------------------------------------------
 //for uploaded files (TODO: Change this to a CDN when storage gets switched to an S3 bucket)
 app.use("/storage", express.static(path.join(__dirname, '..', 'storage')));
+
+
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
+//Middleware
 
 const sessionOptions = {
   name: "tapitude.sid",
@@ -107,11 +110,10 @@ const sessionOptions = {
 if (process.env.MONGODB_URI) {
   sessionOptions.store = MongoStore.create({ mongoUrl: process.env.MONGODB_URI });
 }
-
 app.use(session(sessionOptions));
 app.use(cookieParser());
-app.use(attachUser);
-
+app.use(attachUser); //load and attach the user to the request every time (get the user from session userId)
+app.use(injectCsrfToken);
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------

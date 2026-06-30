@@ -58,8 +58,8 @@
   /* max-width: 800px; */
 }
 
-.mini-list__item a{
-    background-color: whitesmoke;
+.mini-list__item a {
+  background-color: whitesmoke;
 }
 
 .footer {
@@ -67,6 +67,12 @@
   text-align: center;
   grid-column: 2;
   align-self: end;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-grid {
+    display: block;
+  }
 }
 
 @media (max-width: 1400px) {
@@ -81,16 +87,15 @@
     padding: 10px;
   }
 
-  .mini-list__item a span{
+  .mini-list__item a span {
     display: none;
   }
 
-  .mini-list__item a{
+  .mini-list__item a {
     padding: 15px;
   }
 
-
-  .mini-list__item i{
+  .mini-list__item i {
     font-size: 1.5em;
   }
 

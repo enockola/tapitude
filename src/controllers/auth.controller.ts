@@ -25,10 +25,15 @@ export class AuthController {
     const user = await User.findOne({ email: email?.toLowerCase().trim() });
     // console.log("The user is: ", user);
 
-    if (!user || user.status !== "active") {
+    if (!user) {
       return res.status(401).render("forms/login", {
         title: "Log in",
         error: "User account not found."
+      });
+    } else if (user.status !== "active") {
+      return res.status(403).render("forms/login", {
+        title: "Log in",
+        error: "User account has been disabled."
       });
     }
 

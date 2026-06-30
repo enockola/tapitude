@@ -1,6 +1,7 @@
 import { doubleCsrf } from "csrf-csrf";
 import crypto from 'crypto';
 import User from '../models/User';
+import { Request, Response, NextFunction } from 'express';
 
 const {
     invalidCsrfTokenError, // This is just for convenience if you plan on making your own middleware.
@@ -13,31 +14,37 @@ const {
     //   getCsrfTokenFromRequest: (req) => req.body._csrf,   //Force it to use the _csrf field
 });
 
-import { Request, Response, NextFunction } from 'express';
+// Server level middlewares
+export const injectCsrfToken = (req: Request, res: Response, next: NextFunction) => {
+    const token = generateCsrfToken(req, res);
+    if (token) res.locals._csrf = token;
+    next();
+};
 
+// Utility functions
+function show403(res: Response, title: string) {
+    return res.status(403).render("errors/403", {
+        title: title
+    });
+}
 
+// Controller middlewares
 export const adminCheck = async (req: Request, res: Response, next: NextFunction) => {
     if (req.user && req.user.role === 'admin') {
         return next();
     }
-    return res.status(500).render("Forbidden: Unauthorized admin");
+    return show403(res, "Forbidden: Unauthorized admin");
 }
 
 export const creatorCheck = async (req: Request, res: Response, next: NextFunction) => {
     if (req.user && (req.user.role === 'admin' || req.user.role === 'creator')) {
-        if (req.user.status !== 'active') return res.status(500).render("Forbidden: Creator is disabled");
+        if (req.user.status !== 'active') return show403(res, "Forbidden: Creator account is disabled");
         return next();
     }
-    return res.status(500).render("Forbidden: Unauthorized creator");
+    return show403(res, "Forbidden: Unauthorized creator");
 }
 
-export const csrfInject = (req: Request, res: Response, next: NextFunction) => {
-    const token = generateCsrfToken(req, res);
 
-    // Make it available in your EJS templates as <%= _csrf %>
-    res.locals._csrf = token;
-    next();
-};
 
 /**
  * Requres the csrf token to be in the header or the body of the request
@@ -54,7 +61,7 @@ export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction,
     //A malicious site (attacker.com) cannot read or write cookies belonging to your domain
     const cookieToken = req.cookies['__Host-psifi.x-csrf-token'];
     if (!cookieToken) {
-        return res.status(500).render('Forbidden: Missing CSRF Cookie Token');
+        return show403(res, 'Forbidden: Missing CSRF Cookie Token');
     }
     if (verbose) console.log("       The cookie token is: ", cookieToken);
 
@@ -64,7 +71,7 @@ export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction,
         headerToken = req.body._csrf; //If we can't get the header token from the header, we can get it from the body
         if (verbose) console.log("       The body token is: ", headerToken);
         if (!headerToken) {
-            return res.status(500).render('Forbidden: Missing CSRF Header/Body Token');
+            return show403(res, 'Forbidden: Missing CSRF Header/Body Token');
         }
     } else if (verbose) console.log("       The header token is: ", headerToken);
 
@@ -79,7 +86,7 @@ export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction,
     if (verbose) console.log("       CSRF tokens match: ", isMatch);
 
     if (!isMatch) {
-        return res.status(500).render('Forbidden: Invalid CSRF Token');
+        return show403(res, 'Forbidden: Invalid CSRF Token');
     }
 
     next();

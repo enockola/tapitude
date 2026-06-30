@@ -6,7 +6,7 @@ import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/timezoneUtils";
 import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
-import { manualCsrfCheck, creatorCheck, generateCsrfToken, csrfInject } from '../utils/securityUtils.js';
+import { manualCsrfCheck, creatorCheck, generateCsrfToken } from '../utils/securityUtils.js';
 
 const MAX_CONTENT_PAGES_PER_CREATOR = 25;
 
@@ -83,17 +83,17 @@ async function getContentPageLimitInfo(creatorId: any) {
 
 export class CreatorController {
   registerRoutes(router: Router) {
-    router.get("/dashboard", csrfInject, creatorCheck, asyncHandler(this.dashboard));
-    router.get("/content", csrfInject, creatorCheck, asyncHandler(this.contentList));
+    router.get("/dashboard",  creatorCheck, asyncHandler(this.dashboard));
+    router.get("/content",  creatorCheck, asyncHandler(this.contentList));
 
     //For previewing content
-    router.get("/pages/preview", csrfInject, creatorCheck, this.showNewContent);
+    router.get("/pages/preview",  creatorCheck, this.showNewContent);
 
     //Page editor
-    router.get("/pages/:id/editor", csrfInject, creatorCheck, asyncHandler(this.get_createEditContent));
-    router.get("/pages/editor", csrfInject, creatorCheck, asyncHandler(this.get_createEditContent));
+    router.get("/pages/:id/editor",  creatorCheck, asyncHandler(this.get_createEditContent));
+    router.get("/pages/editor",  creatorCheck, asyncHandler(this.get_createEditContent));
 
-    router.get("/profile", csrfInject, creatorCheck, asyncHandler(this.get_profile));
+    router.get("/profile",  creatorCheck, asyncHandler(this.get_profile));
     router.post("/profile/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_updateProfile));
 
     //For creating/editing/deleting content

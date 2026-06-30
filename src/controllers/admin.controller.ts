@@ -4,15 +4,15 @@ import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
-import { doubleCsrfProtection, generateCsrfToken, csrfInject, manualCsrfCheck, adminCheck } from '../utils/securityUtils.js';
+import { doubleCsrfProtection, generateCsrfToken,  manualCsrfCheck, adminCheck } from '../utils/securityUtils.js';
 
 export class AdminController {
 
   registerRoutes(router: Router) {
-    router.get("/dashboard", csrfInject, adminCheck, asyncHandler(this.getDashboardView));
-    router.get("/creators", csrfInject, adminCheck, asyncHandler(this.getCreatorsView));
-    router.get("/creators/new", csrfInject, adminCheck, asyncHandler(this.getNewCreatorView));
-    router.get("/edit-creator-account/:id", csrfInject, adminCheck, asyncHandler(this.getEditCreatorsView));
+    router.get("/dashboard",  adminCheck, asyncHandler(this.getDashboardView));
+    router.get("/creators",  adminCheck, asyncHandler(this.getCreatorsView));
+    router.get("/creators/new",  adminCheck, asyncHandler(this.getNewCreatorView));
+    router.get("/edit-creator-account/:id",  adminCheck, asyncHandler(this.getEditCreatorsView));
 
     router.post("/creators/new", manualCsrfCheck, adminCheck, asyncHandler(this.postNewCreator));
     router.post("/edit-creator-account/:id", manualCsrfCheck, adminCheck, asyncHandler(this.postEditCreator));
