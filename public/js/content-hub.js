@@ -68,7 +68,7 @@ async function getMimeType(url) {
 }
 
 
-
+const doubleTapDelay = 300;
 
 function createPost(parentElement, post) {
     const postChild = document.createElement("div");
@@ -84,7 +84,7 @@ function createPost(parentElement, post) {
     <div class="post-text">${post.body ?? ""}</div>
     <div class="actions">
         <button class="like-button"><i class="ph ph-heart ${likedPosts.includes(post._id) ? "ph-fill" : ""}"></i>
-         <span class="like-count">${post.likes}</span> Likes</button>
+         <span class="like-count">${post.likes}</span> Double-Taps</button>
     </div>
 `;
 
@@ -95,6 +95,37 @@ function createPost(parentElement, post) {
         likeTogglePost(post._id, likeCount, heartIcon);
     });
 
+    //Double tap function
+    postChild.lastTapTime = 0;
+    postChild.lastTapScroll = 0;
+    postChild.addEventListener('touchstart', (event) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - postChild.lastTapTime;
+        if (tapLength < doubleTapDelay && tapLength > 0) {
+            // --- DOUBLE TAP DETECTED ---
+            likeTogglePost(post._id, likeCount, heartIcon);
+            likeButton.classList.add("like-active");
+            setTimeout(() => {
+                likeButton.classList.remove("like-active");
+            }, 500);
+            event.preventDefault(); // Prevents zoom/ghost clicks
+        }
+        postChild.lastTapTime = currentTime;
+        postChild.lastTapScroll = document.body.scrollTop;
+    });
+    postChild.addEventListener('touchend', (event) => {
+        const currentTime = new Date().getTime();
+        const tapLength = currentTime - postChild.lastTapTime;
+        const tapScrollDelta = Math.abs(document.body.scrollTop - postChild.lastTapScroll);
+        if (tapLength > doubleTapDelay * 0.4 && tapScrollDelta < 10) {
+            console.log("Touch end ", tapLength);
+            console.log("Single tap detected");
+            document.body.classList.toggle("max");
+        }
+        event.preventDefault();
+    });
+    //------------------------------------
+
     parentElement.appendChild(postChild);
     //Important for unloading content not in viewport
     const postObserver = new IntersectionObserver(async ([entry]) => {
@@ -104,12 +135,15 @@ function createPost(parentElement, post) {
                 const fileURL = `/storage/${post.fileKey}`;
                 const mimeType = await getMimeType(fileURL);
                 if (mimeType.startsWith("image/")) {
+                    postChildMedia.style.display = "flex";
                     postChildMedia.innerHTML = `<image src="${fileURL}" alt="Post Media" />`;
                 } else {
+                    postChildMedia.style.display = "flex";
                     postChildMedia.innerHTML = `<video src="${fileURL}" alt="Post Media" autoplay controls />`;
                 }
             }
         } else {
+            postChildMedia.style.display = "none";
             postChildMedia.innerHTML = "";
         }
     }, { threshold: 0 });
@@ -144,7 +178,12 @@ const observer = new IntersectionObserver(
 observer.observe(target);
 
 
+const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
+if (isDarkMode) {
+    document.body.classList.add("dark");
+    console.log("System is in Dark Mode");
+}
 
 ///Update styliing
 function getBrightness(color) {
@@ -160,19 +199,20 @@ function getBrightness(color) {
     return (r * 299 + g * 587 + b * 114) / 1000;
 }
 
+
 function tintColor(color, amount = 0.95) {
-  const div = document.createElement("div");
-  div.style.color = color;
-  document.body.appendChild(div);
+    const div = document.createElement("div");
+    div.style.color = color;
+    document.body.appendChild(div);
 
-  const rgb = getComputedStyle(div).color;
-  document.body.removeChild(div);
+    const rgb = getComputedStyle(div).color;
+    document.body.removeChild(div);
 
-  const [r, g, b] = rgb.match(/\d+/g).map(Number);
+    const [r, g, b] = rgb.match(/\d+/g).map(Number);
 
-  const mix = c => Math.round(c + (255 - c) * amount);
+    const mix = c => Math.round(c + (255 - c) * amount);
 
-  return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+    return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
 }
 
 if (getBrightness(brandColor) < 128) {
@@ -180,6 +220,8 @@ if (getBrightness(brandColor) < 128) {
         '--color-heading',
         'white'
     );
-    document.body.style.backgroundColor = tintColor(brandColor);
-    document.querySelector(".powered-by-logo").style.filter = "invert(1)";
+    document.documentElement.style.setProperty(
+        '--color-brand-background',
+        tintColor(brandColor)
+    );
 }

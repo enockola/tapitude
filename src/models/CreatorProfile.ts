@@ -9,6 +9,7 @@ export interface ICreatorProfile {
   displayName: string;
   brandName?: string;
   brandColor?: string;
+  brandDarkMode?: boolean;
   bio?: string;
   profileImageKey?: string;
   createdAt?: Date;
@@ -47,6 +48,9 @@ const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
     brandColor: {
       type: String,
       trim: true
+    },
+    brandDarkMode: {
+      type: Boolean
     },
     bio: {
       type: String,

@@ -227,6 +227,7 @@ export class CreatorController {
         content.brandName = fields.brandName;
         content.brandColor = fields.brandColor;
         content.bio = fields.bio;
+        content.brandDarkMode = fields.brandDarkMode;
 
         const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
         if (!profile) {

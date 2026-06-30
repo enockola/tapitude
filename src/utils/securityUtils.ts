@@ -45,7 +45,6 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
 }
 
 
-
 /**
  * Requres the csrf token to be in the header or the body of the request
  * In the header, the field should be "x-csrf-token"
@@ -55,7 +54,7 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
  * @param next 
  * @returns 
  */
-export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction, verbose = false) => {
+export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction, verbose = true) => {
     //Get cookie token and body token
 
     //A malicious site (attacker.com) cannot read or write cookies belonging to your domain
@@ -68,6 +67,7 @@ export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction,
     //The attacker can trigger the request, and your browser will attach the cookie, but the attacker cannot read the data on your site.
     let headerToken = req.headers['x-csrf-token'] as string; //get the header token from the 
     if (!headerToken) {
+        console.log(req.body);
         headerToken = req.body._csrf; //If we can't get the header token from the header, we can get it from the body
         if (verbose) console.log("       The body token is: ", headerToken);
         if (!headerToken) {

@@ -52,6 +52,7 @@ body {
   height: 100vh;
   scroll-snap-align: start;
   margin: 0;
+  user-select: none;
 }
 
 .post-content {
@@ -111,9 +112,9 @@ body {
     color 0.8s ease-out;
 }
 
-.actions button:active {
+.like-button:active,
+.like-active {
   transition: none;
-
   transform: scale(0.96);
   background: rgba(255, 188, 188, 0.586);
   color: rgb(190, 29, 0);
@@ -171,15 +172,113 @@ footer {
   text-align: center;
 }
 
-.powered-by img{
-max-height: 20px;
-display: inline;
+.powered-by img {
+  max-height: 20px;
+  display: inline;
 }
 
 .topbar .brand-logo {
   max-height: 40px;
   display: inline;
 }
+
+.post-media {
+  display: none;
+}
+
+body{
+  background-color: var(--color-brand-background);
+}
+
+/*
+=================================================================
+Dark mode
+=================================================================
+*/
+.dark .like-button:active,
+.dark .like-active {
+  background: rgb(190, 29, 0);
+  color: rgba(255, 232, 232, 0.586);
+}
+.dark {
+  background-color: #020202;
+  color: white;
+}
+
+.dark .topbar {
+  border-bottom: none;
+}
+
+.dark .like-button {
+  color: white;
+}
+
+.dark .post-content {
+  background-color: #232323;
+  color: white;
+}
+
+.dark .powered-by img {
+  filter: invert(1);
+}
+
+.dark .actions {
+  border-top: 1px solid #ffffff2e;
+}
+
+/*
+=================================================================
+Maximized mode
+=================================================================
+*/
+.max .post-content {
+  top: 0px;
+  padding: 0px;
+  border-radius: 0px;
+  margin: 0px;
+  height: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-top: 2px solid var(--color-border);
+}
+
+.max .post-media {
+  border-radius: 0px;
+  flex-grow: 1;
+  align-items: center;
+  background: black;
+}
+.max .post-media img,
+.max .post-media video {
+  border-radius: 0px;
+  margin: 0;
+  padding: 0;
+}
+
+.max .like-button {
+  padding: 20px;
+}
+
+.max .post-text {
+  padding: 20px;
+}
+
+.max .post-date {
+  padding: 10px;
+  display: none;
+}
+
+.max .topbar,
+.max footer {
+  display: none;
+}
+
+/*
+=================================================================
+Media queries
+=================================================================
+*/
 
 @media (max-width: 600px) {
   .powered-by-logo span {

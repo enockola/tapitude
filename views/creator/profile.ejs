@@ -18,6 +18,8 @@
   <h2>Edit Profile</h2>
   <form class="form-stack" method="post" action="/creator/profile/update" enctype="multipart/form-data">
 
+    <input type="hidden" name="_csrf" value="<%= _csrf %>">
+
     <label>Display Name:
 
     </label>
@@ -48,12 +50,16 @@
     </script>
     <% } %>
     <div>
-      <label>Brand Color:</label>
-
+      <label>Theme Color:</label>
     </div>
     <p>Choose a brand color to use for your brand, For best results, it is recommended to use a color from <a href="https://coolors.co/" target="_blank">coolors.co</a></p>
     <input type="color" name="brandColor" value="<%= profile?.brandColor || "#000" %>" />
 
+    <label>Theme Dark Mode: </label>
+    <label class="switch">
+      <input type="checkbox" name="brandDarkMode">
+      <span class="slider"></span>
+    </label>
 
     <label>Bio:
 
