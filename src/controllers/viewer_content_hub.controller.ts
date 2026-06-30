@@ -2,6 +2,7 @@ import { Request, Response, Router } from 'express';
 import ContentPage from "../models/ContentPage";
 import CreatorProfile from "../models/CreatorProfile";
 import asyncHandler from "../utils/asyncHandler";
+import  User  from '../models/User';
 
 
 export class ViewerContentHubController {
@@ -73,6 +74,12 @@ export class ViewerContentHubController {
       console.log("CREATOR HUB SLUG: " + req.params.slug);
       const creatorProfile = await CreatorProfile.findOne({ creatorSlug: req.params.slug });
       if (creatorProfile) {
+        const creatorUser = await User.findOne({ _id: creatorProfile.userId });
+        if (!creatorUser || creatorUser.status !== "active") {
+          return res.status(404).render("errors/404", {
+            title: "Content Hub page not found"
+          });
+        }
         return res.render("content_hub/index", {
           slug: req.params.slug,
           creatorProfile: creatorProfile
