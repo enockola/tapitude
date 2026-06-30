@@ -40,7 +40,7 @@
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
 
-       <input type="hidden" name="_csrf" value="<%= _csrf %>">
+      <input type="hidden" name="_csrf" value="<%= _csrf %>">
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
@@ -66,8 +66,8 @@
       <input type="hidden" name="_csrf" value="<%= _csrf %>">
 
       <label>
-        Description
-        <textarea class="uploadInput" name="body" rows="8" placeholder="Tell your story..."><%= contentPage?.body || '' %></textarea>
+        Description <span id="desc-character-count">0/200</span>
+        <textarea maxlength="200" class="uploadInput" name="body" rows="8" placeholder="Tell your story..." style="max-height: 300px;"><%= contentPage?.body || '' %></textarea>
       </label>
 
 
@@ -108,7 +108,7 @@
 
     <% if (contentPage) { %>
     <form id="delete-content-form" action="<%= `/creator/pages/${contentPage._id}/delete` %>" method="POST">
-       <input type="hidden" name="_csrf" value="<%= _csrf %>">
+      <input type="hidden" name="_csrf" value="<%= _csrf %>">
     </form>
     <% } %>
   </article>
@@ -120,6 +120,15 @@
   const form = document.getElementById("contentForm");
   const mediaForm = document.getElementById("mediaForm");
   const deleteForm = document.getElementById("delete-content-form");
+
+  const descInput = document.querySelector("textarea[name='body']");
+
+  function updateDescCharacterCount() {
+    const charCount = descInput.value.length;
+    document.getElementById("desc-character-count").textContent = `${charCount}/200`;
+  }
+  descInput.addEventListener("input", updateDescCharacterCount);
+  updateDescCharacterCount();
 
 
   const saveContentBtn = document.querySelector("#save-content-btn");

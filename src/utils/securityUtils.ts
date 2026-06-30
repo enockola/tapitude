@@ -47,14 +47,14 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
 
 /**
  * Requres the csrf token to be in the header or the body of the request
- * In the header, the field should be "x-csrf-token"
+ * In the header, the field should be "x-csrf-token" (REQUIRED if the form is multipart/form-data)
  * In the body, the field should be "_csrf"
  * @param req 
  * @param res 
  * @param next 
  * @returns 
  */
-export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction, verbose = true) => {
+export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction, requestToken:string|null, verbose = false) => {
     //Get cookie token and body token
 
     //A malicious site (attacker.com) cannot read or write cookies belonging to your domain
@@ -65,15 +65,15 @@ export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction,
     if (verbose) console.log("       The cookie token is: ", cookieToken);
 
     //The attacker can trigger the request, and your browser will attach the cookie, but the attacker cannot read the data on your site.
-    let headerToken = req.headers['x-csrf-token'] as string; //get the header token from the 
-    if (!headerToken) {
+    if (!requestToken) requestToken = req.headers['x-csrf-token'] as string; //get the header token from the 
+    if (!requestToken) {
         console.log(req.body);
-        headerToken = req.body._csrf; //If we can't get the header token from the header, we can get it from the body
-        if (verbose) console.log("       The body token is: ", headerToken);
-        if (!headerToken) {
+        requestToken = req.body._csrf; //If we can't get the header token from the header, we can get it from the body
+        if (verbose) console.log("       The body token is: ", requestToken);
+        if (!requestToken) {
             return show403(res, 'Forbidden: Missing CSRF Header/Body Token');
         }
-    } else if (verbose) console.log("       The header token is: ", headerToken);
+    } else if (verbose) console.log("       The header token is: ", requestToken);
 
     //If the value in the cookie and the value in the body are identical, 
     // the server concludes that the request originated from your own website 
@@ -81,7 +81,7 @@ export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction,
     // and inject its value into the form.
     const isMatch = crypto.timingSafeEqual( //Checks if the two buffers are equal at a constant time to prevent timing attacks
         Buffer.from(cookieToken),
-        Buffer.from(headerToken)
+        Buffer.from(requestToken)
     );
     if (verbose) console.log("       CSRF tokens match: ", isMatch);
 

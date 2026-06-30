@@ -83,18 +83,18 @@ async function getContentPageLimitInfo(creatorId: any) {
 
 export class CreatorController {
   registerRoutes(router: Router) {
-    router.get("/dashboard",  creatorCheck, asyncHandler(this.dashboard));
-    router.get("/content",  creatorCheck, asyncHandler(this.contentList));
+    router.get("/dashboard", creatorCheck, asyncHandler(this.dashboard));
+    router.get("/content", creatorCheck, asyncHandler(this.contentList));
 
     //For previewing content
-    router.get("/pages/preview",  creatorCheck, this.showNewContent);
+    router.get("/pages/preview", creatorCheck, this.showNewContent);
 
     //Page editor
-    router.get("/pages/:id/editor",  creatorCheck, asyncHandler(this.get_createEditContent));
-    router.get("/pages/editor",  creatorCheck, asyncHandler(this.get_createEditContent));
+    router.get("/pages/:id/editor", creatorCheck, asyncHandler(this.get_createEditContent));
+    router.get("/pages/editor", creatorCheck, asyncHandler(this.get_createEditContent));
 
-    router.get("/profile",  creatorCheck, asyncHandler(this.get_profile));
-    router.post("/profile/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_updateProfile));
+    router.get("/profile", creatorCheck, asyncHandler(this.get_profile));
+    router.post("/profile/update", creatorCheck, asyncHandler(this.post_updateProfile));
 
     //For creating/editing/deleting content
     router.post("/pages/create", creatorCheck, manualCsrfCheck, asyncHandler(this.post_createEditContent));
@@ -103,7 +103,7 @@ export class CreatorController {
     router.post("/pages/:id/delete", creatorCheck, manualCsrfCheck, asyncHandler(this.post_deleteContent));
   }
 
-  
+
 
   post_deleteContent = async (req: Request, res: Response): Promise<void> => {
     console.log("\nDELETING CONTENT PAGE", req.params.id);
@@ -223,21 +223,26 @@ export class CreatorController {
       },
       async (fields) => { //On finish
         console.log("FIELDS", fields);
-        content.displayName = fields.displayName;
-        content.brandName = fields.brandName;
-        content.brandColor = fields.brandColor;
-        content.bio = fields.bio;
-        content.brandDarkMode = fields.brandDarkMode;
+        //TODO: Putting CSRF as a header would be better, but we've put the csrf check here since this is multipart data.
+        manualCsrfCheck(req, res, async () => {
 
-        const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
-        if (!profile) {
-          return res.status(404).render("errors/404", {
-            title: "Profile not found"
-          });
-        } else {
-          console.log(profile);
-          res.redirect("/creator/profile");
-        }
+          content.displayName = fields.displayName;
+          content.brandName = fields.brandName;
+          content.brandColor = fields.brandColor;
+          content.bio = fields.bio;
+          content.brandDarkMode = fields.brandDarkMode;
+
+          const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
+          if (!profile) {
+            return res.status(404).render("errors/404", {
+              title: "Profile not found"
+            });
+          } else {
+            console.log(profile);
+            res.redirect("/creator/profile");
+          }
+
+        }, fields._csrf, true);
       });
   }
 
