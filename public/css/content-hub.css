@@ -53,6 +53,7 @@ body {
   scroll-snap-align: start;
   margin: 0;
   user-select: none;
+  overflow: hidden;
 }
 
 .post-content {
