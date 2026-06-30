@@ -1,7 +1,6 @@
 @layer reset, tokens, base, layout, components, utilities;
 
-@import url("./base/reset.css") layer(reset);
-@import url("./base/variables.css") layer(tokens);
+@import url("./base/base.css") layer(reset);
 @import url("./base/elements.css") layer(base);
 @import url("./layout/home.css") layer(layout);
 @import url("./layout/forms.css") layer(layout);
@@ -10,7 +9,6 @@
 @import url("./components/cards.css") layer(components);
 @import url("./components/nav.css") layer(components);
 @import url("./components/sidebar.css") layer(components);
-
 
 .feed {
   max-width: 600px;
@@ -48,22 +46,6 @@ body {
 .powered-by-logo img {
   max-height: 20px;
   width: auto;
-}
-
-/*TODO: We can remove this if we want the header to be conditionally visible*/
-header {
-  position: fixed;
-  width: 100%;
-}
-header .left-group {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-footer {
-  position: relative;
-  bottom: 80px;
 }
 
 .post {
@@ -164,12 +146,38 @@ footer {
   height: 200px;
 }
 
-.creator-topbar {
+.topbar {
+  position: fixed;
+  width: 100%;
   background-color: var(--brand-color-primary);
+  height: initial;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-direction: column;
 }
 
-.creator-topbar .brand-logo {
-  max-height: 50px;
+.topbar div {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: auto;
+}
+
+footer {
+  position: fixed;
+  width: 100%;
+  bottom: 10px;
+  text-align: center;
+}
+
+.powered-by img{
+max-height: 20px;
+display: inline;
+}
+
+.topbar .brand-logo {
+  max-height: 40px;
   display: inline;
 }
 
@@ -190,4 +198,3 @@ footer {
 .powered-by-logo:hover {
   opacity: 0.8;
 }
-

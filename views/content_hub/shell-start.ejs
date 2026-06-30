@@ -38,8 +38,8 @@
 </html>
 
 
-<header class="topbar creator-topbar">
-  <div class="left-group" style="display: flex; gap: 10px;">
+<header class="topbar">
+  <div>
     <% if(creatorProfile.profileImageKey ) { %>
     <!-- <a  href="/content-hub/<%= creatorProfile.creatorSlug %>"> -->
       <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
@@ -50,8 +50,4 @@
 
 
   </div>
-  <!-- <span class="eyebrow"> <%= creatorProfile.displayName %>'s Content Hub</span> -->
-  <!-- <div class="topbar__menu" id="site-navigation" data-menu> </div> -->
-
-  <a class="powered-by-logo" href="/"> <img src="/assets/icons/tapitude_logo.png" alt="Tapitude Logo" /> <span>Powered by Tapitude</span> </a>
 </header>

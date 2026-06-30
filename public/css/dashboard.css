@@ -1,7 +1,6 @@
 @layer reset, tokens, base, layout, components, utilities;
 
-@import url("./base/reset.css") layer(reset);
-@import url("./base/variables.css") layer(tokens);
+@import url("./base/base.css") layer(reset);
 @import url("./base/elements.css") layer(base);
 @import url("./components/sidebar.css") layer(components);
 @import url("./layout/home.css") layer(layout);
