@@ -1,1 +1,4 @@
-<a class="button" href="/creator/pages/editor"><i class="ph ph-plus"></i> New Post</a>
+<form action="/creator/pages/new-page" method="POST">
+  <input type="hidden" name="_csrf" value="<%= _csrf %>">
+  <button class="button" style="width: 100%" type="submit"><i class="ph ph-plus"></i> New Post</button>
+</form>

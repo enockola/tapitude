@@ -83,22 +83,17 @@ async function getContentPageLimitInfo(creatorId: any) {
 
 export class CreatorController {
   registerRoutes(router: Router) {
-    router.get("/dashboard", creatorCheck, asyncHandler(this.dashboard));
-    router.get("/content", creatorCheck, asyncHandler(this.contentList));
+    router.get("/dashboard", creatorCheck, asyncHandler(this.dashboard)); //dashboard
+    router.get("/content", creatorCheck, asyncHandler(this.contentList)); //content list
+    router.get("/pages/:id/editor", creatorCheck, asyncHandler(this.get_createEditContent)); //Page editor
 
-    //For previewing content
-    router.get("/pages/preview", creatorCheck, this.showNewContent);
-
-    //Page editor
-    router.get("/pages/:id/editor", creatorCheck, asyncHandler(this.get_createEditContent));
-    router.get("/pages/editor", creatorCheck, asyncHandler(this.get_createEditContent));
-
-    router.get("/profile", creatorCheck, asyncHandler(this.get_profile));
-    router.post("/profile/update", creatorCheck, asyncHandler(this.post_updateProfile));
+    router.get("/profile", creatorCheck, asyncHandler(this.get_profile)); //Profile editor
+    router.post("/profile/update", creatorCheck, asyncHandler(this.post_updateProfile)); //We already preform a manual CSRF check inside this function
 
     //For creating/editing/deleting content
-    router.post("/pages/create", creatorCheck, manualCsrfCheck, asyncHandler(this.post_createEditContent));
-    router.post("/pages/:id/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_createEditContent));
+    router.post("/pages/new-page", creatorCheck, manualCsrfCheck, asyncHandler(this.post_newPost));
+    router.post("/pages/create", creatorCheck, manualCsrfCheck, asyncHandler(this.post_editPost));
+    router.post("/pages/:id/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_editPost));
     router.post("/pages/upload", creatorCheck, manualCsrfCheck, asyncHandler(this.post_uploadMedia));
     router.post("/pages/:id/delete", creatorCheck, manualCsrfCheck, asyncHandler(this.post_deleteContent));
   }
@@ -162,22 +157,6 @@ export class CreatorController {
       title: "My Content",
       contentPages,
       contentPageLimit
-    });
-  }
-
-
-
-  showNewContent = async (req: Request, res: Response): Promise<void> => {
-    const contentPageLimit = await getContentPageLimitInfo(req.user._id);
-
-    res.render("creator/content-editor", {
-      title: "New Content Page",
-      contentPage: null,
-      fileMetadata: null,
-      contentPageLimit,
-      publicUrl: null,
-      success: null,
-      error: null
     });
   }
 
@@ -319,7 +298,7 @@ export class CreatorController {
 
   }
 
-  post_createEditContent = async (req: Request, res: Response): Promise<void> => {
+  post_editPost = async (req: Request, res: Response): Promise<void> => {
     const { postID, body, status, scheduledFor, aspectRatioMode } = req.body;
     //Convert scheduled status to published
     const pageStatus = status === "scheduled" ? "published" : status;
@@ -362,44 +341,50 @@ export class CreatorController {
 
 
   get_createEditContent = async (req: Request, res: Response): Promise<void> => {
-    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) { //Editing: Get the ID parameter from the URL
-      let contentPage = await ContentPage.findOne({
-        _id: req.params.id,
-        creatorId: req.user._id
+    if (!req.params.id || !mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return res.status(404).render("errors/404", {
+        title: "Post not found"
       });
-
-      if (!contentPage) {
-        return res.status(404).render("errors/404", {
-          title: "Content not found"
-        });
-      }
-      //Get the file metadata, because the frontend needs it
-      let fileMetadata = null;
-      if (contentPage.fileKey) {
-        fileMetadata = await FileServiceInstance.getFileMetadata(contentPage.fileKey);
-      }
-      res.render("creator/content-editor", {
-        title: "Edit Content Page",
-        contentPage: contentPage,
-        fileMetadata: fileMetadata,
-        contentPageLimit: await getContentPageLimitInfo(req.user._id),
-        success: req.query.saved === "1" ? "Post saved." : null,
-        error: null
-      });
-    } else { //new document (there is no parameter id)
-
-      let contentPage = await ContentPage.create({
-        creatorId: req.user._id,
-        publishDate: new Date()
-      });
-
-      //Delete the oldest content pages if we are over the post limit
-      const deletedContentPages = await enforceContentPageLimit(req.user._id, contentPage._id);
-      if (deletedContentPages.length > 0) {
-        console.log(`Deleted ${deletedContentPages.length} oldest content page(s) after creating ${contentPage._id}.`);
-      }
-      res.redirect(`/creator/pages/${contentPage._id}/editor`);//Redirect to the editor
     }
+    let contentPage = await ContentPage.findOne({
+      _id: req.params.id,
+      creatorId: req.user._id
+    });
+
+    if (!contentPage) {
+      return res.status(404).render("errors/404", {
+        title: "Content not found"
+      });
+    }
+    //Get the file metadata, because the frontend needs it
+    let fileMetadata = null;
+    if (contentPage.fileKey) {
+      fileMetadata = await FileServiceInstance.getFileMetadata(contentPage.fileKey);
+    }
+    res.render("creator/content-editor", {
+      title: "Edit Content Page",
+      contentPage: contentPage,
+      fileMetadata: fileMetadata,
+      contentPageLimit: await getContentPageLimitInfo(req.user._id),
+      success: req.query.saved === "1" ? "Post saved." : null,
+      error: null
+    });
+  }
+
+  post_newPost = async (req: Request, res: Response): Promise<void> => {
+    let contentPage = await ContentPage.create({
+      creatorId: req.user._id,
+      //Because there are no drafts, we can just set the status to "published" otherwise it will be public instantly.
+      //The user has 24 hours to publish it
+      publishDate: new Date(new Date().getTime() + (24 * 60 * 60 * 1000))
+    });
+
+    //Delete the oldest content pages if we are over the post limit
+    const deletedContentPages = await enforceContentPageLimit(req.user._id, contentPage._id);
+    if (deletedContentPages.length > 0) {
+      console.log(`Deleted ${deletedContentPages.length} oldest content page(s) after creating ${contentPage._id}.`);
+    }
+    res.redirect(`/creator/pages/${contentPage._id}/editor`);//Redirect to the editor
   }
 
 

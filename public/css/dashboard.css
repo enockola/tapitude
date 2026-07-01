@@ -19,6 +19,13 @@
   grid-template-rows: 1fr;
 }
 
+.cards-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 20px 0;
+}
+
 .dashboard-main {
   padding: var(--space-2xl);
 }
