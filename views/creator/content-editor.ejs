@@ -40,6 +40,8 @@
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
 
+
+      
       <input type="hidden" name="_csrf" value="<%= _csrf %>">
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
@@ -58,6 +60,13 @@
     </form>
 
     <div class="divider"></div>
+    
+    <label>Preserve Media aspect ratio: </label>
+    <p>Turning this ON will preserve the aspect ratio of your media, but make it smaller</p>
+    <label class="switch">
+      <input type="checkbox" name="brandDarkMode">
+      <span class="slider"></span>
+    </label>
 
     <form action="<%= contentPage ? `/creator/pages/${contentPage._id}/update` : '/creator/pages/create' %>" method="POST" class="form-stack" id="contentForm">
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
@@ -69,6 +78,7 @@
         Description <span id="desc-character-count">0/200</span>
         <textarea maxlength="500" class="uploadInput" name="body" rows="8" placeholder="Tell your story..." style="max-height: 300px;"><%= contentPage?.body || '' %></textarea>
       </label>
+
 
 
       <label>

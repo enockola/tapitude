@@ -10,6 +10,7 @@ export interface IContentPage extends Document {
   updatedAt: Date;
   likes: number;
   viewedBy: String[];
+  preserveAspectRatio?: boolean;
   isPublished(): boolean;
   isScheduled(): boolean;
 }
@@ -27,7 +28,8 @@ const contentPageSchema = new Schema<IContentPage>(
     body: { type: String, trim: true },
     publishDate: { type: Date },
     likes: { type: Number, default: 0 },
-    viewedBy: { type: [String], default: [] }
+    viewedBy: { type: [String], default: [] },
+    preserveAspectRatio: { type: Boolean, default: false }
   },
   { timestamps: true }
 );
