@@ -80,7 +80,7 @@ function createPost(parentElement, post) {
 
     postChildContent.innerHTML = `
     <p class="post-date">${formatEtDateTime(post.publishDate)}</p>
-    <div class="post-media"></div>
+    <div class="post-media media-fill"></div>
     <div class="post-text">${post.body ?? ""}</div>
     <div class="actions">
         <button class="like-button"><i class="ph ph-heart ${likedPosts.includes(post._id) ? "ph-fill" : ""}"></i>

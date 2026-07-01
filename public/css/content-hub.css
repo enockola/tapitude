@@ -56,6 +56,7 @@ body {
 .post-text {
   overflow-y: auto;
   margin-top: 6px;
+    font-size: 0.9em;
 }
 
 .actions {
@@ -203,6 +204,18 @@ body {
   background-color: var(--color-brand-background);
 }
 
+/*Add this CSS to make images and video fill the container instead of leaving empty space*/
+.media-fill {
+  aspect-ratio: 1 / 1;
+}
+
+.post-media img,
+.post-media video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures it fills the square without stretching */
+}
+
 /*
 =================================================================
 Dark mode
@@ -274,8 +287,10 @@ Maximized mode
 }
 
 .max .post-text {
-  padding: 20px;
-  flex: 1;
+  padding: 5px 15px;
+  max-height: 70px;
+
+  /* position: absolute; */
 }
 
 .max .post-date {
