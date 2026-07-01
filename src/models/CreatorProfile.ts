@@ -46,7 +46,8 @@ const creatorProfileSchema = new mongoose.Schema<ICreatorProfile>(
     },
     brandColor: {
       type: String,
-      trim: true
+      trim: true,
+      default: "#004ba8"
     },
     bio: {
       type: String,
