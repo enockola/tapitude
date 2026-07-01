@@ -67,7 +67,7 @@
 
       <label>
         Description <span id="desc-character-count">0/200</span>
-        <textarea maxlength="200" class="uploadInput" name="body" rows="8" placeholder="Tell your story..." style="max-height: 300px;"><%= contentPage?.body || '' %></textarea>
+        <textarea maxlength="500" class="uploadInput" name="body" rows="8" placeholder="Tell your story..." style="max-height: 300px;"><%= contentPage?.body || '' %></textarea>
       </label>
 
 
@@ -125,7 +125,7 @@
 
   function updateDescCharacterCount() {
     const charCount = descInput.value.length;
-    document.getElementById("desc-character-count").textContent = `${charCount}/200`;
+    document.getElementById("desc-character-count").textContent = `${charCount}/${descInput.getAttribute("maxlength")}`;
   }
   descInput.addEventListener("input", updateDescCharacterCount);
   updateDescCharacterCount();
