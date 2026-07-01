@@ -117,6 +117,7 @@ export class CreatorController {
   }
 
   dashboard = async (req: Request, res: Response): Promise<void> => {
+
     const creatorProfile = await CreatorProfile.findOne({ userId: req.user._id });
     if (!creatorProfile) {
       return res.status(404).render("errors/404", {
@@ -127,6 +128,7 @@ export class CreatorController {
     const contentPages = await ContentPage.find({ creatorId: req.user._id })
       .sort({ updatedAt: -1 })
       .limit(5);
+    console.log("\nCREATOR DASHBOARD ", contentPages);
 
     //Analytics
     const totalPages = await ContentPage.countDocuments({ creatorId: req.user._id });
@@ -248,7 +250,6 @@ export class CreatorController {
 
   post_uploadMedia = async (req: Request, res: Response): Promise<void> => {
     // Stream the media field from our form as a Readable stream
-    console.log("MEDIA UPLOAD POST REQUEST");
     // console.log(req.headers["content-type"]);
     // console.log(req.readableEnded); //Has the stream been read already?
     // console.log(req.complete);
@@ -276,11 +277,15 @@ export class CreatorController {
       });
     });
     busboy.on("field", (name: any, value: any) => {
-      console.log("field:", name, value);
       fields[name] = value;
     });
     busboy.on("finish", async () => {
       console.log("request finished ", fields);
+      if (!fields.postID || !mongoose.Types.ObjectId.isValid(fields.postID)) {
+        return res.status(404).render("errors/404", {
+          title: "Post not found"
+        });
+      }
       let fileKey = null;
 
       if (uploadPromise) {
@@ -289,10 +294,6 @@ export class CreatorController {
       } else {
         //Delete the file
         fileKey = null;
-      }
-
-      if (!fields.postID || !mongoose.Types.ObjectId.isValid(fields.postID)) {
-        return res.status(500).send("Invalid post ID");
       }
 
       //If the content page already has a file, delete it
@@ -319,31 +320,31 @@ export class CreatorController {
   }
 
   post_createEditContent = async (req: Request, res: Response): Promise<void> => {
-    const { postID, body, status, scheduledFor,aspectRatioMode } = req.body;
+    const { postID, body, status, scheduledFor, aspectRatioMode } = req.body;
     //Convert scheduled status to published
     const pageStatus = status === "scheduled" ? "published" : status;
-
-    console.log("ASPECT RATIO MODE", aspectRatioMode);
     let preserveAspectRatio = null;
     if (aspectRatioMode !== null && aspectRatioMode !== "auto") {
       preserveAspectRatio = aspectRatioMode === "true";
     }
 
-    const pageData = {
-      creatorId: req.user._id,
-      body,
-      //Status can only be "published" or "scheduled"
-      status: pageStatus,
-      publishDate: scheduledFor ? etInputToUtcDate(scheduledFor) : new Date(),
-      preserveAspectRatio: preserveAspectRatio
-    };
+
 
     if (postID && mongoose.Types.ObjectId.isValid(postID)) { //editing
       //Find one and update it with the fields we have specified, first param is the filter, second is the update, third is options
       let contentPage = await ContentPage.findOneAndUpdate({
         _id: postID,
         creatorId: req.user._id
-      }, pageData, { new: true });
+      },
+        {
+          creatorId: req.user._id,
+          body,
+          //Status can only be "published" or "scheduled"
+          status: pageStatus,
+          publishDate: scheduledFor ? etInputToUtcDate(scheduledFor) : new Date(),
+          preserveAspectRatio: preserveAspectRatio
+        }
+        , { new: true });
       if (!contentPage) {
         return res.status(404).render("errors/404", {
           title: "Content not found"
@@ -351,21 +352,17 @@ export class CreatorController {
       }
       console.log("\nEDITED CONTENT PAGE", postID, contentPage);
       res.redirect(`/creator/pages/${postID}/editor?saved=1`);
-    } else { //creating
-      let contentPage = await ContentPage.create(pageData);
-      const deletedContentPages = await enforceContentPageLimit(req.user._id, contentPage._id);
-      if (deletedContentPages.length > 0) {
-        console.log(`Deleted ${deletedContentPages.length} oldest content page(s) after creating ${contentPage._id}.`);
-      }
-      console.log("\nNEW CONTENT PAGE", contentPage);
-      res.redirect(`/creator/content`);
+    } else {
+      return res.status(404).render("errors/404", {
+        title: "Post not found"
+      });
     }
   }
 
-  get_createEditContent = async (req: Request, res: Response): Promise<void> => {
 
-    //edit document
-    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) { //Get the ID parameter from the URL
+
+  get_createEditContent = async (req: Request, res: Response): Promise<void> => {
+    if (req.params.id && mongoose.Types.ObjectId.isValid(req.params.id)) { //Editing: Get the ID parameter from the URL
       let contentPage = await ContentPage.findOne({
         _id: req.params.id,
         creatorId: req.user._id
@@ -389,17 +386,19 @@ export class CreatorController {
         success: req.query.saved === "1" ? "Post saved." : null,
         error: null
       });
-    } else { //new document
-      const contentPageLimit = await getContentPageLimitInfo(req.user._id);
+    } else { //new document (there is no parameter id)
 
-      res.render("creator/content-editor", {
-        title: "New Content Page",
-        fileMetadata: null,
-        contentPage: null,
-        contentPageLimit,
-        success: null,
-        error: null
+      let contentPage = await ContentPage.create({
+        creatorId: req.user._id,
+        publishDate: new Date()
       });
+
+      //Delete the oldest content pages if we are over the post limit
+      const deletedContentPages = await enforceContentPageLimit(req.user._id, contentPage._id);
+      if (deletedContentPages.length > 0) {
+        console.log(`Deleted ${deletedContentPages.length} oldest content page(s) after creating ${contentPage._id}.`);
+      }
+      res.redirect(`/creator/pages/${contentPage._id}/editor`);//Redirect to the editor
     }
   }
 
