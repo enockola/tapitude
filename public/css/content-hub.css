@@ -162,9 +162,11 @@ footer {
   margin: 0;
   user-select: none;
   overflow: hidden;
+
 }
 
 .post-content {
+    background-color: white;
   border-radius: 10px;
   padding: 12px;
   top: 75px;

@@ -200,7 +200,7 @@ function getBrightness(color) {
 }
 
 
-function tintColor(color, amount = 0.95) {
+function tintColor(color, amount = 0.92) {
     const div = document.createElement("div");
     div.style.color = color;
     document.body.appendChild(div);
