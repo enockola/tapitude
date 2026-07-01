@@ -48,41 +48,9 @@ body {
   width: auto;
 }
 
-.post {
-  height: 100vh;
-  scroll-snap-align: start;
-  margin: 0;
-  user-select: none;
-  overflow: hidden;
-}
-
-.post-content {
-  background: white;
-  border-radius: 10px;
-  padding: 12px;
-  position: relative;
-  top: 90px;
-  margin: 20px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  max-height: calc(100vh - 160px);
-}
-
-.post_media {
-  /* min-height: 50vh; */
-}
-
 .post-header {
   font-weight: bold;
   margin-bottom: 8px;
-}
-
-.post img,
-.post video {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  border-radius: 8px;
-  margin-top: 8px;
 }
 
 .post-text {
@@ -95,6 +63,7 @@ body {
   justify-content: space-around;
   margin-top: 10px;
   border-top: 1px solid #eee;
+  margin-top: auto;
 }
 
 .actions button {
@@ -186,8 +155,48 @@ footer {
   display: inline;
 }
 
+.post {
+  height: 100vh;
+  scroll-snap-align: start;
+  margin: 0;
+  user-select: none;
+  overflow: hidden;
+}
+
+.post-content {
+  border-radius: 10px;
+  padding: 12px;
+  top: 75px;
+  margin: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 160px);
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  height: 100%; /* Ensure content fills the 500px post height */
+  overflow: hidden; /* Prevents overflow from breaking the border */
+}
+
 .post-media {
   display: none;
+  flex: 1; /* Allows the image area to take up remaining space */
+  min-height: 0; /* CRITICAL: Allows this item to shrink below its content size */
+  justify-content: center;
+}
+
+.post img,
+.post video {
+  object-fit: contain;
+  border-radius: 8px;
+  margin: auto;
+  height: 100%;
+  width: 100%;
+}
+
+.post video {
+  background-color: black;
 }
 
 body {
