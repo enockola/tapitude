@@ -93,10 +93,13 @@ function createPost(parentElement, post) {
     likeButton.addEventListener("click", () => {
         likeTogglePost(post._id, likeCount, heartIcon);
     });
+    const postChildMedia = postChildContent.querySelector(".post-media");
+    const postChildText = postChildContent.querySelector(".post-text");
 
     //Double tap function
     postChild.lastTapTime = 0;
-    postChild.lastTapScroll = 0;
+    postChild.pressY = 0;
+    postChild.deltaY = 0;
     const touchStart = (event) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
@@ -110,24 +113,37 @@ function createPost(parentElement, post) {
             event.preventDefault(); // Prevents zoom/ghost clicks
         }
         postChild.lastTapTime = currentTime;
-        postChild.lastTapScroll = document.body.scrollTop;
+        const touch = event.touches[0];
+        // console.log(`Tapping at X: ${touch.clientX}, Y: ${touch.clientY}`);
+        postChild.pressY = touch.clientY;
+        postChild.deltaY = 0;
     };
 
     const touchEnd = (event) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
-        const tapScrollDelta = Math.abs(document.body.scrollTop - postChild.lastTapScroll);
-        if (tapLength > doubleTapDelay * 0.4 && tapScrollDelta < 10) {
+        console.log("final scroll delta: ", postChild.deltaY);
+        if (tapLength > doubleTapDelay * 0.4
+            && postChild.deltaY < 10) {
             document.body.classList.toggle("max");
         }
         event.preventDefault();
     };
 
-    const postChildMedia = postChildContent.querySelector(".post-media");
-    const postChildText = postChildContent.querySelector(".post-text");
+    const touchMove = (event) => {
+        const touch = event.touches[0];
+        // console.log(`Moving at X: ${touch.clientX}, Y: ${touch.clientY}`);
+        const delta = Math.abs(touch.clientY - postChild.pressY);
+        if (delta > postChild.deltaY) {
+            // console.log(delta)
+            postChild.deltaY = delta;
+        }
+    };
 
+    postChildMedia.addEventListener('touchmove', touchMove);
     postChildMedia.addEventListener('touchstart', touchStart);
     postChildMedia.addEventListener('touchend', touchEnd);
+    postChildText.addEventListener('touchmove', touchMove);
     postChildText.addEventListener('touchstart', touchStart);
     postChildText.addEventListener('touchend', touchEnd);
     //------------------------------------
