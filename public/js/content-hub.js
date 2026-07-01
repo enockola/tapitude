@@ -195,14 +195,6 @@ const observer = new IntersectionObserver(
 observer.observe(target);
 
 
-const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-if (isDarkMode) {
-    document.body.classList.add("dark");
-    console.log("System is in Dark Mode");
-}
-
-///Update styliing
 function getBrightness(color) {
     const el = document.createElement('div');
     el.style.color = color;

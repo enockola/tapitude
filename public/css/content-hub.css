@@ -84,7 +84,7 @@ body {
     transform 0.15s ease,
     background-color 0.8s ease-out,
     color 0.8s ease-out;
-    border-radius: 6px;
+  border-radius: 6px;
 }
 
 .reactions {
@@ -182,7 +182,7 @@ footer {
   justify-content: center;
 }
 
-.post-media:empty{
+.post-media:empty {
   display: none;
 }
 
@@ -236,37 +236,39 @@ body {
 Dark mode
 =================================================================
 */
-.dark .like-button:active,
-.dark .like-active {
-  background: rgb(190, 29, 0) !important;
-  color: rgba(255, 232, 232, 0.586);
-}
-.dark {
-  background-color: #020202;
-  color: white;
-}
+@media (prefers-color-scheme: dark) {
+  .like-button:active,
+  .like-active {
+    background: rgb(190, 29, 0) !important;
+    color: rgba(255, 232, 232, 0.586);
+  }
+  body {
+    background-color: #020202;
+    color: white;
+  }
 
-.dark .topbar {
-  border-bottom: none;
-}
+  .topbar {
+    border-bottom: none;
+  }
 
-.dark .like-button {
-  color: white;
-}
+  .like-button {
+    color: white;
+  }
 
-.dark .post-content {
-  background-color: #232323;
-  color: white;
-  display: flex;
-  flex-direction: column;
-}
+  .post-content {
+    background-color: #232323;
+    color: white;
+    display: flex;
+    flex-direction: column;
+  }
 
-.dark .powered-by img {
-  filter: invert(1);
-}
+  .powered-by img {
+    filter: invert(1);
+  }
 
-.dark .actions {
-  border-top: 1px solid #ffffff2e;
+  .actions {
+    border-top: 1px solid #ffffff2e;
+  }
 }
 
 /*
