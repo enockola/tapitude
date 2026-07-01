@@ -29,7 +29,7 @@ const contentPageSchema = new Schema<IContentPage>(
     publishDate: { type: Date },
     likes: { type: Number, default: 0 },
     viewedBy: { type: [String], default: [] },
-    preserveAspectRatio: { type: Boolean, default: false }
+    preserveAspectRatio: { type: Boolean, default: null }
   },
   { timestamps: true }
 );

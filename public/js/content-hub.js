@@ -80,13 +80,12 @@ function createPost(parentElement, post) {
 
     postChildContent.innerHTML = `
     <p class="post-date">${formatEtDateTime(post.publishDate)}</p>
-    <div class="post-media media-fill"></div>
+    <div class="post-media"></div>
     <div class="post-text">${post.body ?? ""}</div>
     <div class="actions">
         <button class="like-button"><i class="ph ph-heart ${likedPosts.includes(post._id) ? "ph-fill" : ""}"></i>
          <span class="like-count">${post.likes}</span> Double-Taps</button>
-    </div>
-`;
+    </div>`;
 
     const likeButton = postChildContent.querySelector(".like-button");
     const likeCount = postChildContent.querySelector(".like-count");
@@ -98,7 +97,7 @@ function createPost(parentElement, post) {
     //Double tap function
     postChild.lastTapTime = 0;
     postChild.lastTapScroll = 0;
-    postChild.addEventListener('touchstart', (event) => {
+    const touchStart = (event) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
         if (tapLength < doubleTapDelay && tapLength > 0) {
@@ -112,40 +111,58 @@ function createPost(parentElement, post) {
         }
         postChild.lastTapTime = currentTime;
         postChild.lastTapScroll = document.body.scrollTop;
-    });
-    postChild.addEventListener('touchend', (event) => {
+    };
+
+    const touchEnd = (event) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
         const tapScrollDelta = Math.abs(document.body.scrollTop - postChild.lastTapScroll);
         if (tapLength > doubleTapDelay * 0.4 && tapScrollDelta < 10) {
-            console.log("Touch end ", tapLength);
-            console.log("Single tap detected");
             document.body.classList.toggle("max");
         }
         event.preventDefault();
-    });
+    };
+
+    const postChildMedia = postChildContent.querySelector(".post-media");
+    const postChildText = postChildContent.querySelector(".post-text");
+
+    postChildMedia.addEventListener('touchstart', touchStart);
+    postChildMedia.addEventListener('touchend', touchEnd);
+    postChildText.addEventListener('touchstart', touchStart);
+    postChildText.addEventListener('touchend', touchEnd);
     //------------------------------------
 
     parentElement.appendChild(postChild);
     //Important for unloading content not in viewport
     const postObserver = new IntersectionObserver(async ([entry]) => {
-        const postChildMedia = postChildContent.querySelector(".post-media");
+        let preserveAspectRatio = false;
         if (entry.isIntersecting) {
             if (post.fileKey) {
                 const fileURL = `/storage/${post.fileKey}`;
                 const mimeType = await getMimeType(fileURL);
                 if (mimeType.startsWith("image/")) {
-                    postChildMedia.style.display = "flex";
+                    if (post.preserveAspectRatio == null) preserveAspectRatio = true;
+                    else preserveAspectRatio = post.preserveAspectRatio;
                     postChildMedia.innerHTML = `<image src="${fileURL}" alt="Post Media" />`;
                 } else {
-                    postChildMedia.style.display = "flex";
-                    postChildMedia.innerHTML = `<video src="${fileURL}" alt="Post Media" autoplay controls />`;
+                    if (post.preserveAspectRatio == null) preserveAspectRatio = false;
+                    else preserveAspectRatio = post.preserveAspectRatio;
+                    postChildMedia.innerHTML = `<video controls loop autoplay muted playsinline>
+                    <source src="${fileURL}" type="video/mp4">
+                    Your browser does not support the video tag.</video>`;
+                    const video = postChildMedia.querySelector('video');
+                    video.play().catch(error => {
+                        console.log("Autoplay was prevented by the browser. Adding a play button.");
+                        // Add logic here to show a "Play" button overlay to the user
+                    });
                 }
             }
         } else {
-            postChildMedia.style.display = "none";
             postChildMedia.innerHTML = "";
         }
+        //Media fill == preserve aspect ratio is false
+        if (preserveAspectRatio) postChildMedia.classList.remove("media-fill");
+        else postChildMedia.classList.add("media-fill");
     }, { threshold: 0 });
     postObserver.observe(postChild);
 }

@@ -281,17 +281,14 @@ export class CreatorController {
     });
     busboy.on("finish", async () => {
       console.log("request finished ", fields);
-      let content;
+      let fileKey = null;
+
       if (uploadPromise) {
         //Upload the file
-        content = {
-          fileKey: await uploadPromise
-        };
+        fileKey = await uploadPromise;
       } else {
         //Delete the file
-        content = {
-          fileKey: null
-        };
+        fileKey = null;
       }
 
       if (!fields.postID || !mongoose.Types.ObjectId.isValid(fields.postID)) {
@@ -306,8 +303,12 @@ export class CreatorController {
       }
 
       //Update the database with the file key
-      contentPage = await ContentPage.findByIdAndUpdate(fields.postID, content, { new: true });
-      console.log("\nUPDATED CONTENT PAGE", fields.postID, contentPage);
+      contentPage = await ContentPage.findByIdAndUpdate(
+        fields.postID,
+        {
+          fileKey: fileKey
+        },
+        { new: true });
       res.redirect(`/creator/pages/${fields.postID}/editor`);
     });
     busboy.on("error", (err: any) => {
@@ -318,16 +319,23 @@ export class CreatorController {
   }
 
   post_createEditContent = async (req: Request, res: Response): Promise<void> => {
-    const { postID, body, status, scheduledFor } = req.body;
+    const { postID, body, status, scheduledFor,aspectRatioMode } = req.body;
     //Convert scheduled status to published
     const pageStatus = status === "scheduled" ? "published" : status;
+
+    console.log("ASPECT RATIO MODE", aspectRatioMode);
+    let preserveAspectRatio = null;
+    if (aspectRatioMode !== null && aspectRatioMode !== "auto") {
+      preserveAspectRatio = aspectRatioMode === "true";
+    }
 
     const pageData = {
       creatorId: req.user._id,
       body,
       //Status can only be "published" or "scheduled"
       status: pageStatus,
-      publishDate: scheduledFor ? etInputToUtcDate(scheduledFor) : new Date()
+      publishDate: scheduledFor ? etInputToUtcDate(scheduledFor) : new Date(),
+      preserveAspectRatio: preserveAspectRatio
     };
 
     if (postID && mongoose.Types.ObjectId.isValid(postID)) { //editing

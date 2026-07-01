@@ -41,7 +41,7 @@
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
 
 
-      
+
       <input type="hidden" name="_csrf" value="<%= _csrf %>">
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
@@ -60,15 +60,26 @@
     </form>
 
     <div class="divider"></div>
-    
-    <label>Preserve Media aspect ratio: </label>
-    <p>Turning this ON will preserve the aspect ratio of your media, but make it smaller</p>
-    <label class="switch">
-      <input type="checkbox" name="brandDarkMode">
-      <span class="slider"></span>
-    </label>
+
 
     <form action="<%= contentPage ? `/creator/pages/${contentPage._id}/update` : '/creator/pages/create' %>" method="POST" class="form-stack" id="contentForm">
+      <label>Preserve Media aspect ratio: </label>
+      <!-- <p>Turning this ON will preserve the aspect ratio of your media, but make it smaller</p> -->
+      <select name="aspectRatioMode">
+
+        <option value="auto" <%= (contentPage?.preserveAspectRatio == null) ? "selected" : "" %>>
+          Auto (Let the media decide)
+        </option>
+
+        <option value="true" <%= (contentPage?.preserveAspectRatio === true) ? "selected" : "" %>>
+          Preserve Aspect Ratio
+        </option>
+
+        <option value="false" <%= (contentPage?.preserveAspectRatio === false) ? "selected" : "" %>>
+          Zoom to Fit
+        </option>
+      </select>
+
       <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
