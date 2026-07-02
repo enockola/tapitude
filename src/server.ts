@@ -97,6 +97,9 @@ app.use("/storage", express.static(path.join(__dirname, '..', 'storage')));
 if(!process.env.SESSION_SECRET)
   throw new Error("SESSION_SECRET is not set");
 
+const isProduction = process.env.NODE_ENV === "production";
+console.log(`Production Environment: ${process.env.NODE_ENV}`);
+
 const sessionOptions = {
   name: "tapitude.sid",
   secret: process.env.SESSION_SECRET || "dev_secret_change_me",
@@ -105,7 +108,7 @@ const sessionOptions = {
   cookie: {
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: isProduction,
     maxAge: 1000 * 60 * 60 * 24
   }
 };
