@@ -39,11 +39,6 @@
 
     <!-- If content page exists, we are editing it, otherwise we are creating a new one -->
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
-
-
-
-      <input type="hidden" name="_csrf" value="<%= _csrf %>">
-      <!-- We include the page ID so that the server can identify which page to update. If this is a new page, the ID will be null -->
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
       <%- include("./partial_file_upload", {
