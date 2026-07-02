@@ -14,7 +14,7 @@ const {
     doubleCsrfProtection, // This is the default CSRF protection middleware.
 } = doubleCsrf({
     getSecret: (req) => process.env.CSRF_SECRET || "dev_secret_change_me",
-    getSessionIdentifier: (req) => req.session.id, // return the requests unique identifier
+    getSessionIdentifier: (req) => req.sessionID, // return the requests unique identifier
     //Tell the library how to get the csrf token from the request. Get it as a header or a form field
     getCsrfTokenFromRequest: (req) => (req.headers["x-csrf-token"] as string) || req.body._csrf
 });
