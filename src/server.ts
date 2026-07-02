@@ -97,7 +97,7 @@ app.use("/storage", express.static(path.join(__dirname, '..', 'storage')));
 if(!process.env.SESSION_SECRET)
   throw new Error("SESSION_SECRET is not set");
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === "production" ? true : false;
 console.log(`Production Environment: ${process.env.NODE_ENV}`);
 
 const sessionOptions = {
