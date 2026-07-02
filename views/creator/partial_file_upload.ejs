@@ -126,7 +126,7 @@
         const formData = new FormData(mediaForm);
         const xhr = new XMLHttpRequest();
         xhr.open("POST", mediaForm.action);
-        xhr.setRequestHeader('X-CSRF-Token', '<%= _csrf %>');
+        xhr.setRequestHeader('x-csrf-token', '<%= _csrf %>');
 
         // 📊 THIS is what you need
         xhr.upload.onprogress = (event) => {
