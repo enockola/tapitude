@@ -128,7 +128,6 @@
         xhr.open("POST", mediaForm.action);
         xhr.setRequestHeader('x-csrf-token', '<%= _csrf %>');
 
-        // 📊 THIS is what you need
         xhr.upload.onprogress = (event) => {
           if (event.lengthComputable) {
             const percent = (event.loaded / event.total) * 100;
@@ -137,12 +136,15 @@
         };
 
         xhr.onload = () => {
+          console.log(xhr.status);
+          console.log(xhr.responseText);
+
           if (xhr.status >= 200 && xhr.status < 300) {
-            uploadProgress(100, event.loaded, event.total);
+            uploadProgress(100);
             resolve(xhr.response);
-            location.reload(); //Reload so we can see the new media
+            location.reload();
           } else {
-            reject("Upload failed 💥");
+            reject(xhr.responseText);
           }
         };
 
