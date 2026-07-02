@@ -45,13 +45,12 @@ import {generateCsrfToken,injectCsrfToken} from './utils/securityUtils.js';
 
 
 
-
 const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer); //websocket
-const useMockData = process.env.USE_MOCK_DATA === "true";
 
 app.set("view engine", "ejs");
+app.set("trust proxy", 1);
 app.set("views", path.join(__dirname, "..", "views"));
 
 //App globals for use by views
@@ -97,26 +96,25 @@ app.use("/storage", express.static(path.join(__dirname, '..', 'storage')));
 if(!process.env.SESSION_SECRET)
   throw new Error("SESSION_SECRET is not set");
 
+if (!process.env.MONGODB_URI)
+  throw new Error("MONGODB_URI is not set");
+
 const isProduction = process.env.NODE_ENV === "production" ? true : false;
 console.log(`Production Environment: ${isProduction}`);
 
-const sessionOptions = {
+app.use(session({
   name: "tapitude.sid",
   secret: process.env.SESSION_SECRET || "dev_secret_change_me",
   resave: false,
   saveUninitialized: false,
+  store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
   cookie: {
     httpOnly: true,
     sameSite: "lax",
     secure: isProduction,
     maxAge: 1000 * 60 * 60 * 24
   }
-};
-
-if (process.env.MONGODB_URI) {
-  sessionOptions.store = MongoStore.create({ mongoUrl: process.env.MONGODB_URI });
-}
-app.use(session(sessionOptions));
+}));
 app.use(cookieParser());
 app.use(attachUser); //load and attach the user to the request every time (get the user from session userId)
 app.use(injectCsrfToken);
