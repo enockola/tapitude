@@ -98,7 +98,7 @@ if(!process.env.SESSION_SECRET)
   throw new Error("SESSION_SECRET is not set");
 
 const isProduction = process.env.NODE_ENV === "production" ? true : false;
-console.log(`Production Environment: ${process.env.NODE_ENV}`);
+console.log(`Production Environment: ${isProduction}`);
 
 const sessionOptions = {
   name: "tapitude.sid",
