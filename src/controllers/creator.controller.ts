@@ -6,7 +6,7 @@ import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/timezoneUtils";
 import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
-import { manualCsrfCheck, creatorCheck, generateCsrfToken } from '../utils/securityUtils.js';
+import { manualCsrfCheck,middlewareCsrfCheck, creatorCheck, generateCsrfToken } from '../utils/securityUtils.js';
 
 const MAX_CONTENT_PAGES_PER_CREATOR = 25;
 
@@ -91,11 +91,11 @@ export class CreatorController {
     router.post("/profile/update", creatorCheck, asyncHandler(this.post_updateProfile)); //We already preform a manual CSRF check inside this function
 
     //For creating/editing/deleting content
-    router.post("/pages/new-page", creatorCheck, manualCsrfCheck, asyncHandler(this.post_newPost));
-    router.post("/pages/create", creatorCheck, manualCsrfCheck, asyncHandler(this.post_editPost));
-    router.post("/pages/:id/update", creatorCheck, manualCsrfCheck, asyncHandler(this.post_editPost));
-    router.post("/pages/upload", creatorCheck, manualCsrfCheck, asyncHandler(this.post_uploadMedia));
-    router.post("/pages/:id/delete", creatorCheck, manualCsrfCheck, asyncHandler(this.post_deleteContent));
+    router.post("/pages/new-page", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_newPost));
+    router.post("/pages/create", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_editPost));
+    router.post("/pages/:id/update", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_editPost));
+    router.post("/pages/upload", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_uploadMedia));
+    router.post("/pages/:id/delete", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_deleteContent));
   }
 
 

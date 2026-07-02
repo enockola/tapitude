@@ -1,5 +1,4 @@
 import ContentPage from "../models/ContentPage";
-import mockData from "../data/mockData";
 
 async function showPublicContent(req, res) {
   const now = new Date();

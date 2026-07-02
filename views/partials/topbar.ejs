@@ -16,14 +16,17 @@
       <% } else { %>
       <a href="/creator/dashboard" class="<%= currentPath === '/creator/dashboard' ? 'is-active' : '' %>">Dashboard</a>
       <a href="/creator/content" class="<%= currentPath === '/creator/content' ? 'is-active' : '' %>">Content</a>
-       <a href="/creator/profile" class="<%= currentPath === '/creator/profile' ? 'is-active' : '' %>">Settings</a>
+       <a href="/creator/profile" class="<%= currentPath === '/creator/profile' ? 'is-active' : '' %>">Profile</a>
       <% } %>
       <% } else { %>
       <a href="/about" class="<%= currentPath === '/about' ? 'is-active' : '' %>">About</a>
       <a href="/auth/login" class="<%= currentPath === '/auth/login' ? 'is-active' : '' %>"><i class="ph ph-user"></i> Log in</a>
       <% } %>
       <% if (currentUser) { %>
-      <a type="submit" href="/auth/logout"><i class="ph ph-user"></i> Log out</a>
+        <form action="/auth/logout" method="POST" style="display: inline;cursor: pointer;">
+            <input type="hidden" name="_csrf" value="<%= _csrf %>">
+            <button type="submit" ><i class="ph ph-user"></i> Log out</button>
+        </form>
       <% } %>
     </nav>
   </div>

@@ -1,17 +1,18 @@
 import User from "../models/User";
 import asyncHandler from "../utils/asyncHandler";
 import { Request, Response, Router } from 'express';
+import {  middlewareCsrfCheck, adminCheck } from '../utils/securityUtils.js';
 
 export class AuthController {
   registerRoutes(router: Router) {
     router.get("/login", this.showLogin);
+
     router.post("/login", asyncHandler(this.login));
-    router.get("/logout", this.logout);
-    router.post("/logout", this.logout);
+    router.post("/logout", middlewareCsrfCheck, asyncHandler(this.logout));
   }
 
   showLogin = async (req: Request, res: Response): Promise<void> => {
-    res.render("forms/login", {
+    res.render("login", {
       title: "Log in",
       error: null
     });
@@ -26,12 +27,12 @@ export class AuthController {
     // console.log("The user is: ", user);
 
     if (!user) {
-      return res.status(401).render("forms/login", {
+      return res.status(401).render("login", {
         title: "Log in",
         error: "User account not found."
       });
     } else if (user.status !== "active") {
-      return res.status(403).render("forms/login", {
+      return res.status(403).render("login", {
         title: "Log in",
         error: "User account has been disabled."
       });
@@ -39,7 +40,7 @@ export class AuthController {
 
     const passwordMatches = await user.comparePassword(password);
     if (!passwordMatches) {
-      return res.status(401).render("forms/login", {
+      return res.status(401).render("login", {
         title: "Log in",
         error: "Invalid email or password."
       });

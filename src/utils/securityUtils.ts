@@ -2,6 +2,10 @@ import { doubleCsrf } from "csrf-csrf";
 import crypto from 'crypto';
 import User from '../models/User';
 import { Request, Response, NextFunction } from 'express';
+import "dotenv/config";
+
+if(!process.env.CSRF_SECRET)
+    throw new Error("CSRF_SECRET is not set");
 
 const {
     invalidCsrfTokenError, // This is just for convenience if you plan on making your own middleware.
@@ -9,7 +13,7 @@ const {
     validateRequest, // Also a convenience if you plan on making your own middleware.
     doubleCsrfProtection, // This is the default CSRF protection middleware.
 } = doubleCsrf({
-    getSecret: (req) => 'return some cryptographically pseudorandom secret here',
+    getSecret: (req) => process.env.CSRF_SECRET || "dev_secret_change_me",
     getSessionIdentifier: (req) => req.session.id, // return the requests unique identifier
     //   getCsrfTokenFromRequest: (req) => req.body._csrf,   //Force it to use the _csrf field
 });
@@ -44,6 +48,18 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
     return show403(res, "Forbidden: Unauthorized creator");
 }
 
+/**
+ * Requres the csrf token to be in the header or the body of the request
+ * In the header, the field should be "x-csrf-token" (REQUIRED if the form is multipart/form-data)
+ * In the body, the field should be "_csrf"
+ * @param req 
+ * @param res 
+ * @param next 
+ * @returns 
+ */
+export const middlewareCsrfCheck = (req: Request, res: Response, next: NextFunction) => {
+    return manualCsrfCheck(req, res, next, null);
+}
 
 /**
  * Requres the csrf token to be in the header or the body of the request
@@ -52,6 +68,8 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
  * @param req 
  * @param res 
  * @param next 
+ * @param requestToken the csrf token from the request
+ * @param verbose if true, print the console output
  * @returns 
  */
 export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction, requestToken:string|null, verbose = false) => {
