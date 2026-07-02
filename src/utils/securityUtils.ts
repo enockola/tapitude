@@ -4,7 +4,7 @@ import User from '../models/User';
 import { Request, Response, NextFunction } from 'express';
 import "dotenv/config";
 
-if(!process.env.CSRF_SECRET)
+if (!process.env.CSRF_SECRET)
     throw new Error("CSRF_SECRET is not set");
 
 const {
@@ -15,7 +15,8 @@ const {
 } = doubleCsrf({
     getSecret: (req) => process.env.CSRF_SECRET || "dev_secret_change_me",
     getSessionIdentifier: (req) => req.session.id, // return the requests unique identifier
-    //   getCsrfTokenFromRequest: (req) => req.body._csrf,   //Force it to use the _csrf field
+    //Tell the library how to get the csrf token from the request. Get it as a header or a form field
+    getCsrfTokenFromRequest: (req) => (req.headers["x-csrf-token"] as string) || req.body._csrf
 });
 
 // Server level middlewares
@@ -47,68 +48,6 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
     }
     return show403(res, "Forbidden: Unauthorized creator");
 }
-
-/**
- * Requres the csrf token to be in the header or the body of the request
- * In the header, the field should be "x-csrf-token" (REQUIRED if the form is multipart/form-data)
- * In the body, the field should be "_csrf"
- * @param req 
- * @param res 
- * @param next 
- * @returns 
- */
-export const middlewareCsrfCheck = (req: Request, res: Response, next: NextFunction) => {
-    return manualCsrfCheck(req, res, next, null);
-}
-
-/**
- * Requres the csrf token to be in the header or the body of the request
- * In the header, the field should be "x-csrf-token" (REQUIRED if the form is multipart/form-data)
- * In the body, the field should be "_csrf"
- * @param req 
- * @param res 
- * @param next 
- * @param requestToken the csrf token from the request
- * @param verbose if true, print the console output
- * @returns 
- */
-export const manualCsrfCheck = (req: Request, res: Response, next: NextFunction, requestToken:string|null, verbose = false) => {
-    //Get cookie token and body token
-
-    //A malicious site (attacker.com) cannot read or write cookies belonging to your domain
-    const cookieToken = req.cookies['__Host-psifi.x-csrf-token'];
-    if (!cookieToken) {
-        return show403(res, 'Forbidden: Missing CSRF Cookie Token');
-    }
-    if (verbose) console.log("       The cookie token is: ", cookieToken);
-
-    //The attacker can trigger the request, and your browser will attach the cookie, but the attacker cannot read the data on your site.
-    if (!requestToken) requestToken = req.headers['x-csrf-token'] as string; //get the header token from the 
-    if (!requestToken) {
-        console.log(req.body);
-        requestToken = req.body._csrf; //If we can't get the header token from the header, we can get it from the body
-        if (verbose) console.log("       The body token is: ", requestToken);
-        if (!requestToken) {
-            return show403(res, 'Forbidden: Missing CSRF Header/Body Token');
-        }
-    } else if (verbose) console.log("       The header token is: ", requestToken);
-
-    //If the value in the cookie and the value in the body are identical, 
-    // the server concludes that the request originated from your own website 
-    // because only your website's code has the ability to read the cookie 
-    // and inject its value into the form.
-    const isMatch = crypto.timingSafeEqual( //Checks if the two buffers are equal at a constant time to prevent timing attacks
-        Buffer.from(cookieToken),
-        Buffer.from(requestToken)
-    );
-    if (verbose) console.log("       CSRF tokens match: ", isMatch);
-
-    if (!isMatch) {
-        return show403(res, 'Forbidden: Invalid CSRF Token');
-    }
-
-    next();
-};
 
 export {
     invalidCsrfTokenError,

@@ -6,7 +6,7 @@ import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/timezoneUtils";
 import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
-import { manualCsrfCheck,middlewareCsrfCheck, creatorCheck, generateCsrfToken } from '../utils/securityUtils.js';
+import { doubleCsrfProtection, creatorCheck, generateCsrfToken } from '../utils/securityUtils.js';
 
 const MAX_CONTENT_PAGES_PER_CREATOR = 25;
 
@@ -88,14 +88,14 @@ export class CreatorController {
     router.get("/pages/:id/editor", creatorCheck, asyncHandler(this.get_createEditContent)); //Page editor
 
     router.get("/profile", creatorCheck, asyncHandler(this.get_profile)); //Profile editor
-    router.post("/profile/update", creatorCheck, asyncHandler(this.post_updateProfile)); //We already preform a manual CSRF check inside this function
+    router.post("/profile/update", creatorCheck,doubleCsrfProtection, asyncHandler(this.post_updateProfile)); //We already preform a manual CSRF check inside this function
 
     //For creating/editing/deleting content
-    router.post("/pages/new-page", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_newPost));
-    router.post("/pages/create", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_editPost));
-    router.post("/pages/:id/update", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_editPost));
-    router.post("/pages/upload", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_uploadMedia));
-    router.post("/pages/:id/delete", creatorCheck, middlewareCsrfCheck, asyncHandler(this.post_deleteContent));
+    router.post("/pages/new-page", creatorCheck, doubleCsrfProtection, asyncHandler(this.post_newPost));
+    router.post("/pages/create", creatorCheck, doubleCsrfProtection, asyncHandler(this.post_editPost));
+    router.post("/pages/:id/update", creatorCheck, doubleCsrfProtection, asyncHandler(this.post_editPost));
+    router.post("/pages/upload", creatorCheck, doubleCsrfProtection, asyncHandler(this.post_uploadMedia));
+    router.post("/pages/:id/delete", creatorCheck, doubleCsrfProtection, asyncHandler(this.post_deleteContent));
   }
 
 
@@ -204,26 +204,22 @@ export class CreatorController {
       },
       async (fields) => { //On finish
         console.log("FIELDS", fields);
-        //TODO: Putting CSRF as a header would be better, but we've put the csrf check here since this is multipart data.
-        manualCsrfCheck(req, res, async () => {
 
-          content.displayName = fields.displayName;
-          content.brandName = fields.brandName;
-          content.brandColor = fields.brandColor;
-          content.bio = fields.bio;
-          content.brandDarkMode = fields.brandDarkMode;
+        content.displayName = fields.displayName;
+        content.brandName = fields.brandName;
+        content.brandColor = fields.brandColor;
+        content.bio = fields.bio;
+        content.brandDarkMode = fields.brandDarkMode;
 
-          const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
-          if (!profile) {
-            return res.status(404).render("errors/404", {
-              title: "Profile not found"
-            });
-          } else {
-            console.log(profile);
-            res.redirect("/creator/profile");
-          }
-
-        }, fields._csrf, true);
+        const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
+        if (!profile) {
+          return res.status(404).render("errors/404", {
+            title: "Profile not found"
+          });
+        } else {
+          console.log(profile);
+          res.redirect("/creator/profile");
+        }
       });
   }
 

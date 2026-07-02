@@ -34,16 +34,18 @@ const cookieParser = require('cookie-parser');
 import {generateCsrfToken,injectCsrfToken} from './utils/securityUtils.js';
 
 
+//----------------------------------------------------------------------------------------------
+// Constants -----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 
+if(!process.env.SESSION_SECRET)
+  throw new Error("SESSION_SECRET is not set");
 
+if (!process.env.MONGODB_URI)
+  throw new Error("MONGODB_URI is not set");
 
-
-
-
-
-
-
-
+const isProduction = process.env.NODE_ENV === "production" ? true : false;
+console.log(`Production Environment: ${isProduction}`);
 
 const app = express();
 const httpServer = createServer(app);
@@ -63,15 +65,7 @@ app.use(helmet({
   contentSecurityPolicy: false
 }));
 
-//Use Morgan, a logging middleware for HTTP requests
-//Morgan logs the client request and the servers response to said request
-app.use(morgan('dev', {
-  skip: function (req, res) {
-    return req.url.includes('/css/') ||
-      req.url.includes('/js/') ||
-      req.url.includes('/images/');
-  }
-}));
+
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -89,19 +83,18 @@ app.use("/storage", express.static(path.join(__dirname, '..', 'storage')));
 
 
 //----------------------------------------------------------------------------------------------
+//Middleware -----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
-//----------------------------------------------------------------------------------------------
-//Middleware
 
-if(!process.env.SESSION_SECRET)
-  throw new Error("SESSION_SECRET is not set");
-
-if (!process.env.MONGODB_URI)
-  throw new Error("MONGODB_URI is not set");
-
-const isProduction = process.env.NODE_ENV === "production" ? true : false;
-console.log(`Production Environment: ${isProduction}`);
-
+//Use Morgan, a logging middleware for HTTP requests
+//Morgan logs the client request and the servers response to said request
+app.use(morgan('dev', {
+  skip: function (req, res) {
+    return req.url.includes('/css/') ||
+      req.url.includes('/js/') ||
+      req.url.includes('/images/');
+  }
+}));
 app.use(session({
   name: "tapitude.sid",
   secret: process.env.SESSION_SECRET || "dev_secret_change_me",
@@ -118,9 +111,11 @@ app.use(session({
 app.use(cookieParser());
 app.use(attachUser); //load and attach the user to the request every time (get the user from session userId)
 app.use(injectCsrfToken);
+
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
+
 //Routes
 app.use("/", indexRoutes);
 

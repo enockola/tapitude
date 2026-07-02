@@ -4,7 +4,7 @@ import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
-import { manualCsrfCheck,middlewareCsrfCheck, adminCheck } from '../utils/securityUtils.js';
+import { manualCsrfCheck,doubleCsrfProtection, adminCheck } from '../utils/securityUtils.js';
 
 export class AdminController {
 
@@ -14,9 +14,9 @@ export class AdminController {
     router.get("/creators/new",  adminCheck, asyncHandler(this.getNewCreatorView));
     router.get("/edit-creator-account/:id",  adminCheck, asyncHandler(this.getEditCreatorsView));
 
-    router.post("/creators/new", middlewareCsrfCheck, adminCheck, asyncHandler(this.postNewCreator));
-    router.post("/edit-creator-account/:id", middlewareCsrfCheck, adminCheck, asyncHandler(this.postEditCreator));
-    router.post("/delete-creator-account/:id", middlewareCsrfCheck, adminCheck, asyncHandler(this.postDeleteCreator));
+    router.post("/creators/new", doubleCsrfProtection, adminCheck, asyncHandler(this.postNewCreator));
+    router.post("/edit-creator-account/:id", doubleCsrfProtection, adminCheck, asyncHandler(this.postEditCreator));
+    router.post("/delete-creator-account/:id", doubleCsrfProtection, adminCheck, asyncHandler(this.postDeleteCreator));
   }
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {

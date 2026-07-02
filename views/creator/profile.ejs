@@ -16,10 +16,7 @@
   <br>
 
   <h2>Edit Profile</h2>
-  <form class="form-stack" method="post" action="/creator/profile/update" enctype="multipart/form-data">
-
-    <input type="hidden" name="_csrf" value="<%= _csrf %>">
-
+  <form class="form-stack" method="post" action="/creator/profile/update" enctype="multipart/form-data" id="profileForm">
     <label>Display Name:
 
     </label>
@@ -62,10 +59,34 @@
     <textarea name="bio"><%= profile?.bio ? profile.bio : "" %></textarea>
 
     <div class="form-actions">
-      <button class="button" type="submit" id="uploadAttatchmentBtn"> <i class="ph ph-pencil"></i> Update</button>
+      <button class="button" type="button" id="updateProfile">
+        <i class="ph ph-pencil"></i> Update
+      </button>
     </div>
-
   </form>
+
+  <script>
+    const form = document.getElementById("profileForm");
+    const updateProfile = document.getElementById("updateProfile");
+    const csrfToken = '<%= _csrf %>';
+
+    updateProfile.addEventListener("click", () => {
+      const formData = new FormData(form);
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", form.action);
+      xhr.setRequestHeader("x-csrf-token", csrfToken);
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          console.log("Success");
+          window.location.reload();
+        } else {
+          console.error(xhr.status, xhr.responseText);
+        }
+      };
+      xhr.send(formData);
+    });
+  </script>
 
 </section>
 
