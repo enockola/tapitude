@@ -1,6 +1,4 @@
-import { doubleCsrf } from "csrf-csrf";
 import crypto from 'crypto';
-import User from '../models/User';
 import { Request, Response, NextFunction } from 'express';
 import "dotenv/config";
 
@@ -11,37 +9,28 @@ const COOKIE_CSRF_NAME = "psifi-csrf-token";
 //It should start with __Host- on a production environment
 const CSRF_HEADER_NAME = "x-csrf-token";
 
-const {
-    invalidCsrfTokenError, // This is just for convenience if you plan on making your own middleware.
-    generateCsrfToken, // Use this in your routes to provide a CSRF token.
-    validateRequest, // Also a convenience if you plan on making your own middleware.
-    doubleCsrfProtection, // This is the default CSRF protection middleware.
-} = doubleCsrf({
-    getSecret: (req) => process.env.CSRF_SECRET || "dev_secret_change_me",
-    getSessionIdentifier: (req) => req.sessionID, // return the requests unique identifier
-    cookieName: COOKIE_CSRF_NAME,
-    getCsrfTokenFromRequest: (req) =>
-        (req.headers[CSRF_HEADER_NAME] as string) ||
-        (req.body?._csrf as string)
-});
-
 export const attachCsrfToken = (req: Request, res: Response) => {
-    // If we haven't generated a token for this request cycle yet
-    if (!res.locals._csrf) {
-        // Generate a plain, random hex string
-        const token = crypto.randomBytes(32).toString("hex");
+    if (!req.session.csrfToken) { // Only generate the CSRF token ONCE per session lifetime
+        const secret = process.env.CSRF_SECRET;
+        const sessionIdentifier = req.sessionID;
+        if (!secret) {
+            throw new Error("CSRF_SECRET environment variable is missing");
+        }
 
-        // Set it directly as the browser cookie
-        res.cookie(COOKIE_CSRF_NAME, token, {
-            httpOnly: true, 
-            sameSite: "lax",
-            secure: process.env.NODE_ENV === "production",
-            path: "/"
-        });
-
-        // Make it available to your EJS/HTML templates as <%= _csrf %>
-        res.locals._csrf = token;
+        // Generate a stable, session-bound base secret using HMAC
+        req.session.csrfToken = crypto.createHmac("sha256", secret).update(sessionIdentifier).digest("hex");
     }
+
+    //Always keep the cookie synchronized with the session token
+    res.cookie(COOKIE_CSRF_NAME, req.session.csrfToken, {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/"
+    });
+
+    //Pass this stable token to your HTML form views
+    res.locals._csrf = req.session.csrfToken;
 }
 
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
@@ -114,9 +103,4 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
         return next();
     }
     return show403(res, "Forbidden: Unauthorized creator");
-}
-
-export {
-    invalidCsrfTokenError,
-    validateRequest
 }

@@ -11,10 +11,6 @@ import { attachCsrfToken } from '../utils/securityUtils.js';
 async function reqAttachments(req, res, next) {
   // We add the current path to the response locals
   res.locals.currentPath = req.path;
-
-  //Load the CSRF token ONCE
-  attachCsrfToken(req, res);
-
   // We try to attach the user to the request and response locals
   try {
     res.locals.currentUser = null;

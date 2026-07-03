@@ -1,14 +1,13 @@
 import User from "../models/User";
 import asyncHandler from "../utils/asyncHandler";
 import { Request, Response, Router } from 'express';
-import { generateCsrfToken, checkDoubleCsrf } from '../utils/securityUtils.js';
 
 export class AuthController {
   registerRoutes(router: Router) {
     router.get("/login", this.showLogin);
 
     router.post("/login", asyncHandler(this.login));
-    router.post("/logout", checkDoubleCsrf, asyncHandler(this.logout));
+    router.post("/logout", asyncHandler(this.logout));
   }
 
   showLogin = async (req: Request, res: Response): Promise<void> => {

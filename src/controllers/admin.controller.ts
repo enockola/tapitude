@@ -4,19 +4,19 @@ import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
-import {checkDoubleCsrf, adminCheck } from '../utils/securityUtils.js';
+import { adminCheck } from '../utils/securityUtils.js';
 
 export class AdminController {
 
   registerRoutes(router: Router) {
-    router.get("/dashboard",  adminCheck, asyncHandler(this.getDashboardView));
-    router.get("/creators",  adminCheck, asyncHandler(this.getCreatorsView));
-    router.get("/creators/new",  adminCheck, asyncHandler(this.getNewCreatorView));
-    router.get("/edit-creator-account/:id",  adminCheck, asyncHandler(this.getEditCreatorsView));
+    router.get("/dashboard", adminCheck, asyncHandler(this.getDashboardView));
+    router.get("/creators", adminCheck, asyncHandler(this.getCreatorsView));
+    router.get("/creators/new", adminCheck, asyncHandler(this.getNewCreatorView));
+    router.get("/edit-creator-account/:id", adminCheck, asyncHandler(this.getEditCreatorsView));
 
-    router.post("/creators/new", checkDoubleCsrf, adminCheck, asyncHandler(this.postNewCreator));
-    router.post("/edit-creator-account/:id", checkDoubleCsrf, adminCheck, asyncHandler(this.postEditCreator));
-    router.post("/delete-creator-account/:id", checkDoubleCsrf, adminCheck, asyncHandler(this.postDeleteCreator));
+    router.post("/creators/new", adminCheck, asyncHandler(this.postNewCreator));
+    router.post("/edit-creator-account/:id", adminCheck, asyncHandler(this.postEditCreator));
+    router.post("/delete-creator-account/:id", adminCheck, asyncHandler(this.postDeleteCreator));
   }
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {

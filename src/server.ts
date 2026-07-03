@@ -15,7 +15,7 @@ import {
   SCHEDULE_TIME_ZONE_LABEL
 } from "./utils/timezoneUtils.js";
 
-import {errorHandler, notFound} from "./middleware/errorPages.js";
+import { errorHandler, notFound } from "./middleware/errorPages.js";
 import reqAttachments from "./middleware/reqAttachments.ts";
 
 // routes
@@ -29,23 +29,23 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 const cookieParser = require('cookie-parser');
-import {generateCsrfToken} from './utils/securityUtils.js';
+import { checkDoubleCsrf, attachCsrfToken } from './utils/securityUtils.js';
 
 
 //----------------------------------------------------------------------------------------------
 // Constants -----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 
-if(!process.env.SESSION_SECRET)
+if (!process.env.SESSION_SECRET)
   throw new Error("SESSION_SECRET is not set");
 
 if (!process.env.MONGODB_URI)
   throw new Error("MONGODB_URI is not set");
 
-if(!process.env.NODE_ENV || (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production"))
+if (!process.env.NODE_ENV || (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production"))
   throw new Error("NODE_ENV is not set, Must be 'development' or 'production'");
 
-if(!process.env.PORT)
+if (!process.env.PORT)
   throw new Error("PORT is not set");
 
 const isProduction = process.env.NODE_ENV === "production" ? true : false;
@@ -118,6 +118,9 @@ app.use(session({ //Session ID cookie
 app.use(cookieParser());
 app.use(reqAttachments); //load and attach the user to the request every time (get the user from session userId)
 
+//Security middleware
+app.use(checkDoubleCsrf);
+app.use(attachCsrfToken);
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
@@ -135,7 +138,7 @@ viewerNamespace.on('connection', (socket) => {
 });
 
 //The client asske the server for a CSRF token, and the server responds with the token
-app.get("/csrf-token", (req:any, res:any) => {
+app.get("/csrf-token", (req: any, res: any) => {
   const csrfToken = generateCsrfToken(req, res);
   // You could also pass the token into the context of a HTML response.
   res.json({ csrfToken });
