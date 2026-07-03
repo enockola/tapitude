@@ -25,10 +25,11 @@ const {
 });
 
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
+    const cookieToken = req.cookies[COOKIE_CSRF_NAME];
+    const headerToken = req.headers[CSRF_HEADER_NAME] as string;
+    const bodyToken = req.body?._csrf as string;
+
     if (process.env.NODE_ENV === "development") {
-        const cookieToken = req.cookies[COOKIE_CSRF_NAME];
-        const headerToken = req.headers[CSRF_HEADER_NAME] as string;
-        const bodyToken = req.body?._csrf as string;
         console.log("=== CSRF DEBUG START ===");
         console.log("COOKIE CSRF:", cookieToken);
         console.log("HEADER CSRF:", headerToken);
