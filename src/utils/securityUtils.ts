@@ -24,6 +24,13 @@ const {
         (req.body?._csrf as string)
 });
 
+export const attachCsrfToken = (req: Request, res: Response) => {
+    // const cookieToken = req.cookies[COOKIE_CSRF_NAME];
+    // if (!res.locals._csrf || cookieToken === undefined)
+    req.session.csrfToken = generateCsrfToken(req, res);
+    res.locals._csrf = req.session.csrfToken;
+}
+
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
     const cookieToken = req.cookies[COOKIE_CSRF_NAME];
     const headerToken = req.headers[CSRF_HEADER_NAME] as string;

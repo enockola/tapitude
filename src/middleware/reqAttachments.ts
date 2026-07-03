@@ -1,5 +1,5 @@
 import User from "../models/User";
-import { generateCsrfToken, doubleCsrfProtection } from '../utils/securityUtils.js';
+import { generateCsrfToken, doubleCsrfProtection, attachCsrfToken } from '../utils/securityUtils.js';
 
 /**
  * load and attach the user to the request every time (get the user from session userId)
@@ -13,9 +13,7 @@ async function reqAttachments(req, res, next) {
   res.locals.currentPath = req.path;
 
   //Load the CSRF token ONCE
-  if (!res.locals._csrf)
-    req.session.csrfToken = generateCsrfToken(req, res);
-    res.locals._csrf = req.session.csrfToken;
+  attachCsrfToken(req, res);
 
   // We try to attach the user to the request and response locals
   try {
