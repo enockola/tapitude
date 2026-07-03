@@ -110,7 +110,9 @@ app.use(session({
 }));
 app.use(cookieParser());
 app.use(attachUser); //load and attach the user to the request every time (get the user from session userId)
-app.use("*", injectCsrfToken);
+
+//Use CSRF protection for every request
+app.get("*", injectCsrfToken);
 
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
