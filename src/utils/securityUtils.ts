@@ -20,14 +20,19 @@ const {
         (req.body?._csrf as string)
 });
 
-export const csrfDebugMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
+    // 1. Log the debug stuff first
+    console.log("=== CSRF DEBUG START ===");
     console.log("sessionID:", req.sessionID);
     console.log("COOKIE CSRF:", req.cookies["__Host-psifi.x-csrf-token"]);
     console.log("HEADER CSRF:", req.headers["x-csrf-token"]);
-    console.log("BODY CSRF:", req.body._csrf);
+    console.log("BODY CSRF:", req.body?._csrf);
     console.log("cookie session:", req.cookies["tapitude.sid"]);
-    next();
-}
+    console.log("=== CSRF DEBUG END ===");
+
+    // 2. Call the base doubleCsrfProtection method right after
+    doubleCsrfProtection(req, res, next);
+};
 
 
 // Utility functions
@@ -56,6 +61,5 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
 export {
     invalidCsrfTokenError,
     generateCsrfToken,
-    validateRequest,
-    doubleCsrfProtection
+    validateRequest
 }
