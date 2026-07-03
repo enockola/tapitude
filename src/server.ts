@@ -43,6 +43,9 @@ if(!process.env.SESSION_SECRET)
 if (!process.env.MONGODB_URI)
   throw new Error("MONGODB_URI is not set");
 
+if(!process.env.NODE_ENV || (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production"))
+  throw new Error("NODE_ENV is not set, Must be 'development' or 'production'");
+
 const isProduction = process.env.NODE_ENV === "production" ? true : false;
 console.log(`Production Environment: ${isProduction}`);
 
