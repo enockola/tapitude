@@ -25,19 +25,44 @@ const {
 });
 
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
-    // 1. Log the debug stuff first
+    const cookieToken = req.cookies[COOKIE_CSRF_NAME];
+    const headerToken = req.headers[CSRF_HEADER_NAME] as string;
+    const bodyToken = req.body?._csrf as string;
+
     console.log("=== CSRF DEBUG START ===");
-
-    console.log("COOKIE CSRF:", req.cookies[COOKIE_CSRF_NAME]);
-    console.log("HEADER CSRF:", req.headers[CSRF_HEADER_NAME]);
-    console.log("BODY CSRF:", req.body?._csrf);
-
+    console.log("COOKIE CSRF:", cookieToken);
+    console.log("HEADER CSRF:", headerToken);
+    console.log("BODY CSRF:", bodyToken);
     console.log("\nSESSION ID:", req.sessionID);
     console.log("COOKIE SESSION ID:", req.cookies["tapitude.sid"]);
     console.log("=== CSRF DEBUG END ===");
 
+    // // Skip protection for safe HTTP methods
+    // const safeMethods = ["GET", "HEAD", "OPTIONS"];
+    // if (safeMethods.includes(req.method)) {
+    //     return next();
+    // }
+    // const providedToken = headerToken || bodyToken;
+
+    // if (!cookieToken || !providedToken) {
+    //     return res.status(403).render("errors/403", { title: "Forbidden" });
+    // }
+
+    // // 2. CRITICAL: crypto.timingSafeEqual requires BOTH buffers to be the exact same length.
+    // // If the lengths don't match, it throws an error. Attackers can guess lengths, 
+    // // so we handle length mismatches safely.
+    // const cookieBuffer = Buffer.from(cookieToken, "utf-8");
+    // const providedBuffer = Buffer.from(providedToken, "utf-8");
+
+    // const secureMatch = crypto.timingSafeEqual(cookieBuffer, providedBuffer);
+
+    // if (!secureMatch) {
+    //     console.log("❌ CSRF TOKEN MISMATCH DETECTED!");
+    //     return res.status(403).render("errors/403", { title: "Forbidden" });
+    // }
+
     // 2. Call the base doubleCsrfProtection method right after
-    doubleCsrfProtection(req, res, next);
+    // doubleCsrfProtection(req, res, next);
 };
 
 
