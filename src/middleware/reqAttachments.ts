@@ -13,11 +13,9 @@ async function reqAttachments(req, res, next) {
   res.locals.currentPath = req.path;
 
   //Load the CSRF token ONCE
-  // if (!res.locals._csrf)
-    //Generate a new CSRF token if it doesn't exist
-    // if(!req.session.csrfToken)
-  req.session.csrfToken = generateCsrfToken(req, res);
-  res.locals._csrf = req.session.csrfToken;
+  if (!res.locals._csrf)
+    req.session.csrfToken = generateCsrfToken(req, res);
+    res.locals._csrf = req.session.csrfToken;
 
   // We try to attach the user to the request and response locals
   try {
