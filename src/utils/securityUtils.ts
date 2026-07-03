@@ -30,6 +30,8 @@ export const csrfDebugMiddleware = (req: Request, res: Response, next: NextFunct
 }
 
 // Server level middlewares
+//TODO: Figure out how to prevent the issue with doubleCsrfProtection where the cookie and header token don't match
+//This stems because we are rotating the token on every request whereas it should be static
 export const injectCsrfToken = (req: Request, res: Response, next: NextFunction) => {
     const token = generateCsrfToken(req, res);
     if (token) res.locals._csrf = token;
