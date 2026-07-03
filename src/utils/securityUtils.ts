@@ -22,9 +22,10 @@ const {
 
 export const csrfDebugMiddleware = (req: Request, res: Response, next: NextFunction) => {
     console.log("sessionID:", req.sessionID);
-    console.log("csrf header:", req.headers["x-csrf-token"]);
+    console.log("COOKIE CSRF:", req.cookies["__Host-psifi.x-csrf-token"]);
+    console.log("HEADER CSRF:", req.headers["x-csrf-token"]);
+    console.log("BODY CSRF:", req.body._csrf);
     console.log("cookie session:", req.cookies["tapitude.sid"]);
-    console.log("body csrf token:", req.body._csrf);
     next();
 }
 
