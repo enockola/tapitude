@@ -1,5 +1,5 @@
 import User from "../models/User";
-import { generateCsrfToken, doubleCsrfProtection, attachCsrfToken } from '../utils/securityUtils.js';
+import { attachCsrfToken } from '../utils/securityUtils.js';
 
 /**
  * load and attach the user to the request every time (get the user from session userId)
