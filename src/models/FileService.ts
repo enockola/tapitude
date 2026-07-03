@@ -5,6 +5,7 @@ const { randomUUID } = require('crypto');
 import mime from 'mime';
 //A buffer is an entire file in memory, a readable stream is a stream of chunks of data
 import { Readable } from "stream";
+import { stat } from 'fs/promises';
 
 //Purely for typescript to do type checking
 export interface IFile extends Document {
@@ -50,6 +51,7 @@ class FileService {
 
   //All of these operations are fully atomic.
 
+
   /**
    * Return a URL or a unique key to identify the file.
    * Returns an error if the upload fails
@@ -62,13 +64,13 @@ class FileService {
     if (mongoose.connection.readyState != 1) {
       throw new Error("Database not connected");
     }
-    if(!options.filename) {
+    if (!options.filename) {
       throw new Error("Filename required");
     }
-    if(!options.data) {
+    if (!options.data) {
       throw new Error("Data required");
     }
-    if(!options.ownerId) {
+    if (!options.ownerId) {
       throw new Error("Owner ID required");
     }
     //Generate the key
@@ -122,6 +124,20 @@ class FileService {
         }
       }
       throw e;
+    }
+  }
+
+
+  async fileExists(filePath: string): Promise<boolean> {
+    try {
+      const stats = await stat(filePath);
+      return stats.isFile(); // Ensures it's a file, not a directory
+    } catch (error: any) {
+      // 'ENOENT' means the file or directory does not exist
+      if (error.code === 'ENOENT') {
+        return false;
+      }
+      throw error; // Rethrow other unexpected errors (e.g., permission issues)
     }
   }
 
@@ -215,8 +231,9 @@ class FileService {
     }
     const fullPath = path.join(this.STORAGE_DIR, key);
     try {
-      await fs.promises.unlink(fullPath);
-
+      if (await this.fileExists(fullPath)) {
+        await fs.promises.unlink(fullPath);
+      }
       const result = await FileModel.deleteOne({ fileKey: key });
       if (result.deletedCount === 0) {
         console.warn(`File deleted from disk, but no metadata found for key: ${key}`);
