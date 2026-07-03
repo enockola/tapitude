@@ -128,7 +128,7 @@ class FileService {
   }
 
 
-  async fileExists(filePath: string): Promise<boolean> {
+  private async fileExists(filePath: string): Promise<boolean> {
     try {
       const stats = await stat(filePath);
       return stats.isFile(); // Ensures it's a file, not a directory
