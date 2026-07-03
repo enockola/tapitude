@@ -15,9 +15,8 @@ import {
   SCHEDULE_TIME_ZONE_LABEL
 } from "./utils/timezoneUtils.js";
 
-import notFound from "./middleware/notFound.js";
-import errorHandler from "./middleware/errorHandler.js";
-import attachUser from "./middleware/attachUser.js";
+import {errorHandler, notFound} from "./middleware/errorPages.js";
+import reqAttachments from "./middleware/reqAttachments.ts";
 
 // routes
 import indexRoutes from "./routes/index.routes.js";
@@ -31,7 +30,7 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 const cookieParser = require('cookie-parser');
-import {generateCsrfToken,injectCsrfToken} from './utils/securityUtils.js';
+import {generateCsrfToken} from './utils/securityUtils.js';
 
 
 //----------------------------------------------------------------------------------------------
@@ -109,8 +108,7 @@ app.use(session({
   }
 }));
 app.use(cookieParser());
-app.use(attachUser); //load and attach the user to the request every time (get the user from session userId)
-app.use(injectCsrfToken);
+app.use(reqAttachments); //load and attach the user to the request every time (get the user from session userId)
 
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------

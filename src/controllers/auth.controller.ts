@@ -1,7 +1,7 @@
 import User from "../models/User";
 import asyncHandler from "../utils/asyncHandler";
 import { Request, Response, Router } from 'express';
-import {  middlewareCsrfCheck, adminCheck,doubleCsrfProtection } from '../utils/securityUtils.js';
+import { generateCsrfToken, doubleCsrfProtection } from '../utils/securityUtils.js';
 
 export class AuthController {
   registerRoutes(router: Router) {
@@ -47,6 +47,7 @@ export class AuthController {
     }
 
     req.session.userId = user._id.toString();
+
 
     //We automatically redirect the user based on their role
     if (user.role === "admin") {

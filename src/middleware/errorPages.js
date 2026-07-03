@@ -7,4 +7,10 @@ function errorHandler(error, req, res, next) {
   });
 }
 
-module.exports = errorHandler;
+function notFound(req, res) {
+  res.status(404).render("errors/404", {
+    title: "Page not found"
+  });
+}
+
+module.exports = { errorHandler, notFound };
