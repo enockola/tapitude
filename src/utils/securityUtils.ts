@@ -41,6 +41,7 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
 
     const providedToken = headerToken || bodyToken;
     if (!cookieToken || !providedToken) {
+        console.log("❌ NO CSRF TOKEN DETECTED!");
         return res.status(403).render("errors/403", { title: "Forbidden" });
     }
 
