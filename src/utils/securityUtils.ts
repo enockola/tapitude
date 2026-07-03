@@ -63,6 +63,7 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
 
     // 2. Call the base doubleCsrfProtection method right after
     // doubleCsrfProtection(req, res, next);
+    return next();
 };
 
 
