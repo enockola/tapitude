@@ -38,23 +38,23 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
         console.log("=== CSRF DEBUG END ===");
     }
 
-    // const providedToken = headerToken || bodyToken;
-    // if (!cookieToken || !providedToken) {
-    //     return res.status(403).render("errors/403", { title: "Forbidden" });
-    // }
+    const providedToken = headerToken || bodyToken;
+    if (!cookieToken || !providedToken) {
+        return res.status(403).render("errors/403", { title: "Forbidden" });
+    }
 
-    // const cookieBuffer = Buffer.from(cookieToken, "utf-8");
-    // const providedBuffer = Buffer.from(providedToken, "utf-8");
+    const cookieBuffer = Buffer.from(cookieToken, "utf-8");
+    const providedBuffer = Buffer.from(providedToken, "utf-8");
 
-    // const secureMatch = crypto.timingSafeEqual(cookieBuffer, providedBuffer);
+    const secureMatch = crypto.timingSafeEqual(cookieBuffer, providedBuffer);
 
-    // if (!secureMatch) {
-    //     console.log("❌ CSRF TOKEN MISMATCH DETECTED!");
-    //     return res.status(403).render("errors/403", { title: "Forbidden" });
-    // }
-    // return next();
+    if (!secureMatch) {
+        console.log("❌ CSRF TOKEN MISMATCH DETECTED!");
+        return res.status(403).render("errors/403", { title: "Forbidden" });
+    }
+    return next();
 
-    return doubleCsrfProtection(req, res, next);
+    // return doubleCsrfProtection(req, res, next);
 };
 
 
