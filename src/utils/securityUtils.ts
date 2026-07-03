@@ -19,6 +19,14 @@ const {
     getCsrfTokenFromRequest: (req) => (req.headers["x-csrf-token"] as string) || req.body._csrf
 });
 
+export const csrfDebugMiddleware = (req: Request, res: Response, next: NextFunction) => {
+    console.log("sessionID:", req.sessionID);
+    console.log("csrf header:", req.headers["x-csrf-token"]);
+    console.log("cookie session:", req.cookies["tapitude.sid"]);
+    console.log("body csrf token:", req.body._csrf);
+    next();
+}
+
 // Server level middlewares
 export const injectCsrfToken = (req: Request, res: Response, next: NextFunction) => {
     const token = generateCsrfToken(req, res);
