@@ -8,6 +8,7 @@ if (!process.env.CSRF_SECRET)
     throw new Error("CSRF_SECRET is not set");
 
 const COOKIE_CSRF_NAME = "psifi-csrf-token";
+//It should start with __Host- on a production environment
 const CSRF_HEADER_NAME = "x-csrf-token";
 
 const {
@@ -25,10 +26,22 @@ const {
 });
 
 export const attachCsrfToken = (req: Request, res: Response) => {
-    // const cookieToken = req.cookies[COOKIE_CSRF_NAME];
-    if (!res.locals._csrf)
-        req.session.csrfToken = generateCsrfToken(req, res);
-        res.locals._csrf = req.session.csrfToken;
+    // If we haven't generated a token for this request cycle yet
+    if (!res.locals._csrf) {
+        // Generate a plain, random hex string
+        const token = crypto.randomBytes(32).toString("hex");
+
+        // Set it directly as the browser cookie
+        res.cookie(COOKIE_CSRF_NAME, token, {
+            httpOnly: true, 
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            path: "/"
+        });
+
+        // Make it available to your EJS/HTML templates as <%= _csrf %>
+        res.locals._csrf = token;
+    }
 }
 
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
@@ -92,6 +105,5 @@ export const creatorCheck = async (req: Request, res: Response, next: NextFuncti
 
 export {
     invalidCsrfTokenError,
-    generateCsrfToken,
     validateRequest
 }
