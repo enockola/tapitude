@@ -88,7 +88,7 @@ export class CreatorController {
     router.get("/pages/:id/editor", creatorCheck, asyncHandler(this.get_createEditContent)); //Page editor
 
     router.get("/profile", creatorCheck, asyncHandler(this.get_profile)); //Profile editor
-    router.post("/profile/update", creatorCheck,doubleCsrfProtection, asyncHandler(this.post_updateProfile)); //We already preform a manual CSRF check inside this function
+    router.post("/profile/update", creatorCheck, csrfDebugMiddleware, doubleCsrfProtection, asyncHandler(this.post_updateProfile)); //We already preform a manual CSRF check inside this function
 
     //For creating/editing/deleting content
     router.post("/pages/new-page", creatorCheck, doubleCsrfProtection, asyncHandler(this.post_newPost));
