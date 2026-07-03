@@ -45,6 +45,11 @@ export const attachCsrfToken = (req: Request, res: Response) => {
 }
 
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
+    // Skip protection for read-only GET requests
+    if (["GET", "HEAD", "OPTIONS"].includes(req.method)) {
+        return next();
+    }
+
     const cookieToken = req.cookies[COOKIE_CSRF_NAME];
     const headerToken = req.headers[CSRF_HEADER_NAME] as string;
     const bodyToken = req.body?._csrf as string;
@@ -55,28 +60,36 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
         console.log("HEADER CSRF:", headerToken);
         console.log("BODY CSRF:", bodyToken);
         console.log("\nSESSION ID:", req.sessionID);
-        console.log("COOKIE SESSION ID:", req.cookies["tapitude.sid"]);
         console.log("=== CSRF DEBUG END ===");
     }
 
     const providedToken = headerToken || bodyToken;
+
+    // 1. Fail early if either token is missing entirely
     if (!cookieToken || !providedToken) {
         console.log("❌ NO CSRF TOKEN DETECTED!");
-        return res.status(403).render("errors/403", { title: "Forbidden" });
+        return show403(res, "Forbidden: Missing CSRF Token");
     }
 
     const cookieBuffer = Buffer.from(cookieToken, "utf-8");
     const providedBuffer = Buffer.from(providedToken, "utf-8");
 
+    // 2. CRITICAL: timingSafeEqual throws an error if buffer lengths don't match!
+    if (cookieBuffer.length !== providedBuffer.length) {
+        console.log("❌ CSRF LENGTH MISMATCH DETECTED!");
+        return show403(res, "Forbidden: Invalid CSRF Token");
+    }
+
+    // 3. Time-safe comparison of the two matching-length buffers
     const secureMatch = crypto.timingSafeEqual(cookieBuffer, providedBuffer);
 
     if (!secureMatch) {
         console.log("❌ CSRF TOKEN MISMATCH DETECTED!");
-        return res.status(403).render("errors/403", { title: "Forbidden" });
+        return show403(res, "Forbidden: Invalid CSRF Token");
     }
-    return next();
 
-    // return doubleCsrfProtection(req, res, next);
+    console.log("✅ CSRF MATCHED PERFECTLY");
+    return next();
 };
 
 
