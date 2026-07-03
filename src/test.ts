@@ -1,5 +1,5 @@
 import { FileServiceInstance } from './models/FileService';
-import connectDB from "./utils/db";
+import connectDB from "./utils/dbUtils";
 
 
 const mockData = Buffer.from('hello');

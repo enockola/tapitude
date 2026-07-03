@@ -7,7 +7,7 @@ import MongoStore from "connect-mongo";
 import methodOverride from "method-override";
 import helmet from "helmet";
 import morgan from "morgan";
-import connectDB from "./utils/db.js";
+import connectDB from "./utils/dbUtils.js";
 import {
   formatEtDateTime,
   toEtDateTimeInputValue,
@@ -23,7 +23,6 @@ import indexRoutes from "./routes/index.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import creatorRoutes from "./routes/creator.routes.js";
-import publicRoutes from "./routes/public.routes.js";
 import viewerContentHubRoutes from "./routes/viewer_content_hub.routes.js";
 
 import { createServer } from 'http';
@@ -45,6 +44,9 @@ if (!process.env.MONGODB_URI)
 
 if(!process.env.NODE_ENV || (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production"))
   throw new Error("NODE_ENV is not set, Must be 'development' or 'production'");
+
+if(!process.env.PORT)
+  throw new Error("PORT is not set");
 
 const isProduction = process.env.NODE_ENV === "production" ? true : false;
 console.log(`Production Environment: ${isProduction}`);
@@ -122,16 +124,11 @@ app.use(reqAttachments); //load and attach the user to the request every time (g
 
 //Routes
 app.use("/", indexRoutes);
-
 app.use("/auth", authRoutes);
-
 app.use("/admin", adminRoutes);
-
 app.use("/creator", creatorRoutes);
-
-app.use("/p", publicRoutes);
-
 app.use("/content-hub", viewerContentHubRoutes);
+
 const viewerNamespace = io.of('/content-hub'); //register websocket
 viewerNamespace.on('connection', (socket) => {
   viewerContentHubRoutes.handleSocketConnection(viewerNamespace, socket);
@@ -153,15 +150,10 @@ app.use(errorHandler);
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 
-
-//Start the server
-const PORT = process.env.PORT || 3000;
-
 async function startServer() {
   await connectDB();
-
-  httpServer.listen(PORT, () => {
-    console.log(`Tapitude Creator Hub running on port ${PORT}`);
+  httpServer.listen(process.env.PORT, () => {
+    console.log(`Tapitude Creator Hub running on port ${process.env.PORT}`);
   });
 }
 
