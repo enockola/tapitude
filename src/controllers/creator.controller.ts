@@ -6,7 +6,7 @@ import { etInputToUtcDate, SCHEDULE_TIME_ZONE } from "../utils/timezoneUtils";
 import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
-import { creatorCheck } from '../utils/securityUtils.js';
+import { creatorCheck } from '../middleware/security.js';
 
 const MAX_CONTENT_PAGES_PER_CREATOR = 25;
 

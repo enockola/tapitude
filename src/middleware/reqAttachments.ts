@@ -1,5 +1,5 @@
 import User from "../models/User";
-import { attachCsrfToken } from '../utils/securityUtils.js';
+import { attachCsrfToken } from './security.js';
 
 /**
  * load and attach the user to the request every time (get the user from session userId)
@@ -8,7 +8,7 @@ import { attachCsrfToken } from '../utils/securityUtils.js';
  * @param {*} next 
  * @returns 
  */
-async function reqAttachments(req, res, next) {
+async function reqAttachUser(req, res, next) {
   // We add the current path to the response locals
   res.locals.currentPath = req.path;
   // We try to attach the user to the request and response locals
@@ -33,4 +33,4 @@ async function reqAttachments(req, res, next) {
   }
 }
 
-export default reqAttachments;
+export default reqAttachUser;

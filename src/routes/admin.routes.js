@@ -1,7 +1,6 @@
 import express from "express";
 
-import requireAuth from "../middleware/requireAuth";
-import requireRole from "../middleware/requireRole";
+import {requireAuth, requireRole} from "../middleware/requireAuth";
 import adminController from "../controllers/admin.controller";
 
 const router = express.Router();

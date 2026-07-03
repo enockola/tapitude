@@ -4,7 +4,7 @@ import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
-import { adminCheck } from '../utils/securityUtils.js';
+import { adminCheck } from '../middleware/security.js';
 
 export class AdminController {
 

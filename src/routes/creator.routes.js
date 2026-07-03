@@ -1,7 +1,6 @@
 import express from "express";
 import asyncHandler from "../utils/asyncHandler";
-import requireAuth from "../middleware/requireAuth";
-import requireRole from "../middleware/requireRole";
+import {requireAuth, requireRole} from "../middleware/requireAuth";
 import creatorController from "../controllers/creator.controller";
 
 const router = express.Router();
