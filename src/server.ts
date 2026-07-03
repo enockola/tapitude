@@ -31,14 +31,14 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 
 const cookieParser = require('cookie-parser');
-import {generateCsrfToken,injectCsrfToken} from './utils/securityUtils.js';
+import { generateCsrfToken, injectCsrfToken } from './utils/securityUtils.js';
 
 
 //----------------------------------------------------------------------------------------------
 // Constants -----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
 
-if(!process.env.SESSION_SECRET)
+if (!process.env.SESSION_SECRET)
   throw new Error("SESSION_SECRET is not set");
 
 if (!process.env.MONGODB_URI)
@@ -110,7 +110,7 @@ app.use(session({
 }));
 app.use(cookieParser());
 app.use(attachUser); //load and attach the user to the request every time (get the user from session userId)
-app.use(injectCsrfToken);
+app.use("*", injectCsrfToken);
 
 //----------------------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
@@ -134,7 +134,7 @@ viewerNamespace.on('connection', (socket) => {
 });
 
 //The client asske the server for a CSRF token, and the server responds with the token
-app.get("/csrf-token", (req:any, res:any) => {
+app.get("/csrf-token", (req: any, res: any) => {
   const csrfToken = generateCsrfToken(req, res);
   // You could also pass the token into the context of a HTML response.
   res.json({ csrfToken });
