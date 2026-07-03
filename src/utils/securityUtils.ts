@@ -7,6 +7,9 @@ import "dotenv/config";
 if (!process.env.CSRF_SECRET)
     throw new Error("CSRF_SECRET is not set");
 
+const COOKIE_CSRF_NAME = "psifi-csrf-token";
+const CSRF_HEADER_NAME = "x-csrf-token";
+
 const {
     invalidCsrfTokenError, // This is just for convenience if you plan on making your own middleware.
     generateCsrfToken, // Use this in your routes to provide a CSRF token.
@@ -15,19 +18,22 @@ const {
 } = doubleCsrf({
     getSecret: (req) => process.env.CSRF_SECRET || "dev_secret_change_me",
     getSessionIdentifier: (req) => req.sessionID, // return the requests unique identifier
+    cookieName: COOKIE_CSRF_NAME,
     getCsrfTokenFromRequest: (req) =>
-        (req.headers["x-csrf-token"] as string) ||
+        (req.headers[CSRF_HEADER_NAME] as string) ||
         (req.body?._csrf as string)
 });
 
 export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction) => {
     // 1. Log the debug stuff first
     console.log("=== CSRF DEBUG START ===");
-    console.log("sessionID:", req.sessionID);
-    console.log("COOKIE CSRF:", req.cookies["__Host-psifi.x-csrf-token"]);
-    console.log("HEADER CSRF:", req.headers["x-csrf-token"]);
+
+    console.log("COOKIE CSRF:", req.cookies[COOKIE_CSRF_NAME]);
+    console.log("HEADER CSRF:", req.headers[CSRF_HEADER_NAME]);
     console.log("BODY CSRF:", req.body?._csrf);
-    console.log("cookie session:", req.cookies["tapitude.sid"]);
+
+    console.log("\nSESSION ID:", req.sessionID);
+    console.log("COOKIE SESSION ID:", req.cookies["tapitude.sid"]);
     console.log("=== CSRF DEBUG END ===");
 
     // 2. Call the base doubleCsrfProtection method right after

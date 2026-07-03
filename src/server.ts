@@ -94,7 +94,9 @@ app.use(morgan('dev', {
       req.url.includes('/images/');
   }
 }));
-app.use(session({
+
+
+app.use(session({ //Session ID cookie
   name: "tapitude.sid",
   secret: process.env.SESSION_SECRET || "dev_secret_change_me",
   resave: false,
@@ -107,6 +109,7 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24
   }
 }));
+
 app.use(cookieParser());
 app.use(reqAttachments); //load and attach the user to the request every time (get the user from session userId)
 
