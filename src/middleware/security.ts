@@ -42,8 +42,8 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
     const cookieToken = req.cookies[COOKIE_CSRF_NAME];
     const headerToken = req.headers[CSRF_HEADER_NAME] as string;
     const bodyToken = req.body?._csrf as string;
-
-    if (process.env.NODE_ENV === "development") {
+    const isDevelopment = process.env.NODE_ENV === "development";
+    if (isDevelopment) {
         console.log("=== CSRF DEBUG START ===");
         console.log("COOKIE CSRF:", cookieToken);
         console.log("HEADER CSRF:", headerToken);
@@ -56,7 +56,7 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
 
     // 1. Fail early if either token is missing entirely
     if (!cookieToken || !providedToken) {
-        console.log("❌ NO CSRF TOKEN DETECTED!");
+        if (isDevelopment) console.log("❌ NO CSRF TOKEN DETECTED!");
         return show403(res, "Forbidden: Missing CSRF Token");
     }
 
@@ -65,7 +65,7 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
 
     // 2. CRITICAL: timingSafeEqual throws an error if buffer lengths don't match!
     if (cookieBuffer.length !== providedBuffer.length) {
-        console.log("❌ CSRF LENGTH MISMATCH DETECTED!");
+        if (isDevelopment) console.log("❌ CSRF LENGTH MISMATCH DETECTED!");
         return show403(res, "Forbidden: Invalid CSRF Token");
     }
 
@@ -73,11 +73,11 @@ export const checkDoubleCsrf = (req: Request, res: Response, next: NextFunction)
     const secureMatch = crypto.timingSafeEqual(cookieBuffer, providedBuffer);
 
     if (!secureMatch) {
-        console.log("❌ CSRF TOKEN MISMATCH DETECTED!");
+        if (isDevelopment) console.log("❌ CSRF TOKEN MISMATCH DETECTED!");
         return show403(res, "Forbidden: Invalid CSRF Token");
     }
 
-    console.log("✅ CSRF MATCHED PERFECTLY");
+    if (isDevelopment) console.log("✅ CSRF MATCHED");
     return next();
 };
 
