@@ -10,32 +10,29 @@ const COOKIE_CSRF_NAME = "psifi-csrf-token";
 const CSRF_HEADER_NAME = "x-csrf-token";
 
 export const attachCsrfToken = (req: Request, res: Response, next: NextFunction) => {
-    if (!["GET"].includes(req.method)) {
-        return next();
-    }
+    if (req.session) {
+        if (!req.session.csrfToken) { // Only generate the CSRF token ONCE per session lifetime
+            const secret = process.env.CSRF_SECRET;
+            const sessionIdentifier = req.sessionID;
+            if (!secret) {
+                throw new Error("CSRF_SECRET environment variable is missing");
+            }
 
-    if (!req.session.csrfToken) { // Only generate the CSRF token ONCE per session lifetime
-        const secret = process.env.CSRF_SECRET;
-        const sessionIdentifier = req.sessionID;
-        if (!secret) {
-            throw new Error("CSRF_SECRET environment variable is missing");
+            // Generate a stable, session-bound base secret using HMAC
+            req.session.csrfToken = crypto.createHmac("sha256", secret).update(sessionIdentifier).digest("hex");
         }
 
-        // Generate a stable, session-bound base secret using HMAC
-        req.session.csrfToken = crypto.createHmac("sha256", secret).update(sessionIdentifier).digest("hex");
-    }
+        //Always keep the cookie synchronized with the session token
+        res.cookie(COOKIE_CSRF_NAME, req.session.csrfToken, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+            path: "/"
+        });
 
-    //Always keep the cookie synchronized with the session token
-    res.cookie(COOKIE_CSRF_NAME, req.session.csrfToken, {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        path: "/"
-    });
-
-    //Pass this stable token to your HTML form views
-    res.locals._csrf = req.session.csrfToken;
-
+        //Pass this stable token to your HTML form views
+        res.locals._csrf = req.session.csrfToken;
+    } else res.locals._csrf = "";
     next();
 }
 

@@ -11,6 +11,7 @@ import { attachCsrfToken } from './security.js';
 async function reqAttachUser(req, res, next) {
   // We add the current path to the response locals
   res.locals.currentPath = req.path;
+  res.locals.isProduction = process.env.NODE_ENV === "production" ? true : false;
   // We try to attach the user to the request and response locals
   try {
     res.locals.currentUser = null;
