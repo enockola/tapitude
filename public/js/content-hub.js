@@ -1,3 +1,11 @@
+/*CONSTANTS: 
+    const currentPath = "<%= currentPath %>";
+    const creatorSlug = "<%= creatorProfile.creatorSlug %>";
+    const creatorId = "<%= creatorProfile.userId %>";
+    const brandColor = "<%= creatorProfile.brandColor %>";
+    const isProduction = "<%= isProduction %>";
+*/
+
 // SESSION STORAGE
 // Session storage to identify a user that doesnt have an account
 let userId = localStorage.getItem("userId");
@@ -8,19 +16,13 @@ if (!userId) {
 
 let likedPosts = [];
 if (localStorage.getItem("likedPosts")) likedPosts = JSON.parse(localStorage.getItem("likedPosts"));
-console.log("Liked posts: ", likedPosts.length);
+if (!isProduction) console.log("Liked posts: ", likedPosts.length);
 
 // SOCKET
 // Connect to your Express server (ensure the URL matches your server address)
 const socket = io(`${window.location.protocol}//${window.location.host}/content-hub`);
-/*CONSTANTS: 
 
-creatorSlug
-
-
-*/
-
-function randomUUID(){
+function randomUUID() {
     return crypto.randomUUID();
 }
 
@@ -46,12 +48,12 @@ function likeTogglePost(postId, postElement, heartIcon) {
     );
 }
 
-
-
 // Listen for the connection confirmation
-socket.on("connect", () => {
-    console.log("Connected to server with ID:", socket.id);
-});
+if (!isProduction) {
+    socket.on("connect", () => {
+        console.log("Connected to server with ID:", socket.id);
+    });
+}
 
 //Request initial content
 let history = 0;
@@ -76,7 +78,8 @@ async function getMimeType(url) {
 }
 
 
-const doubleTapDelay = 300;
+const doubleTapDelay = 250;
+const singleTapDelay = 180;
 
 function createPost(parentElement, post) {
     const postChild = document.createElement("div");
@@ -108,11 +111,14 @@ function createPost(parentElement, post) {
     postChild.lastTapTime = 0;
     postChild.pressY = 0;
     postChild.deltaY = 0;
+    postChild.doubleTapped = false;
     const touchStart = (event) => {
+        postChild.doubleTapped = false;
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
         if (tapLength < doubleTapDelay && tapLength > 0) {
             // --- DOUBLE TAP DETECTED ---
+            postChild.doubleTapped = true;
             likeTogglePost(post._id, likeCount, heartIcon);
             likeButton.classList.add("like-active");
             setTimeout(() => {
@@ -130,12 +136,13 @@ function createPost(parentElement, post) {
     const touchEnd = (event) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
-        console.log("final scroll delta: ", postChild.deltaY);
-        if (tapLength > doubleTapDelay * 0.4
-            && postChild.deltaY < 10) {
-            document.body.classList.toggle("max");
+        if(!isProduction) console.log("scroll delta: ", postChild.deltaY, " tap length: ", tapLength, " double tapped: ", postChild.doubleTapped);
+        if (!postChild.doubleTapped) {
+            if (tapLength > singleTapDelay && postChild.deltaY < 10) {
+                document.body.classList.toggle("max");
+            }
+            event.preventDefault();
         }
-        event.preventDefault();
     };
 
     const touchMove = (event) => {
@@ -195,18 +202,15 @@ const feed = document.getElementById("feed");
 const target = document.querySelector('#loadMore');
 
 socket.on("requestContent", (contentPage) => {
-    console.log("Received content:", contentPage);
+    if (!isProduction) console.log("Received content:", contentPage);
     if (contentPage) {
         createPost(feed, contentPage);
     }
-    //  else { //If there is no more content
-    //     target.style.display = "none";
-    // }
 });
 
 const observer = new IntersectionObserver(
     ([entry]) => {
-        console.log('Element is in viewport: ' + entry.isIntersecting);
+        if (!isProduction) console.log('Element is in viewport: ' + entry.isIntersecting);
         if (entry.isIntersecting) {
             requestNextPost();
         }

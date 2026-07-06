@@ -27,9 +27,14 @@
     const creatorSlug = "<%= creatorProfile.creatorSlug %>";
     const creatorId = "<%= creatorProfile.userId %>";
     const brandColor = "<%= creatorProfile.brandColor %>";
+    const isProduction = "<%= isProduction %>";
+    <% if(!isProduction) { %>
+    console.log("== In development mode ==");
+    console.log("Current path = ", currentPath);
     console.log("Current path = ", currentPath);
     console.log("Creator slug = ", creatorSlug);
     console.log("Creator user id = ", creatorId);
+    <% } %>
   </script>
 </head>
 
@@ -42,12 +47,10 @@
   <div>
     <% if(creatorProfile.profileImageKey ) { %>
     <!-- <a  href="/content-hub/<%= creatorProfile.creatorSlug %>"> -->
-      <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
+    <img class="brand-logo" src="/storage/<%= creatorProfile.profileImageKey %>" alt="Creator Avatar" />
     <!-- </a> -->
     <% } if(creatorProfile.brandName) { %>
     <a class="creatorBrand" href="/content-hub/<%= creatorProfile.creatorSlug %>"><%= creatorProfile.brandName %></a>
     <% } %>
-
-
   </div>
 </header>
