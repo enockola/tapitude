@@ -192,14 +192,7 @@ footer {
   display: none;
 }
 
-.post img,
-.post video {
-  object-fit: contain;
-  border-radius: 8px;
-  margin: auto;
-  height: 100%;
-  width: 100%;
-}
+
 
 .post .video-container {
   width: 100%;
@@ -215,8 +208,9 @@ footer {
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 12px 14px;
+  padding: 12px;
   font-size: 18px;
+  margin: 5px;
   cursor: pointer;
   z-index: 10;
   transition: background 0.2s;
@@ -322,8 +316,18 @@ Maximized mode
   align-items: center;
   background: black;
 }
+
+.post img,
+.post .video-container {
+  object-fit: contain;
+  border-radius: 8px;
+  margin: auto;
+  height: 100%;
+  width: 100%;
+}
+
 .max .post-media img,
-.max .post-media video {
+.max .post-media .video-container {
   border-radius: 0px;
   margin: 0;
   padding: 0;
