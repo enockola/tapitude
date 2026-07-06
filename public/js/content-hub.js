@@ -112,6 +112,8 @@ function createPost(parentElement, post) {
     postChild.pressY = 0;
     postChild.deltaY = 0;
     postChild.doubleTapped = false;
+    postChild.singleTapped = false;
+
     const touchStart = (event) => {
         postChild.doubleTapped = false;
         const currentTime = new Date().getTime();
@@ -126,6 +128,7 @@ function createPost(parentElement, post) {
             }, 500);
             event.preventDefault(); // Prevents zoom/ghost clicks
         }
+        postChild.singleTapped = false;
         postChild.lastTapTime = currentTime;
         const touch = event.touches[0];
         // console.log(`Tapping at X: ${touch.clientX}, Y: ${touch.clientY}`);
@@ -136,8 +139,9 @@ function createPost(parentElement, post) {
     const touchEnd = (event) => {
         const currentTime = new Date().getTime();
         const tapLength = currentTime - postChild.lastTapTime;
-        if(!isProduction) console.log("scroll delta: ", postChild.deltaY, " tap length: ", tapLength, " double tapped: ", postChild.doubleTapped);
+        if (!isProduction) console.log("scroll delta: ", postChild.deltaY, " tap length: ", tapLength, " double tapped: ", postChild.doubleTapped);
         if (!postChild.doubleTapped) {
+            postChild.singleTapped = true;
             if (tapLength > singleTapDelay && postChild.deltaY < 10) {
                 document.body.classList.toggle("max");
             }
@@ -155,12 +159,16 @@ function createPost(parentElement, post) {
         }
     };
 
-    postChildMedia.addEventListener('touchmove', touchMove);
-    postChildMedia.addEventListener('touchstart', touchStart);
-    postChildMedia.addEventListener('touchend', touchEnd);
-    postChildText.addEventListener('touchmove', touchMove);
-    postChildText.addEventListener('touchstart', touchStart);
-    postChildText.addEventListener('touchend', touchEnd);
+    // postChildMedia.addEventListener('touchmove', touchMove);
+    // postChildText.addEventListener('touchmove', touchMove);
+    // postChildMedia.addEventListener('touchstart', touchStart);
+    // postChildText.addEventListener('touchstart', touchStart);
+    // postChildMedia.addEventListener('touchend', touchEnd);
+    // postChildText.addEventListener('touchend', touchEnd);
+
+    postChildContent.addEventListener('touchmove', touchMove);
+    postChildContent.addEventListener('touchstart', touchStart);
+    postChildContent.addEventListener('touchend', touchEnd);
     //------------------------------------
 
     parentElement.appendChild(postChild);

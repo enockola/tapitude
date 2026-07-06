@@ -173,6 +173,8 @@ footer {
   gap: 10px;
   height: 100%; /* Ensure content fills the 500px post height */
   overflow: hidden; /* Prevents overflow from breaking the border */
+
+  transition: all 0.15s ease-in-out;
 }
 
 .post-media {
@@ -283,7 +285,7 @@ Maximized mode
   margin: 0px;
   height: 100%;
   max-height: 100%;
-  gap: 2;
+  gap: 0;
   border-top: 2px solid #ffffff2e;
 }
 
