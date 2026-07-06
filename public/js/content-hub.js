@@ -1,16 +1,28 @@
-//Session storage to identify a user that doesnt have an account
+// SESSION STORAGE
+// Session storage to identify a user that doesnt have an account
 let userId = localStorage.getItem("userId");
 if (!userId) {
-    userId = crypto.randomUUID();
+    userId = randomUUID();
     localStorage.setItem("userId", userId);
 }
 
-//Store the posts that have been liked by the user
 let likedPosts = [];
 if (localStorage.getItem("likedPosts")) likedPosts = JSON.parse(localStorage.getItem("likedPosts"));
 console.log("Liked posts: ", likedPosts.length);
 
+// SOCKET
+// Connect to your Express server (ensure the URL matches your server address)
+const socket = io(`${window.location.protocol}//${window.location.host}/content-hub`);
+/*CONSTANTS: 
 
+creatorSlug
+
+
+*/
+
+function randomUUID(){
+    return crypto.randomUUID();
+}
 
 function likeTogglePost(postId, postElement, heartIcon) {
     if (likedPosts.includes(postId)) {
@@ -34,11 +46,7 @@ function likeTogglePost(postId, postElement, heartIcon) {
     );
 }
 
-// Connect to your Express server (ensure the URL matches your server address)
-const socket = io("http://localhost:3000/content-hub");
-/* CONSTANTS: 
-creatorSlug
- */
+
 
 // Listen for the connection confirmation
 socket.on("connect", () => {
