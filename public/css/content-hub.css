@@ -303,7 +303,7 @@ Maximized mode
 }
 
 .max .like-button {
-  padding: 20px;
+  padding: 12px;
 }
 
 .max .post-text {
@@ -319,6 +319,15 @@ Maximized mode
 .max .topbar,
 .max footer {
   display: none;
+}
+
+img {
+  -webkit-user-drag: none;  /* Prevents dragging in Safari and Chrome */
+  user-drag: none;          
+  -webkit-user-select: none; /* Safari */
+  -moz-user-select: none;    /* Firefox */
+  -ms-user-select: none;     /* IE/Edge */
+  user-select: none;         /* Standard */
 }
 
 /*
