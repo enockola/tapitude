@@ -23,7 +23,13 @@ if (!isProduction) console.log("Liked posts: ", likedPosts.length);
 const socket = io(`${window.location.protocol}//${window.location.host}/content-hub`);
 
 function randomUUID() {
-    return crypto.randomUUID();
+    if (crypto?.randomUUID) {
+        return crypto.randomUUID();
+    }
+    // Fallback for non-secure contexts / older browsers
+    return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+        (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+    );
 }
 
 function likeTogglePost(postId, postElement, heartIcon) {
