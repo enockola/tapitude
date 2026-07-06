@@ -1,5 +1,30 @@
 import "dotenv/config";
 
+//----------------------------------------------------------------------------------------------
+// Constants -----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
+
+if (!process.env.NODE_ENV || (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production"))
+  throw new Error("NODE_ENV is not set, Must be 'development' or 'production'");
+
+// Import logging utils
+import { logger } from './utils/loggingUtils.js';
+const isProduction = process.env.NODE_ENV === "production" ? true : false;
+logger.info(`Production Environment: ${isProduction}`);
+
+// check for required environment variables
+if (!process.env.SESSION_SECRET)
+  throw new Error("SESSION_SECRET is not set");
+
+if (!process.env.MONGODB_URI)
+  throw new Error("MONGODB_URI is not set");
+
+if (!process.env.PORT)
+  throw new Error("PORT is not set");
+
+//----------------------------------------------------------------------------------------------
+// Imports -----------------------------------------------------------------------------------
+//----------------------------------------------------------------------------------------------
 import path from "path";
 import express from "express";
 import session from "express-session";
@@ -33,23 +58,8 @@ import { checkDoubleCsrf, attachCsrfToken } from './middleware/security.js';
 
 
 //----------------------------------------------------------------------------------------------
-// Constants -----------------------------------------------------------------------------------
+// Server Setup -----------------------------------------------------------------------------------
 //----------------------------------------------------------------------------------------------
-
-if (!process.env.SESSION_SECRET)
-  throw new Error("SESSION_SECRET is not set");
-
-if (!process.env.MONGODB_URI)
-  throw new Error("MONGODB_URI is not set");
-
-if (!process.env.NODE_ENV || (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "production"))
-  throw new Error("NODE_ENV is not set, Must be 'development' or 'production'");
-
-if (!process.env.PORT)
-  throw new Error("PORT is not set");
-
-const isProduction = process.env.NODE_ENV === "production" ? true : false;
-console.log(`Production Environment: ${isProduction}`);
 
 const app = express();
 const httpServer = createServer(app);
@@ -148,12 +158,12 @@ app.use(errorHandler);
 async function startServer() {
   await connectDB();
   httpServer.listen(process.env.PORT, () => {
-    console.log(`Tapitude Creator Hub running on port ${process.env.PORT}`);
+    logger.info('Server started on port ${process.env.PORT}');
   });
 }
 
 startServer().catch((error) => {
-  console.error("Failed to start server:", error);
+  logger.error({ error }, "Failed to start server:");
   process.exit(1);
 });
 

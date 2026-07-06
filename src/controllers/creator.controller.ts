@@ -7,8 +7,10 @@ import mongoose from "mongoose";
 import Busboy from "busboy";
 import { FileServiceInstance } from '../models/FileService';
 import { creatorCheck } from '../middleware/security.js';
+import { logger } from '../utils/loggingUtils.js';
 
 const MAX_CONTENT_PAGES_PER_CREATOR = 25;
+const isProduction = process.env.NODE_ENV === "production";
 
 function describeContentPage(contentPage: any): string {
   if (!contentPage) {
@@ -36,7 +38,8 @@ async function deleteContentPageWithMedia(contentPage: any): Promise<void> {
     try {
       await FileServiceInstance.deleteFile(contentPage.fileKey);
     } catch (error) {
-      console.error(`Failed to delete media for content page ${contentPage._id}:`, error);
+      logger.error({ error, fileKey: contentPage.fileKey, contentPageId: contentPage._id },
+         `Failed to delete media for content page ${contentPage._id}`);
     }
   }
 
@@ -211,13 +214,23 @@ export class CreatorController {
         content.bio = fields.bio;
         content.brandDarkMode = fields.brandDarkMode;
 
-        const profile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: true });
-        if (!profile) {
+        const origProfile = await CreatorProfile.findOneAndUpdate({ userId: req.user._id }, content, { new: false });
+        if (!origProfile) {
           return res.status(404).render("errors/404", {
             title: "Profile not found"
           });
         } else {
-          console.log(profile);
+          //If the profile image has changed, delete the old one
+          if (origProfile.profileImageKey
+            && content.profileImageKey
+            && origProfile.profileImageKey !== content.profileImageKey) {
+            try {
+              //Delete the old profile image
+              await FileServiceInstance.deleteFile(origProfile.profileImageKey);
+            } catch (error) {
+              logger.error({error, fileKey: origProfile.profileImageKey}, "Error deleting old profile image:");
+            }
+          }
           res.redirect("/creator/profile");
         }
       });
@@ -248,7 +261,7 @@ export class CreatorController {
       });
 
       file.on("end", async () => {
-        console.log("upload finished");
+        logger.debug("upload finished");
       });
     });
     busboy.on("field", (name: any, value: any) => {
