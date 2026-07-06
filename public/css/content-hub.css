@@ -328,6 +328,27 @@ Media queries
 */
 
 @media (max-width: 800px) {
+  /* Disable selection */
+  * {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+  }
+  *,
+  *::before,
+  *::after {
+    -webkit-user-select: none; /* Safari, Chrome, and Opera on iOS/Android */
+    -moz-user-select: none; /* Firefox Mobile */
+    -ms-user-select: none; /* IE/Edge Mobile (legacy) */
+    user-select: none; /* Standard syntax */
+  }
+  input, textarea {
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
+  }
+  /*-------------------------------*/
+
   .actions button {
     padding: 13px 0 13px 0;
   }
