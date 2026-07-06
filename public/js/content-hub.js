@@ -189,21 +189,24 @@ function createPost(parentElement, post) {
                     if (post.preserveAspectRatio == null) preserveAspectRatio = true;
                     else preserveAspectRatio = post.preserveAspectRatio;
                     postChildMedia.innerHTML = `<image src="${fileURL}" alt="Post Media" />`;
-                } else {
+                } else if (mimeType.startsWith("video/")) {
                     if (post.preserveAspectRatio == null) preserveAspectRatio = false;
                     else preserveAspectRatio = post.preserveAspectRatio;
                     postChildMedia.innerHTML = `
                     <div class="video-container">
+                        <button class="fullscreen-btn"><i class="ph ph-corners-out"></i></button>
                         <video loop autoplay muted playsinline>
                             <source src="${fileURL}" type="video/mp4">Your browser does not support the video tag.
                         </video>
-                        <button class="fullscreen-btn"><i class="ph ph-corners-out"></i></button>
                     </div>`;
                     const video = postChildMedia.querySelector('video');
                     video.play().catch(error => {
                         console.log("Autoplay was prevented by the browser. Adding a play button.");
                         // Add logic here to show a "Play" button overlay to the user
                     });
+                } else {
+                    console.log("Unsupported media type; mimeType=",mimeType,"; URL=",fileURL)
+                    postChildMedia.innerHTML = `<div class='unsupported-media'>Unsupported / invalid media</div>`;
                 }
             }
         } else {
