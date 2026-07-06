@@ -192,9 +192,13 @@ function createPost(parentElement, post) {
                 } else {
                     if (post.preserveAspectRatio == null) preserveAspectRatio = false;
                     else preserveAspectRatio = post.preserveAspectRatio;
-                    postChildMedia.innerHTML = `<video controls loop autoplay muted playsinline>
-                    <source src="${fileURL}" type="video/mp4">
-                    Your browser does not support the video tag.</video>`;
+                    postChildMedia.innerHTML = `
+                    <div class="video-container">
+                        <video loop autoplay muted playsinline>
+                            <source src="${fileURL}" type="video/mp4">Your browser does not support the video tag.
+                        </video>
+                        <button class="fullscreen-btn"><i class="ph ph-corners-out"></i></button>
+                    </div>`;
                     const video = postChildMedia.querySelector('video');
                     video.play().catch(error => {
                         console.log("Autoplay was prevented by the browser. Adding a play button.");
