@@ -158,7 +158,7 @@ app.use(errorHandler);
 async function startServer() {
   await connectDB();
   httpServer.listen(process.env.PORT, () => {
-    logger.info('Server started on port ${process.env.PORT}');
+    logger.info("Server started on port "+process.env.PORT);
   });
 }
 
