@@ -4,10 +4,10 @@
   "description": "Frontend/mock-mode Express/EJS starter project for the Tapitude Creator Hub.",
   "main": "src/server.js",
   "scripts": {
-    "dev": "npx tsx --watch src/server.js",
-    "start": "npx tsx src/server.js",
-    "test": "npx tsx src/test.js",
-    "new_admin_account": "npx tsx src/new_admin_account.js"
+    "dev": "npx tsx --watch src/server.ts",
+    "start": "npx tsx src/server.ts",
+    "test": "npx tsx src/test.ts",
+    "new_admin_account": "npx tsx src/new_admin_account.ts"
   },
   "keywords": [
     "node",

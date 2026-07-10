@@ -17,46 +17,6 @@ The main recommendations are:
 
 ## Highest Priority Items
 
-### 1. Fix Startup and Environment Configuration
-
-The current `package.json` scripts point to `src/server.js`, but the server file in the repository is `src/server.ts`.
-
-Current scripts:
-
-```json
-"dev": "npx tsx --watch src/server.js",
-"start": "npx tsx src/server.js"
-```
-
-Recommended change:
-
-```json
-"dev": "npx tsx --watch src/server.ts",
-"start": "npx tsx src/server.ts"
-```
-
-Also, `src/middleware/security.ts` requires `CSRF_SECRET`, but `.env.example` does not currently include it. This can cause a fresh install to fail at startup.
-
-Recommended `.env.example` addition:
-
-```env
-CSRF_SECRET=replace_this_with_a_long_random_secret
-```
-
-There is also a small logging issue in `src/server.ts`:
-
-```ts
-logger.info('Server started on port ${process.env.PORT}');
-```
-
-Because this uses single quotes instead of backticks, it logs the literal text instead of the actual port.
-
-Recommended change:
-
-```ts
-logger.info(`Server started on port ${process.env.PORT}`);
-```
-
 ### 2. Add Automated Tests for Core Workflows
 
 The app currently relies heavily on manual testing. Before handoff or sponsor review, the project would benefit from tests for the most important user flows.
