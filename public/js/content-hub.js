@@ -90,151 +90,247 @@ const singleTapDelay = 180;
 function createPost(parentElement, post) {
     const postChild = document.createElement("div");
     postChild.classList.add("post");
+    // Store necessary IDs and state on the element's dataset
+    postChild.dataset.postId = post._id;
+    postChild.dataset.fileKey = post.fileKey || "";
+    postChild.dataset.preserveAspectRatio = post.preserveAspectRatio ?? (post.fileKey ? "default" : "");
 
-    const postChildContent = document.createElement("div");
-    postChildContent.classList.add("post-content");
-    postChild.appendChild(postChildContent);
-
-    postChildContent.innerHTML = `
-    <p class="post-date">${formatEtDateTime(post.publishDate)}</p>
-    <div class="post-media"></div>
-    <div class="post-text">${post.body ?? ""}</div>
-    <div class="actions">
-        <button class="like-button"><i class="ph ph-heart ${likedPosts.includes(post._id) ? "ph-fill" : ""}"></i>
-         <span class="like-count">${post.likes}</span> Double-Taps</button>
-    </div>`;
-
-    const likeButton = postChildContent.querySelector(".like-button");
-    const likeCount = postChildContent.querySelector(".like-count");
-    const heartIcon = postChildContent.querySelector(".ph-heart");
-    likeButton.addEventListener("click", () => {
-        likeTogglePost(post._id, likeCount, heartIcon);
-    });
-    const postChildMedia = postChildContent.querySelector(".post-media");
-    const postChildText = postChildContent.querySelector(".post-text");
-
-    //Double tap function
+    // Keep track of touch gestures directly on the DOM node's properties
     postChild.lastTapTime = 0;
     postChild.pressY = 0;
     postChild.deltaY = 0;
-    postChild.doubleTapped = false;
-    postChild.singleTapped = false;
 
-    const touchStart = (event) => {
-        postChild.doubleTapped = false;
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - postChild.lastTapTime;
-        if (tapLength < doubleTapDelay && tapLength > 0) {
-            // --- DOUBLE TAP DETECTED ---
-            postChild.doubleTapped = true;
-            likeTogglePost(post._id, likeCount, heartIcon);
-            likeButton.classList.add("like-active");
-            setTimeout(() => {
-                likeButton.classList.remove("like-active");
-            }, 500);
-            event.preventDefault(); // Prevents zoom/ghost clicks
-        }
-        postChild.singleTapped = false;
-        postChild.lastTapTime = currentTime;
-        const touch = event.touches[0];
-        // console.log(`Tapping at X: ${touch.clientX}, Y: ${touch.clientY}`);
-        postChild.pressY = touch.clientY;
-        postChild.deltaY = 0;
-    };
-
-    const touchEnd = (event) => {
-        const currentTime = new Date().getTime();
-        const tapLength = currentTime - postChild.lastTapTime;
-        if (!isProduction) console.log("scroll delta: ", postChild.deltaY, " tap length: ", tapLength, " double tapped: ", postChild.doubleTapped);
-        if (!postChild.doubleTapped) {
-            postChild.singleTapped = true;
-            if (tapLength > singleTapDelay && postChild.deltaY < 10) {
-                document.body.classList.toggle("max");
-            }
-            event.preventDefault();
-        }
-    };
-
-    const touchMove = (event) => {
-        const touch = event.touches[0];
-        // console.log(`Moving at X: ${touch.clientX}, Y: ${touch.clientY}`);
-        const delta = Math.abs(touch.clientY - postChild.pressY);
-        if (delta > postChild.deltaY) {
-            // console.log(delta)
-            postChild.deltaY = delta;
-        }
-    };
-
-
-    postChildContent.addEventListener('touchmove', touchMove);
-    postChildContent.addEventListener('touchstart', touchStart);
-    postChildContent.addEventListener('touchend', touchEnd);
-    //------------------------------------
+    postChild.innerHTML = `
+    <div class="post-content">
+        <p class="post-date">${formatEtDateTime(post.publishDate)}</p>
+        <div class="post-media"></div>
+        <div class="post-text">${post.body ?? ""}</div>
+        <div class="actions">
+            <button class="like-button" data-action="like">
+                <i class="ph ph-heart ${likedPosts.includes(post._id) ? "ph-fill" : ""}"></i>
+                <span class="like-count">${post.likes}</span> Double-Taps
+            </button>
+        </div>
+    </div>`;
 
     parentElement.appendChild(postChild);
-    //Important for unloading content not in viewport
-    const postObserver = new IntersectionObserver(async ([entry]) => {
-        let preserveAspectRatio = false;
+    
+    // Register this post to our single global observer
+    globalPostObserver.observe(postChild);
+}
+
+
+const globalPostObserver = new IntersectionObserver(async (entries) => {
+    for (const entry of entries) {
+        const postElement = entry.target;
+        const mediaContainer = postElement.querySelector(".post-media");
+        const fileKey = postElement.dataset.fileKey;
+
         if (entry.isIntersecting) {
-            if (post.fileKey) {
-                const fileURL = `/storage/${post.fileKey}`;
+            if (!fileKey) continue;
+            
+            const fileURL = `/storage/${fileKey}`;
+            try {
                 const mimeType = await getMimeType(fileURL);
+                let preserveAspectRatio = postElement.dataset.preserveAspectRatio;
+
                 if (mimeType.startsWith("image/")) {
-                    if (post.preserveAspectRatio == null) preserveAspectRatio = true;
-                    else preserveAspectRatio = post.preserveAspectRatio;
-                    postChildMedia.innerHTML = `<image src="${fileURL}" alt="Post Media" />`;
+                    if (preserveAspectRatio === "default") preserveAspectRatio = "true";
+                    mediaContainer.innerHTML = `<img src="${fileURL}" alt="Post Media" />`;
+                    
                 } else if (mimeType.startsWith("video/")) {
-                    if (post.preserveAspectRatio == null) preserveAspectRatio = false;
-                    else preserveAspectRatio = post.preserveAspectRatio;
-                    postChildMedia.innerHTML = `
+                    if (preserveAspectRatio === "default") preserveAspectRatio = "false";
+                    mediaContainer.innerHTML = `
                     <div class="video-container">
-                        <button class="fullscreen-btn"><i class="ph ph-corners-out"></i></button>
+                        <button class="fullscreen-btn" data-action="fullscreen"><i class="ph ph-corners-out"></i></button>
                         <video loop autoplay muted playsinline>
-                            <source src="${fileURL}" type="video/mp4">Your browser does not support the video tag.
+                            <source src="${fileURL}" type="video/mp4">
                         </video>
                     </div>`;
-                    const video = postChildMedia.querySelector('video');
-                    const fullscreenBtn = document.querySelector('.video-container .fullscreen-btn');
-                    video.play().catch(error => {
-                        console.log("Autoplay was prevented by the browser. Adding a play button.");
-                        // Add logic here to show a "Play" button overlay to the user
+                    
+                    const video = mediaContainer.querySelector('video');
+                    video.play().catch(() => {
+                        console.log("Autoplay blocked. User gesture required.");
                     });
-
-                    let toggleFullscreen = () => {
-                        console.log("Fullscreen");
-                        if (!document.fullscreenElement) {
-                            video.requestFullscreen().catch(err => {
-                                console.error(`Error attempting to enable fullscreen: ${err.message}`);
-                            });
-                        } else {
-                            document.exitFullscreen();
-                        }
-                    };
-                    document.addEventListener('fullscreenchange', () => {
-                        if (document.fullscreenElement === video) {
-                            // Video is now fullscreen
-                            video.controls = true;
-                        } else {
-                            // Video exited fullscreen
-                            video.controls = false;
-                        }
-                    });
-                    fullscreenBtn.addEventListener('click', toggleFullscreen);
-                    fullscreenBtn.addEventListener('touchstart', toggleFullscreen);
                 } else {
-                    console.log("Unsupported media type; mimeType=", mimeType, "; URL=", fileURL)
-                    postChildMedia.innerHTML = `<div class='unsupported-media'>Unsupported / invalid media</div>`;
+                    mediaContainer.innerHTML = `<div class='unsupported-media'>Unsupported media</div>`;
                 }
+
+                // Handle aspect ratio class toggle
+                if (preserveAspectRatio === "true") {
+                    mediaContainer.classList.remove("media-fill");
+                } else {
+                    mediaContainer.classList.add("media-fill");
+                }
+            } catch (err) {
+                console.error("Error loading media:", err);
             }
         } else {
-            postChildMedia.innerHTML = "";
+            // Unload media when it leaves the viewport to save RAM and CPU
+            mediaContainer.innerHTML = "";
         }
-        //Media fill == preserve aspect ratio is false
-        if (preserveAspectRatio) postChildMedia.classList.remove("media-fill");
-        else postChildMedia.classList.add("media-fill");
-    }, { threshold: 0 });
-    postObserver.observe(postChild);
-}
+    }
+}, { threshold: 0 });
+// --- GLOBAL DELEGATED CLICKS ---
+document.body.addEventListener("click", (event) => {
+    const target = event.target;
+    // Check if the click happened inside a post
+    const postElement = target.closest(".post");
+    if (!postElement) return; // Ignore clicks on non-post elements
+
+    const postId = postElement.dataset.postId;
+    const likeButton = postElement.querySelector(".like-button");
+    const likeCount = postElement.querySelector(".like-count");
+    const heartIcon = postElement.querySelector(".ph-heart");
+
+    // 1. Handle Like Button click
+    if (target.closest('[data-action="like"]')) {
+        likeTogglePost(postId, likeCount, heartIcon);
+        return;
+    }
+
+    // 2. Handle Fullscreen Button click
+    if (target.closest('[data-action="fullscreen"]')) {
+        const video = postElement.querySelector("video");
+        if (video) {
+            if (!document.fullscreenElement) {
+                video.requestFullscreen().catch(err => console.error(err));
+            } else {
+                document.exitFullscreen();
+            }
+        }
+    }
+});
+
+// --- GLOBAL DELEGATED TOUCH GESTURES ---
+document.body.addEventListener("touchstart", (event) => {
+    const postElement = event.target.closest(".post");
+    if (!postElement) return;
+
+    postElement.doubleTapped = false;
+    const currentTime = Date.now();
+    const tapLength = currentTime - postElement.lastTapTime;
+
+    if (tapLength < doubleTapDelay && tapLength > 0) {
+        // --- DOUBLE TAP DETECTED ---
+        postElement.doubleTapped = true;
+        const postId = postElement.dataset.postId;
+        const likeButton = postElement.querySelector(".like-button");
+        const likeCount = postElement.querySelector(".like-count");
+        const heartIcon = postElement.querySelector(".ph-heart");
+
+        likeTogglePost(postId, likeCount, heartIcon);
+        likeButton.classList.add("like-active");
+        setTimeout(() => likeButton.classList.remove("like-active"), 500);
+        
+        event.preventDefault(); // Prevents zoom/ghost clicks on mobile
+    }
+
+    postElement.lastTapTime = currentTime;
+    const touch = event.touches[0];
+    postElement.pressY = touch.clientY;
+    postElement.deltaY = 0;
+}, { passive: false });
+
+document.body.addEventListener("touchmove", (event) => {
+    const postElement = event.target.closest(".post");
+    if (!postElement) return;
+
+    const touch = event.touches[0];
+    const delta = Math.abs(touch.clientY - postElement.pressY);
+    if (delta > postElement.deltaY) {
+        postElement.deltaY = delta;
+    }
+});
+
+document.body.addEventListener("touchend", (event) => {
+    const postElement = event.target.closest(".post");
+    if (!postElement) return;
+
+    const currentTime = Date.now();
+    const tapLength = currentTime - postElement.lastTapTime;
+
+    if (!postElement.doubleTapped) {
+        if (tapLength > singleTapDelay && postElement.deltaY < 10) {
+            document.body.classList.toggle("max");
+            event.preventDefault();
+        }
+    }
+});
+
+// document.addEventListener('fullscreenchange', () => {
+//     const activeFsElement = document.fullscreenElement;
+    
+//     // If the element in fullscreen is a video, turn on controls
+//     if (activeFsElement && activeFsElement.tagName === "VIDEO") {
+//         activeFsElement.controls = true;
+//     }
+    
+//     // When exiting fullscreen, turn off controls on all videos in the DOM
+//     if (!activeFsElement) {
+//         document.querySelectorAll('.post-media video').forEach(video => {
+//             video.controls = false;
+//         });
+//     }
+// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const feed = document.getElementById("feed");
 const target = document.querySelector('#loadMore');
