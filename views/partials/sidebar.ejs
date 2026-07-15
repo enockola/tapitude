@@ -8,7 +8,7 @@
     <% if (currentUser && currentUser.role === "admin") { %>
     <a href="/admin/dashboard" class="<%= currentPath === '/admin/dashboard' ? 'is-active' : '' %>">Dashboard</a>
     <a href="/admin/creators" class="<%= currentPath === '/admin/creators' ? 'is-active' : '' %>">Creators</a>
-    <!-- <a href="/admin/creators/new">New Creator</a> -->
+    <a href="/admin/settings" class="<%= currentPath === '/admin/settings' ? 'is-active' : '' %>">Settings</a>
     <% } else { %>
     <a href="/creator/dashboard" class="<%= currentPath === '/creator/dashboard' ? 'is-active' : '' %>">Dashboard</a>
     <a href="/creator/content" class="<%= currentPath === '/creator/content' ? 'is-active' : '' %>">Content</a>

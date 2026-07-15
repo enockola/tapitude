@@ -1,0 +1,71 @@
+<%- include("../partials/dashboard-shell-start", { title }) %>
+
+<section class="content-header">
+  <div>
+    <p class="eyebrow">Admin</p>
+    <h1>Admin Settings</h1>
+    <p>Manage creator account of this admin.</p>
+  </div>
+</section>
+<section class="card main-card">
+  <% if (typeof success !== 'undefined' && success) { %>
+  <div class="form-success">
+    <%= success %>
+  </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error) { %>
+  <div class="form-warning">
+    <%= error %>
+  </div>
+  <% } %>
+  <h2>Change Admin Password</h2>
+  <p>In the event of a security breach, or for other reasons, you can change the password of this admin.</p>
+  <form action="/auth/change-password-admin" method="POST">
+    <input type="hidden" name="_csrf" value="<%= _csrf %>">
+
+    <div class="form-group">
+      <label for="email">New Password</label>
+      <input type="password" name="password1" value="" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Confirm Password</label>
+      <input type="password" name="password2" value="" required>
+    </div>
+
+    <button class="button" type="submit" class="button-primary">Update Password</button>
+  </form>
+</section>
+
+<!-- <br><br>
+<div class="divider main-card"></div>
+<br><br> -->
+<!-- <section class="card main-card">
+  <h2>Danger Zone</h2>
+  <p>Permanently delete this creator account and all associated data. This action cannot be undone!
+  </p>
+
+  <form id="delete-creator-form" action="/admin/delete-creator-account/" method="POST">
+    <input type="hidden" name="_csrf" value="">
+    <button type="button" class="button danger" onclick="confirmDelete()">
+      Delete Account
+    </button>
+  </form>
+
+</section> -->
+
+<!-- <script>
+
+  function confirmDelete() {
+    showDialog({
+      description: "Are you sure you want to delete this creator account? This action cannot be undone!",
+      confirmText: "Delete",
+      danger: true,
+      onConfirm: async () => {
+        document.getElementById("delete-creator-form").submit();
+      }
+    });
+  }
+</script> -->
+<%- include("../partials/dashboard-shell-end") %>

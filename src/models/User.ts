@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
+import { logger } from "../utils/loggingUtils";
 
 // The user model is where we determine the mongoose schema to ensure rigid data structure
 // We also define helper methods to allow us to easily interact with the accounts in the database
@@ -103,11 +104,24 @@ userSchema.methods.enableAccount = async function () {
   return await this.save();
 };
 
+/**
+ * 
+ * @param newPassword 
+ * @returns if the password is changed
+ */
 userSchema.methods.changePassword = async function (newPassword: string) {
-  const saltRounds = 20;
-  const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
-  this.passwordHash = hashedPassword;
-  return await this.save();
+  const self = this as any;
+  logger.info(`Changing password for user: ${self.email}`);
+  try {
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+    self.passwordHash = hashedPassword;
+    logger.info(`Finished hashing password for user: ${self.email}`);
+    return await self.save();
+  }
+  catch (error) {
+    logger.error(error, "Error changing password:");
+  } return false;
 };
 
 userSchema.methods.comparePassword = async function (password: string) {

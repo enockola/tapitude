@@ -7,7 +7,8 @@
     "dev": "npx tsx --watch src/server.ts",
     "start": "npx tsx src/server.ts",
     "test": "npx tsx src/test.ts",
-    "new_admin_account": "npx tsx src/new_admin_account.ts"
+    "new_admin_account": "npx tsx src/new_admin_account.ts",
+    "new-admin-account": "npx tsx src/new_admin_account.ts"
   },
   "keywords": [
     "node",

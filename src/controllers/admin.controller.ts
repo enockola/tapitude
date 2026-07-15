@@ -13,11 +13,14 @@ export class AdminController {
     router.get("/creators", adminCheck, asyncHandler(this.getCreatorsView));
     router.get("/creators/new", adminCheck, asyncHandler(this.getNewCreatorView));
     router.get("/edit-creator-account/:id", adminCheck, asyncHandler(this.getEditCreatorsView));
+    router.get("/settings", adminCheck, asyncHandler(this.getAdminSettingsView));
 
     router.post("/creators/new", adminCheck, asyncHandler(this.postNewCreator));
     router.post("/edit-creator-account/:id", adminCheck, asyncHandler(this.postEditCreator));
     router.post("/delete-creator-account/:id", adminCheck, asyncHandler(this.postDeleteCreator));
+   
   }
+
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {
     const creatorCount = await User.countDocuments({ role: "creator" });
@@ -27,6 +30,13 @@ export class AdminController {
       title: "Admin Dashboard",
       creatorCount,
       contentCount
+    });
+  }
+
+  getAdminSettingsView = async (req: Request, res: Response): Promise<void> => {
+    res.render("admin/admin-settings", {
+      title: "Admin Settings",
+      error: null
     });
   }
 
