@@ -179,10 +179,8 @@ export class CreatorController {
 
     res.render("creator/profile", {
       title: "Profile",
-
       profileImageMetadata,
       profile,
-
       success: req.flash("success")[0] || null,
       error: req.flash("error")[0] || null
     });
