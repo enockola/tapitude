@@ -61,6 +61,7 @@ textarea {
   border-radius: var(--radius-md);
   padding: var(--space-md);
   font-weight: 700;
+  margin-bottom: var(--space-lg);
 }
 
 .form-warning {
@@ -69,6 +70,7 @@ textarea {
   border: 1px solid rgb(224, 159, 31);
   border-radius: var(--radius-md);
   padding: var(--space-md);
+  margin-bottom: var(--space-lg);
   font-weight: 600;
 }
 

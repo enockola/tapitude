@@ -40,12 +40,14 @@ export class AuthController {
     // 1. Validation: Passwords match
     if (password1 !== password2) {
       req.flash("error", "Passwords do not match.");
+      logger.info("Could not update password: "+"Passwords do not match.");
       return safeRedirect();
     }
 
     let error = getPasswordValidationError(password1);
     if (error) {
       req.flash("error", error);
+      logger.info("Could not update password: "+error);
       return safeRedirect();
     }
 

@@ -14,7 +14,7 @@ export class AdminController {
     router.get("/dashboard", adminCheck, asyncHandler(this.getDashboardView));
     router.get("/creators", adminCheck, asyncHandler(this.getCreatorsView));
     router.get("/creators/new", adminCheck, asyncHandler(this.getNewCreatorView));
-    router.get("/edit-creator-account/:id", adminCheck, asyncHandler(this.getEditCreatorsView));
+    router.get("/edit-creator-account/:id", adminCheck, asyncHandler(this.getEditCreator));
     router.get("/settings", adminCheck, asyncHandler(this.getAdminSettingsView));
 
     router.post("/creators/new", adminCheck, asyncHandler(this.postNewCreator));
@@ -26,12 +26,27 @@ export class AdminController {
 
   getDashboardView = async (req: Request, res: Response): Promise<void> => {
     const creatorCount = await User.countDocuments({ role: "creator" });
+    const adminCount = await User.countDocuments({ role: "admin" });
     const contentCount = await ContentPage.countDocuments();
+
+    let adminsList = await User.find({ role: "admin" })
+      .select("name email -_id") // Space-separated fields. The '-' prefix excludes a field.
+      .lean()
+
+    const myself = req.user;
+    if (!myself) {
+      return res.redirect("/login");
+    }
+    const myAccount = adminsList.find(admin => admin.email.toLowerCase() === myself.email.toLowerCase()) || null;
+    adminsList = adminsList.filter(admin => admin.email.toLowerCase() !== myself.email.toLowerCase());
 
     res.render("admin/dashboard", {
       title: "Admin Dashboard",
       creatorCount,
-      contentCount
+      adminCount,
+      contentCount,
+      adminsList,
+      myAccount
     });
   }
 
@@ -55,7 +70,7 @@ export class AdminController {
   }
 
 
-  getEditCreatorsView = async (req: Request, res: Response): Promise<void> => {
+  getEditCreator = async (req: Request, res: Response): Promise<void> => {
     try {
       ///edit-creator-account/:id
       //We get the ID parameter, the routes makes it easy for us to get the ID
@@ -86,7 +101,8 @@ export class AdminController {
   getNewCreatorView = async (req: Request, res: Response): Promise<void> => {
     res.render("admin/new-creator-account", {
       title: "Create Creator Account",
-      error: null
+      success: req.flash("success")[0] || null,
+      error: req.flash("error")[0] || null
     });
   }
 

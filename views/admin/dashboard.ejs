@@ -21,10 +21,52 @@
   </article>
 </section>
 
-<section class="card">
+<!-- <section class="card">
   <h2>Admin Tasks</h2>
   <p>Start by creating creator accounts. Content creators can then log in and create public pages.</p>
-</section>
+</section> -->
+
+
+<article class="card">
+  <div class="card-header">
+    <h2>Administrators (<%= adminCount %>)</h2>
+  </div>
+
+  <% if (adminsList.length === 0) { %>
+  <p>No administrators found.</p>
+  <% } else { %>
+  <div class="mini-list">
+
+    <div class="mini-list__item" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="content-summary" style="display: flex; flex-direction: column; gap: 2px;">
+        <strong class="admin-name"><%= myAccount.name %> (Me)</strong>
+        <span class="admin-email" style="font-size: 0.85rem; color: #64748b;"><%= myAccount.email %></span>
+      </div>
+      <div class="row-actions">
+        <!-- <a class="button button--small button--secondary" href="mailto:<%= myAccount.email %>">
+          <i class="ph ph-envelope" style="margin-right: 5px;"></i> <span>Email</span>
+        </a> -->
+      </div>
+    </div>
+
+
+    <% adminsList.forEach((admin) => { %>
+    <div class="mini-list__item" style="display: flex; justify-content: space-between; align-items: center;">
+      <div class="content-summary" style="display: flex; flex-direction: column; gap: 2px;">
+        <strong class="admin-name"><%= admin.name %></strong>
+        <span class="admin-email" style="font-size: 0.85rem; color: #64748b;"><%= admin.email %></span>
+      </div>
+      <div class="row-actions">
+        <a class="button button--small button--secondary" href="mailto:<%= admin.email %>">
+          <i class="ph ph-envelope" style="margin-right: 5px;"></i> <span>Email</span>
+        </a>
+      </div>
+    </div>
+    <% }) %>
+  </div>
+  <% } %>
+</article>
+
 
 
 
