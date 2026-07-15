@@ -165,12 +165,6 @@ function createPost(parentElement, post) {
         }
     };
 
-    // postChildMedia.addEventListener('touchmove', touchMove);
-    // postChildText.addEventListener('touchmove', touchMove);
-    // postChildMedia.addEventListener('touchstart', touchStart);
-    // postChildText.addEventListener('touchstart', touchStart);
-    // postChildMedia.addEventListener('touchend', touchEnd);
-    // postChildText.addEventListener('touchend', touchEnd);
 
     postChildContent.addEventListener('touchmove', touchMove);
     postChildContent.addEventListener('touchstart', touchStart);
@@ -200,12 +194,35 @@ function createPost(parentElement, post) {
                         </video>
                     </div>`;
                     const video = postChildMedia.querySelector('video');
+                    const fullscreenBtn = document.querySelector('.video-container .fullscreen-btn');
                     video.play().catch(error => {
                         console.log("Autoplay was prevented by the browser. Adding a play button.");
                         // Add logic here to show a "Play" button overlay to the user
                     });
+
+                    let toggleFullscreen = () => {
+                        console.log("Fullscreen");
+                        if (!document.fullscreenElement) {
+                            video.requestFullscreen().catch(err => {
+                                console.error(`Error attempting to enable fullscreen: ${err.message}`);
+                            });
+                        } else {
+                            document.exitFullscreen();
+                        }
+                    };
+                    document.addEventListener('fullscreenchange', () => {
+                        if (document.fullscreenElement === video) {
+                            // Video is now fullscreen
+                            video.controls = true;
+                        } else {
+                            // Video exited fullscreen
+                            video.controls = false;
+                        }
+                    });
+                    fullscreenBtn.addEventListener('click', toggleFullscreen);
+                    fullscreenBtn.addEventListener('touchstart', toggleFullscreen);
                 } else {
-                    console.log("Unsupported media type; mimeType=",mimeType,"; URL=",fileURL)
+                    console.log("Unsupported media type; mimeType=", mimeType, "; URL=", fileURL)
                     postChildMedia.innerHTML = `<div class='unsupported-media'>Unsupported / invalid media</div>`;
                 }
             }
