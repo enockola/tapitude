@@ -112,7 +112,7 @@
       <div class="form-actions">
         <a class="button button--secondary" type="button" href="/creator/content"><i class="ph ph-arrow-left"></i> Back</a>
 
-        <button class="button" type="submit" id="save-content-btn">Publish</button>
+        <button class="button" type="submit" id="save-content-btn"><i class="ph ph-floppy-disk"></i> <span>Publish</span></button>
 
         <% if (contentPage) { %>
         <button class="button button--danger" type="button" id="delete-content-btn" onclick="deletePost()">
@@ -234,14 +234,15 @@
   const publishOption = document.querySelector("#publishOption");
 
   function updatePublishOption() {
-    saveContentBtn.innerText = "Save";
-    if (publishOption.value === "scheduled") {
-      if (isNewPage) saveContentBtn.innerText = "Schedule";
-      scheduledForInput.disabled = false;
-      scheduleTimeZoneLabel.classList.remove("disabled");
-    } else {
+    let saveContentText = document.querySelector("#save-content-btn span");
+    if (publishOption.value === "published") {
+      saveContentText.innerText = "Publish";
       scheduledForInput.disabled = true;
       scheduleTimeZoneLabel.classList.add("disabled");
+    } else {
+      saveContentText.innerText = "Save";
+      scheduledForInput.disabled = false;
+      scheduleTimeZoneLabel.classList.remove("disabled");
     }
   }
 
