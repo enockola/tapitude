@@ -8,8 +8,9 @@
   </div>
 </section>
 <section class="card main-card">
-<%- include("../partials/status-toast") %>
-  <h2>Change Admin Password</h2>
+  <%- include("../partials/status-toast") %>
+  <h2>Account / Password Settings</h2>
+  <p>You can change your password here.</p>
   <form action="/auth/change-password-admin" method="POST">
     <input type="hidden" name="_csrf" value="<%= _csrf %>">
 
