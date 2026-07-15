@@ -5,6 +5,8 @@ import mongoose from "mongoose";
 import { Request, Response, Router } from 'express';
 import asyncHandler from "../utils/asyncHandler";
 import { adminCheck } from '../middleware/security.js';
+import session from 'express-session';
+import flash from 'connect-flash';
 
 export class AdminController {
 
@@ -18,7 +20,7 @@ export class AdminController {
     router.post("/creators/new", adminCheck, asyncHandler(this.postNewCreator));
     router.post("/edit-creator-account/:id", adminCheck, asyncHandler(this.postEditCreator));
     router.post("/delete-creator-account/:id", adminCheck, asyncHandler(this.postDeleteCreator));
-   
+
   }
 
 
@@ -36,7 +38,8 @@ export class AdminController {
   getAdminSettingsView = async (req: Request, res: Response): Promise<void> => {
     res.render("admin/admin-settings", {
       title: "Admin Settings",
-      error: null
+      success: req.flash("success")[0] || null,
+      error: req.flash("error")[0] || null
     });
   }
 
@@ -45,7 +48,9 @@ export class AdminController {
 
     res.render("admin/creators", {
       title: "Creators",
-      creators
+      creators,
+      success: req.flash("success")[0] || null,
+      error: req.flash("error")[0] || null
     });
   }
 
@@ -69,7 +74,8 @@ export class AdminController {
         title: "Edit Creator Account",
         creator,
         creatorProfile,
-
+        success: req.flash("success")[0] || null,
+        error: req.flash("error")[0] || null
       });
     } catch (error) {
       res.status(500).render("Error loading creator profile");
@@ -121,32 +127,63 @@ export class AdminController {
   }
 
   postDeleteCreator = async (req: Request, res: Response): Promise<void> => {
+    const { email, password, redirectTo } = req.body;
+
+    // Use the form's redirectTo value, falling back to /admin/creators if missing
+    const fallbackRedirect = redirectTo || "/admin/creators";
+
+    const safeRedirect = () => {
+      const referer = req.get("referer");
+      if (referer && referer !== "/") {
+        return res.redirect("back");
+      }
+      return res.redirect(fallbackRedirect);
+    };
+
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
       const creatorId = req.params.id;
 
-      // 1. Delete the user
-      const user = await User.findByIdAndDelete(creatorId).session(session);
-
+      // 1. Retrieve the user first (do not delete yet!)
+      const user = await User.findById(creatorId).session(session);
       if (!user) {
-        throw new Error("Creator not found");
+        req.flash("error", "Creator not found.");
+        await session.abortTransaction();
+        return safeRedirect();
       }
 
-      // 2. Delete the associated profile
+      // 2. Authenticate the deletion request
+      // Assumes user.comparePassword returns a boolean or a promise resolving to one
+      const isPasswordCorrect = await user.comparePassword(password);
+
+      if (user.email !== email || !isPasswordCorrect) {
+        req.flash("error", "Unauthorized to delete creator account. Incorrect email or password.");
+        await session.abortTransaction();
+        return safeRedirect();
+      }
+
+      // 3. Perform the cascading deletions inside the transaction
+      await User.findByIdAndDelete(creatorId).session(session);
       await CreatorProfile.findOneAndDelete({ userId: creatorId }).session(session);
 
       // Commit the transaction
       await session.commitTransaction();
       console.log(`Successfully deleted creator: ${creatorId}`);
 
-      res.redirect("/admin/creators");
+      req.flash("success", "Creator account deleted successfully.");
+
+      // Redirect cleanly to the intended page (e.g. the list of creators)
+      return res.redirect(fallbackRedirect);
+
     } catch (error) {
-      // Abort transaction on error
+      // Abort transaction on database/runtime error
       await session.abortTransaction();
       console.error("Deletion failed:", error);
-      res.status(500).render("Error deleting creator.");
+
+      req.flash("error", "An internal error occurred while trying to delete the creator.");
+      return safeRedirect();
     } finally {
       session.endSession();
     }

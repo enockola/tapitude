@@ -8,6 +8,9 @@
   </div>
 </section>
 
+
+<%- include("../partials/status-toast") %>
+<br>
 <section class="card main-card">
 
   <h2>Creator Profile Information</h2>
@@ -52,6 +55,7 @@
   <p>In the event of a security breach, or for other reasons, you can change the password of this creator.</p>
   <form action="/auth/change-password-creator/<%= creator._id %>" method="POST">
     <input type="hidden" name="_csrf" value="<%= _csrf %>">
+    <input type="hidden" name="redirectTo" value="<%= currentPath %>">
 
     <div class="form-group">
       <label for="email">New Password</label>
@@ -78,13 +82,27 @@
 
   <form id="delete-creator-form" action="/admin/delete-creator-account/<%= creator._id %>" method="POST">
     <input type="hidden" name="_csrf" value="<%= _csrf %>">
-    <button type="button" class="button danger" onclick="confirmDelete()">
-      Delete Account
-    </button>
+    <!-- <input type="hidden" name="redirectTo" value="<%= currentPath %>"> -->
+
+    <div id="confirm-delete-input" style="display: none;">
+      <div class="form-group">
+        <label for="email">Type the creator's email address to confirm</label>
+        <input type="email" name="email" value="" id="creator-delete-email" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Type the creator's password address to confirm</label>
+        <input type="password" name="password" value="" id="creator-delete-password" required>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="button danger" id="delete-creator-button">
+        Delete Account
+      </button>
+    </div>
+
   </form>
-
 </section>
-
 <script>
   //TODO: We can send requests by putting the CSRF token in the header instead of the body
   // async function deleteAccount() {
@@ -103,15 +121,33 @@
   //   }
   // }
 
+  const deleteCreatorButton = document.getElementById("delete-creator-button");
+  const confirmBoxes = document.getElementById("confirm-delete-input");
+  deleteCreatorButton.addEventListener("click", confirmDelete);
+  const deleteConfirmEmail = document.getElementById("creator-delete-email");
+
+  deleteConfirmEmail.addEventListener("input", () => {
+    if (deleteConfirmEmail.value === "<%= creator.email %>") {
+      deleteCreatorButton.disabled = false;
+    } else {
+      deleteCreatorButton.disabled = true;
+    }
+  });
+
   function confirmDelete() {
-    showDialog({
-      description: "Are you sure you want to delete this creator account? This action cannot be undone!",
-      confirmText: "Delete",
-      danger: true,
-      onConfirm: async () => {
-        document.getElementById("delete-creator-form").submit();
-      }
-    });
+    if (confirmBoxes.style.display === "none") {
+      confirmBoxes.style.display = "block";
+      deleteCreatorButton.disabled = true;
+    } else {
+      showDialog({
+        description: "Are you sure you want to delete this creator account? This action cannot be undone!",
+        confirmText: "Delete",
+        danger: true,
+        onConfirm: async () => {
+          document.getElementById("delete-creator-form").submit();
+        }
+      });
+    }
   }
 </script>
 <%- include("../partials/dashboard-shell-end") %>

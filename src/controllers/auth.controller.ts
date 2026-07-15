@@ -4,6 +4,8 @@ import { Request, Response, Router } from 'express';
 import { adminCheck, creatorCheck } from '../middleware/security.js';
 import { logger } from '../utils/loggingUtils.js';
 import { ObjectId } from "mongodb";
+import session from 'express-session';
+import flash from 'connect-flash';
 
 export class AuthController {
   registerRoutes(router: Router) {
@@ -17,60 +19,72 @@ export class AuthController {
     router.post("/change-password-admin", adminCheck, asyncHandler(this.changePasswordAdmin));
   }
 
-  change_password = async (req: Request, res: Response, redirect: string, title: string, password1: string, password2: string, userId: string|null): Promise<void> => {
+  change_password = async (
+    req: Request,
+    res: Response,
+    password1: string,
+    password2: string,
+    userId: string | null,
+    fallbackRedirect: string
+  ): Promise<void> => {
+
+    // Helper helper to safely redirect back, but default to the fallback if referer is missing or "/"
+    const safeRedirect = () => {
+      const referer = req.get("referer");
+      if (referer && referer !== "/") {
+        return res.redirect("back");
+      }
+      return res.redirect(fallbackRedirect);
+    };
+
+    // 1. Validation: Passwords match
     if (password1 !== password2) {
-      return res.status(400).render(redirect, {
-        title: title,
-        error: "Passwords do not match."
-      });
+      req.flash("error", "Passwords do not match.");
+      return safeRedirect();
     }
+
+    // 2. Validation: Length check
     if (password1.length < 8) {
-      return res.status(400).render(redirect, {
-        title: title,
-        error: "Password must be at least 8 characters long."
-      });
+      req.flash("error", "Password must be at least 8 characters long.");
+      return safeRedirect();
     }
 
+    // 3. Validation: Complexity check (Uppercase, Lowercase, Number)
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
-
     if (!passwordRegex.test(password1)) {
-      return res.status(400).render(redirect, {
-        title: title,
-        error: "Password must be at least 8 characters long and contain uppercase, lowercase, and a number."
-      });
+      req.flash(
+        "error",
+        "Password must be at least 8 characters long and contain uppercase, lowercase, and a number."
+      );
+      return safeRedirect();
     }
 
-    const user = userId && await User.findById(userId);
+    // 4. Fetch User
+    const user = userId ? await User.findById(userId) : null;
     if (!user) {
-      return res.status(404).render(redirect, {
-        title: title,
-        error: "User not found."
-      });
+      req.flash("error", "User not found.");
+      return safeRedirect();
     }
-    console.log(user);
 
+    console.log(`Attempting password change for user ID: ${user._id}`);
+
+    // 5. Attempt password update
     if (await user.changePassword(password1)) {
-      // Ensure you use your template name here (e.g., redirect)
-      // NOT the URL path "/admin/settings"
-      return res.render(redirect, {
-        title: title,
-        success: "Password changed successfully."
-      });
+      req.flash("success", "Password changed successfully.");
+      return safeRedirect();
     }
 
-    return res.status(400).render(redirect, {
-      title: title,
-      error: "Could not update password. Make sure it meets requirements."
-    });
+    // 6. Fallback internal failure
+    req.flash("error", "Could not update password. Make sure it meets requirements.");
+    return safeRedirect();
   }
 
-
   changePasswordCreator = async (req: Request, res: Response): Promise<void> => {
-    const { password1, password2 } = req.body;
+    const { password1, password2, redirectTo } = req.body;
 
     const value: string | string[] = req.params.id; // Example value
     const userId: string = Array.isArray(value) ? value[0] : value;
-    return this.change_password(req, res, "creator/settings", "Creator Settings", password1, password2, userId);
+    return this.change_password(req, res, password1, password2, userId, redirectTo);
   }
 
 
@@ -78,7 +92,7 @@ export class AuthController {
     const { password1, password2 } = req.body;
 
     let userId = req.user ? req.user._id.toString() : "";
-    return this.change_password(req, res, "admin/admin-settings", "Admin Settings", password1, password2, userId);
+    return this.change_password(req, res, password1, password2, userId, "/admin/settings");
   }
 
   showLogin = async (req: Request, res: Response): Promise<void> => {

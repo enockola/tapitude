@@ -28,6 +28,7 @@ if (!process.env.PORT)
 import path from "path";
 import express from "express";
 import session from "express-session";
+import flash from 'connect-flash';
 import MongoStore from "connect-mongo";
 import methodOverride from "method-override";
 import helmet from "helmet";
@@ -124,6 +125,7 @@ app.use(session({ //Session ID cookie
     maxAge: 1000 * 60 * 60 * 24
   }
 }));
+app.use(flash());
 
 app.use(cookieParser());
 app.use(reqAttachUser); //load and attach the user to the request every time (get the user from session userId)

@@ -16,13 +16,7 @@
 
   <article class="card main-card">
 
-    <% if (error) { %>
-    <p class="form-error"><%= error %></p>
-    <% } %>
-
-    <% if (success) { %>
-    <p class="form-success"><%= success %></p>
-    <% } %>
+    <%- include("../partials/status-toast") %>
 
     <% if (!contentPage && contentPageLimit?.atLimit) { %>
     <div class="form-warning">
