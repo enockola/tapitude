@@ -3,6 +3,7 @@ import asyncHandler from "../utils/asyncHandler";
 import { Request, Response, Router } from 'express';
 import { adminCheck, creatorCheck } from '../middleware/security.js';
 import { logger } from '../utils/loggingUtils.js';
+import { ObjectId } from "mongodb";
 
 export class AuthController {
   registerRoutes(router: Router) {
@@ -16,8 +17,7 @@ export class AuthController {
     router.post("/change-password-admin", adminCheck, asyncHandler(this.changePasswordAdmin));
   }
 
-  change_password = async (req: Request, res: Response, redirect: string, title: string, password1: string, password2: string, userId: any): Promise<void> => {
-    logger.info("Changing password for user:", userId, "with password:", password1, "and password:", password2, "and title:", title, "and redirect:", redirect);
+  change_password = async (req: Request, res: Response, redirect: string, title: string, password1: string, password2: string, userId: string|null): Promise<void> => {
     if (password1 !== password2) {
       return res.status(400).render(redirect, {
         title: title,
@@ -40,7 +40,7 @@ export class AuthController {
       });
     }
 
-    const user = req.user && await User.findById(userId);
+    const user = userId && await User.findById(userId);
     if (!user) {
       return res.status(404).render(redirect, {
         title: title,
@@ -67,15 +67,18 @@ export class AuthController {
 
   changePasswordCreator = async (req: Request, res: Response): Promise<void> => {
     const { password1, password2 } = req.body;
-    const userId = req.params.id;
-    return this.change_password(req, res, "/creator/settings", "Creator Settings", password1, password2, userId);
+
+    const value: string | string[] = req.params.id; // Example value
+    const userId: string = Array.isArray(value) ? value[0] : value;
+    return this.change_password(req, res, "creator/settings", "Creator Settings", password1, password2, userId);
   }
 
 
   changePasswordAdmin = async (req: Request, res: Response): Promise<void> => {
     const { password1, password2 } = req.body;
-    const userId = req.user ? req.user._id : null;
-    return this.change_password(req, res, "/admin/admin-settings", "Admin Settings", password1, password2, userId);
+
+    let userId = req.user ? req.user._id.toString() : "";
+    return this.change_password(req, res, "admin/admin-settings", "Admin Settings", password1, password2, userId);
   }
 
   showLogin = async (req: Request, res: Response): Promise<void> => {
