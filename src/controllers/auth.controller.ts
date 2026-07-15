@@ -1,4 +1,4 @@
-import User from "../models/User";
+import User, { getPasswordValidationError } from "../models/User";
 import asyncHandler from "../utils/asyncHandler";
 import { Request, Response, Router } from 'express';
 import { adminCheck, creatorCheck } from '../middleware/security.js';
@@ -43,19 +43,9 @@ export class AuthController {
       return safeRedirect();
     }
 
-    // 2. Validation: Length check
-    if (password1.length < 8) {
-      req.flash("error", "Password must be at least 8 characters long.");
-      return safeRedirect();
-    }
-
-    // 3. Validation: Complexity check (Uppercase, Lowercase, Number)
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
-    if (!passwordRegex.test(password1)) {
-      req.flash(
-        "error",
-        "Password must be at least 8 characters long and contain uppercase, lowercase, and a number."
-      );
+    let error = getPasswordValidationError(password1);
+    if (error) {
+      req.flash("error", error);
       return safeRedirect();
     }
 
@@ -130,8 +120,9 @@ export class AuthController {
       });
     }
 
-    const passwordMatches = await user.comparePassword(password);
-    if (!passwordMatches) {
+    // console.log(password, email, user);
+
+    if (!password || !email || !user || !await user.comparePassword(password)) {
       return res.status(401).render("login", {
         title: "Log in",
         error: "Invalid email or password."

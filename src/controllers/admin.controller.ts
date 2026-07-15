@@ -1,4 +1,4 @@
-import User from "../models/User";
+import User, { getPasswordValidationError } from "../models/User";
 import CreatorProfile from "../models/CreatorProfile";
 import ContentPage from "../models/ContentPage";
 import mongoose from "mongoose";
@@ -91,27 +91,61 @@ export class AdminController {
   }
 
   postNewCreator = async (req: Request, res: Response): Promise<void> => {
-    const { name, email, password, brandName } = req.body;
+    const { name, email, password1, password2, brandName } = req.body;
 
+    // Local helper to dry up error rendering and preserve form data
+    const renderError = (status: number, message: string) => {
+      return res.status(status).render("admin/new-creator-account", {
+        title: "Create Creator Account",
+        error: message,
+        name,
+        email,
+        brandName
+      });
+    };
+
+    // 1. Check if user already exists
     const existingUser = await User.findByEmail(email);
     if (existingUser) {
-      return res.status(400).render("admin/new-creator-account", {
-        title: "Create Creator Account",
-        error: "An account with this email already exists."
+      return renderError(400, "An account with this email already exists.");
+    }
+
+    // 2. Check if passwords match
+    if (password1 !== password2) {
+      return renderError(400, "Passwords do not match.");
+    }
+
+    // 3. Verify password complexity requirements
+    const passwordError = getPasswordValidationError(password1);
+    if (passwordError) {
+      return renderError(400, passwordError);
+    }
+
+    // 4. Create the Account and Profile
+    try {
+      const user = await User.createAccount({
+        name,
+        email,
+        password: password1,
+        role: "creator"
       });
-    }
 
-    const user = await User.createAccount({ name: name, email: email, password: password, role: "creator" });
-    if (user === null) {
-      throw new Error("Error creating creator account");
-    }
-    await CreatorProfile.create({
-      userId: user._id,
-      displayName: name,
-      brandName
-    });
+      if (!user) {
+        throw new Error("User creation returned null.");
+      }
 
-    res.redirect("/admin/creators");
+      await CreatorProfile.create({
+        userId: user._id,
+        displayName: name,
+        brandName
+      });
+
+      return res.redirect("/admin/creators");
+
+    } catch (err) {
+      console.error("Account creation failure: ", err);
+      return renderError(500, "Error creating creator account.");
+    }
   }
 
   postEditCreator = async (req: Request, res: Response): Promise<void> => {

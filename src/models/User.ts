@@ -94,6 +94,8 @@ userSchema.statics.createAccount = async function (userData: CreateUserData) {
   return newUser;
 };
 
+
+
 userSchema.methods.disableAccount = async function () {
   this.status = "disabled";
   return await this.save();
@@ -127,6 +129,22 @@ userSchema.methods.changePassword = async function (newPassword: string) {
 userSchema.methods.comparePassword = async function (password: string) {
   return await bcrypt.compare(password, this.passwordHash);
 };
+
+
+
+export const getPasswordValidationError = (password: string): string | null => {
+  if (password.length < 8) {
+    return "Password must be at least 8 characters long.";
+  }
+
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return "Password must be at least 8 characters long and contain uppercase, lowercase, and a number.";
+  }
+
+  return null; // Passed validation!
+};
+
 
 const User = mongoose.model<any, UserModel>("User", userSchema);
 export default User;
