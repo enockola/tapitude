@@ -11,6 +11,14 @@ export class AuthController {
   }
 
   showLogin = async (req: Request, res: Response): Promise<void> => {
+    if (req.user) { //If the user is logged in, redirect to the dashboard
+      if (req.user.role === "admin") {
+        return res.redirect("/admin/dashboard");
+      }
+      return res.redirect("/creator/dashboard");
+    }
+
+
     res.render("login", {
       title: "Log in",
       error: null
