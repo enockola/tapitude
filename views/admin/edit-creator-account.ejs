@@ -90,7 +90,7 @@
       </div>
       <div class="form-group">
         <label for="password">Type the creator's password to confirm</label>
-        <input type="password" name="password" value="" id="creator-delete-password" required>
+        <%- include("../partials/password-input", { name: "password" }) %>
       </div>
     </div>
 
