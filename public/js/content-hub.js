@@ -230,6 +230,7 @@ let toggleMediaMode = () => {
 
 document.body.addEventListener("click", (event) => {
     const target = event.target;
+    const isTouch = event.pointerType === 'touch';
 
     // Check if the click happened inside a post
     const postElement = target.closest(".post");
@@ -256,8 +257,8 @@ document.body.addEventListener("click", (event) => {
                 document.exitFullscreen();
             }
         }
-    } else if (target.closest('video') || target.closest('img')) {
-        console.log("Toggle media mode");
+    } else if (!isTouch && (target.closest('video') || target.closest('img'))) {
+        console.log("Toggle media click");
         toggleMediaMode();
     }
 });
