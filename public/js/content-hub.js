@@ -111,13 +111,29 @@ function requestNextPost() {
     history += 1;
 }
 
-async function getMimeType(url) {
-    const response = await fetch(url, {
-        method: "HEAD"
-    });
-    return response.headers.get("content-type");
-}
+const feed = document.getElementById("feed");
+const target = document.querySelector('#loadMore');
 
+socket.on("requestContent", (contentPage) => {
+    if (!isProduction) console.log("Received content:", contentPage);
+    if (contentPage) {
+        createPost(feed, contentPage);
+    }
+});
+
+const observer = new IntersectionObserver(
+    ([entry]) => {
+        if (!isProduction) console.log('Element is in viewport: ' + entry.isIntersecting);
+        if (entry.isIntersecting) {
+            requestNextPost();
+        }
+    },
+    {
+        threshold: 0
+    }
+);
+
+observer.observe(target);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,6 +145,15 @@ async function getMimeType(url) {
 
 const doubleTapDelay = 250;
 const singleTapDelay = 180;
+
+
+async function getMimeType(url) {
+    const response = await fetch(url, {
+        method: "HEAD"
+    });
+    return response.headers.get("content-type");
+}
+
 
 function createPost(parentElement, post) {
     const postChild = document.createElement("div");
@@ -342,82 +367,13 @@ document.addEventListener('fullscreenchange', () => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const feed = document.getElementById("feed");
-const target = document.querySelector('#loadMore');
-
-socket.on("requestContent", (contentPage) => {
-    if (!isProduction) console.log("Received content:", contentPage);
-    if (contentPage) {
-        createPost(feed, contentPage);
-    }
-});
-
-const observer = new IntersectionObserver(
-    ([entry]) => {
-        if (!isProduction) console.log('Element is in viewport: ' + entry.isIntersecting);
-        if (entry.isIntersecting) {
-            requestNextPost();
-        }
-    },
-    {
-        threshold: 0
-    }
-);
-
-observer.observe(target);
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// STYLING
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 
 function getBrightness(color) {
