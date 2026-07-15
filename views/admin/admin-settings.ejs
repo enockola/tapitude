@@ -10,13 +10,12 @@
 <section class="card main-card">
 <%- include("../partials/status-toast") %>
   <h2>Change Admin Password</h2>
-  <p>In the event of a security breach, or for other reasons, you can change the password of this admin.</p>
   <form action="/auth/change-password-admin" method="POST">
     <input type="hidden" name="_csrf" value="<%= _csrf %>">
 
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="email" name="email" value="<%= currentUser.email %>" readonly required>
+      <input type="email" name="email" value="<%= currentUser.email %>" readonly required disabled>
     </div>
 
     <!-- <div class="form-group">
