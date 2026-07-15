@@ -19,12 +19,6 @@
   gap: var(--space-md);
 }
 
-.form-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-md);
-}
-
 label {
   display: grid;
   gap: var(--space-xs);
@@ -189,11 +183,5 @@ textarea {
 @media (max-width: 1000px) {
   .media-upload {
     grid-template-columns: initial;
-  }
-}
-
-@media (max-width: 700px) {
-  .form-grid {
-    grid-template-columns: 1fr;
   }
 }

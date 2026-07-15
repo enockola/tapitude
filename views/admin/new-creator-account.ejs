@@ -3,37 +3,42 @@
 <section class="content-header">
   <div>
     <p class="eyebrow">Admin</p>
-    <h1>Create Creator Account</h1>
+    <h1>New Creator Account</h1>
     <p>Create a login account for a new content creator.</p>
   </div>
 </section>
 
-<section class="card">
+<section class="card main-card">
   <% if (error) { %>
-    <p class="form-error"><%= error %></p>
+  <p class="form-error"><%= error %></p>
   <% } %>
 
-  <form action="/admin/creators/new" method="POST" class="form-grid">
+  <form action="/admin/creators/new" method="POST">
     <input type="hidden" name="_csrf" value="<%= _csrf %>">
-    <label>
-      Name
+
+    <h2>Information</h2>
+    
+    <div class="form-group">
+      Creator's Full Name
       <input type="text" name="name" required>
-    </label>
+    </div>
 
-    <label>
-      Brand Name
+    <div class="form-group">
+      Creator Brand Name (Optional)
       <input type="text" name="brandName">
-    </label>
+    </div>
 
-    <label>
-      Email
+    <h2>Credentials</h2>
+
+    <div class="form-group">
+      Creator Email
       <input type="email" name="email" required>
-    </label>
+    </div>
 
-    <label>
+    <div class="form-group">
       Temporary Password
       <input type="password" name="password" required minlength="8">
-    </label>
+    </div>
 
     <div class="form-actions">
       <button class="button" type="submit">Create Account</button>
