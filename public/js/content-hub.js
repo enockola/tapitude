@@ -6,8 +6,15 @@
     const isProduction = "<%= isProduction %>";
 */
 
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 // SESSION STORAGE
 // Session storage to identify a user that doesnt have an account
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
 let userId = localStorage.getItem("userId");
 if (!userId) {
     userId = randomUUID();
@@ -18,10 +25,6 @@ let likedPosts = [];
 if (localStorage.getItem("likedPosts")) likedPosts = JSON.parse(localStorage.getItem("likedPosts"));
 if (!isProduction) console.log("Liked posts: ", likedPosts.length);
 
-// SOCKET
-// Connect to your Express server (ensure the URL matches your server address)
-const socket = io(`${window.location.protocol}//${window.location.host}/content-hub`);
-
 function randomUUID() {
     if (crypto?.randomUUID) {
         return crypto.randomUUID();
@@ -31,6 +34,15 @@ function randomUUID() {
         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
     );
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// LIKE / UNLIKE FUNCTIONS
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 function likeTogglePost(postId, postElement, heartIcon) {
     if (likedPosts.includes(postId)) {
@@ -54,12 +66,35 @@ function likeTogglePost(postId, postElement, heartIcon) {
     );
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// SOCKET CONNECTION
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+// SOCKET
+// Connect to your Express server (ensure the URL matches your server address)
+const socket = io(`${window.location.protocol}//${window.location.host}/content-hub`);
+
+
 // Listen for the connection confirmation
 if (!isProduction) {
     socket.on("connect", () => {
         console.log("Connected to server with ID:", socket.id);
     });
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// REQUEST CONTENT
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 //Request initial content
 let history = 0;
@@ -83,6 +118,14 @@ async function getMimeType(url) {
     return response.headers.get("content-type");
 }
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// CREATE POST
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 
 const doubleTapDelay = 250;
 const singleTapDelay = 180;
@@ -114,7 +157,7 @@ function createPost(parentElement, post) {
     </div>`;
 
     parentElement.appendChild(postChild);
-    
+
     // Register this post to our single global observer
     globalPostObserver.observe(postChild);
 }
@@ -128,7 +171,7 @@ const globalPostObserver = new IntersectionObserver(async (entries) => {
 
         if (entry.isIntersecting) {
             if (!fileKey) continue;
-            
+
             const fileURL = `/storage/${fileKey}`;
             try {
                 const mimeType = await getMimeType(fileURL);
@@ -137,7 +180,7 @@ const globalPostObserver = new IntersectionObserver(async (entries) => {
                 if (mimeType.startsWith("image/")) {
                     if (preserveAspectRatio === "default") preserveAspectRatio = "true";
                     mediaContainer.innerHTML = `<img src="${fileURL}" alt="Post Media" />`;
-                    
+
                 } else if (mimeType.startsWith("video/")) {
                     if (preserveAspectRatio === "default") preserveAspectRatio = "false";
                     mediaContainer.innerHTML = `
@@ -147,7 +190,7 @@ const globalPostObserver = new IntersectionObserver(async (entries) => {
                             <source src="${fileURL}" type="video/mp4">
                         </video>
                     </div>`;
-                    
+
                     const video = mediaContainer.querySelector('video');
                     video.play().catch(() => {
                         console.log("Autoplay blocked. User gesture required.");
@@ -171,9 +214,23 @@ const globalPostObserver = new IntersectionObserver(async (entries) => {
         }
     }
 }, { threshold: 0 });
-// --- GLOBAL DELEGATED CLICKS ---
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// GLOBAL EVENT LISTENERS
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+let toggleMediaMode = () => {
+    document.body.classList.toggle("max");
+}
+
 document.body.addEventListener("click", (event) => {
     const target = event.target;
+
     // Check if the click happened inside a post
     const postElement = target.closest(".post");
     if (!postElement) return; // Ignore clicks on non-post elements
@@ -199,6 +256,9 @@ document.body.addEventListener("click", (event) => {
                 document.exitFullscreen();
             }
         }
+    } else if (target.closest('video') || target.closest('img')) {
+        console.log("Toggle media mode");
+        toggleMediaMode();
     }
 });
 
@@ -222,7 +282,7 @@ document.body.addEventListener("touchstart", (event) => {
         likeTogglePost(postId, likeCount, heartIcon);
         likeButton.classList.add("like-active");
         setTimeout(() => likeButton.classList.remove("like-active"), 500);
-        
+
         event.preventDefault(); // Prevents zoom/ghost clicks on mobile
     }
 
@@ -252,27 +312,29 @@ document.body.addEventListener("touchend", (event) => {
 
     if (!postElement.doubleTapped) {
         if (tapLength > singleTapDelay && postElement.deltaY < 10) {
-            document.body.classList.toggle("max");
-            event.preventDefault();
+            if (!target.closest('[data-action="fullscreen"]')) {
+                toggleMediaMode();
+                event.preventDefault();
+            }
         }
     }
 });
 
-// document.addEventListener('fullscreenchange', () => {
-//     const activeFsElement = document.fullscreenElement;
-    
-//     // If the element in fullscreen is a video, turn on controls
-//     if (activeFsElement && activeFsElement.tagName === "VIDEO") {
-//         activeFsElement.controls = true;
-//     }
-    
-//     // When exiting fullscreen, turn off controls on all videos in the DOM
-//     if (!activeFsElement) {
-//         document.querySelectorAll('.post-media video').forEach(video => {
-//             video.controls = false;
-//         });
-//     }
-// });
+document.addEventListener('fullscreenchange', () => {
+    const activeFsElement = document.fullscreenElement;
+
+    // If the element in fullscreen is a video, turn on controls
+    if (activeFsElement && activeFsElement.tagName === "VIDEO") {
+        activeFsElement.controls = true;
+    }
+
+    // When exiting fullscreen, turn off controls on all videos in the DOM
+    if (!activeFsElement) {
+        document.querySelectorAll('.post-media video').forEach(video => {
+            video.controls = false;
+        });
+    }
+});
 
 
 
