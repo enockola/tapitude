@@ -172,6 +172,7 @@ dialog::backdrop {
   overflow: hidden;
   position: relative;
   user-select: none;
+  margin: 10px 0;
 }
 
 .progress-fill {

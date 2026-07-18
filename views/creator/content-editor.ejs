@@ -35,7 +35,7 @@
     <form action="/creator/pages/upload" method="POST" enctype="multipart/form-data" id="mediaForm">
       <input type="hidden" name="postID" value="<%= contentPage ? contentPage._id : null %>">
 
-      <%- include("./partial_file_upload", {
+      <%- include("../partials/file-upload", {
           title: "Upload File",
           description: "Upload your content video and images",
           maxSizeBytes: 1024*1024*1024,
