@@ -26,15 +26,19 @@
     const currentPath = "<%= currentPath %>";
     const creatorSlug = "<%= creatorProfile.creatorSlug %>";
     const creatorId = "<%= creatorProfile.userId %>";
+    const creatorName = "<%= creatorProfile.displayName %>";
     const brandColor = "<%= creatorProfile.brandColor %>";
-    const isProduction = "<%= isProduction %>";
-    <% if(!isProduction) { %>
-    console.log("== In development mode ==");
-    console.log("Current path = ", currentPath);
-    console.log("Current path = ", currentPath);
-    console.log("Creator slug = ", creatorSlug);
-    console.log("Creator user id = ", creatorId);
-    <% } %>
+    window.isProduction = <%= isProduction %>;
+    if(!window.isProduction) {
+      console.log("== In development mode ==");
+      console.log("Current path = ", currentPath);
+      console.log("Current path = ", currentPath);
+      console.log("Creator slug = ", creatorSlug);
+      console.log("Creator user id = ", creatorId);
+      console.log("Creator name = ", creatorName);
+      console.log("Brand color = ", brandColor);
+    }
+    document.title = creatorName.trim()+"'s Content Hub" + " | Tapitude";
   </script>
 </head>
 

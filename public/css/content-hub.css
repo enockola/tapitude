@@ -10,6 +10,10 @@
 @import url("./components/nav.css") layer(components);
 @import url("./components/sidebar.css") layer(components);
 
+:root {
+  --color-dark-surface: #232323;
+}
+
 .feed {
   max-width: 600px;
   margin: auto;
@@ -191,7 +195,7 @@ footer {
   justify-content: center;
 
   border-radius: 8px; /* Add this to protect the boundary */
-  overflow: hidden;   /* Ensure the container itself clips */
+  overflow: hidden; /* Ensure the container itself clips */
 }
 
 .post-media:empty {
@@ -260,12 +264,35 @@ body {
   align-items: center;
 }
 
+#unauthorized-popup {
+  display: block;
+}
+
+#unauthorized-popup div {
+  background-color: #f1f1f1;
+  font-weight: 800;
+}
+
+#unauthorized-popup p {
+  color: inherit;
+}
+
 /*
 =================================================================
 Dark mode
 =================================================================
 */
+
 @media (prefers-color-scheme: dark) {
+  #unauthorized-popup {
+    background-color: var(--color-dark-surface);
+    color: white;
+  }
+
+  #unauthorized-popup div {
+    background-color: #333;
+  }
+
   .like-button:active,
   .like-active {
     background: rgb(190, 29, 0) !important;
@@ -285,7 +312,7 @@ Dark mode
   }
 
   .post-content {
-    background-color: #232323;
+    background-color: var(--color-dark-surface);
     color: white;
     display: flex;
     flex-direction: column;

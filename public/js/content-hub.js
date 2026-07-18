@@ -6,6 +6,55 @@
     const isProduction = "<%= isProduction %>";
 */
 
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+// STYLING
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+function getBrightness(color) {
+    const el = document.createElement('div');
+    el.style.color = color;
+    document.body.appendChild(el);
+
+    const rgb = getComputedStyle(el).color;
+    document.body.removeChild(el);
+
+    const [r, g, b] = rgb.match(/\d+/g).map(Number);
+
+    return (r * 299 + g * 587 + b * 114) / 1000;
+}
+
+
+function tintColor(color, amount = 0.92) {
+    const div = document.createElement("div");
+    div.style.color = color;
+    document.body.appendChild(div);
+
+    const rgb = getComputedStyle(div).color;
+    document.body.removeChild(div);
+
+    const [r, g, b] = rgb.match(/\d+/g).map(Number);
+
+    const mix = c => Math.round(c + (255 - c) * amount);
+
+    return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+}
+
+if (getBrightness(brandColor) < 128) {
+    document.documentElement.style.setProperty(
+        '--color-heading',
+        'white'
+    );
+    document.documentElement.style.setProperty(
+        '--color-brand-background',
+        tintColor(brandColor)
+    );
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -79,9 +128,8 @@ function likeTogglePost(postId, postElement, heartIcon) {
 // Connect to your Express server (ensure the URL matches your server address)
 const socket = io(`${window.location.protocol}//${window.location.host}/content-hub`);
 
-
 // Listen for the connection confirmation
-if (!isProduction) {
+if (window.isProduction === false) {
     socket.on("connect", () => {
         console.log("Connected to server with ID:", socket.id);
     });
@@ -91,24 +139,63 @@ if (!isProduction) {
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
+// VERIFY MOBILE
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+function isMobile() {
+    // 1. Modern approach (User-Agent Client Hints)
+    if (navigator.userAgentData) {
+        return navigator.userAgentData.mobile;
+    }
+
+    // 2. Fallback approach (Classic Regex matching)
+    const regex = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i;
+    return regex.test(navigator.userAgent);
+}
+
+if (window.isProduction === false) {
+    console.log(isMobile() ? "User is on a mobile device" : "User is on a desktop");
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
 // REQUEST CONTENT
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
+
+//TODO: If we want to ONLY allow users to access the content hub on a mobile device in order
+// to prevent access to the content hub without buying a NFC merchandise
+const canAccessContent = isMobile();
+if(!window.isProduction) console.log("Can access content: ", canAccessContent);
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+
+const unauthorizedPopupElement = document.getElementById("unauthorized-popup");
+if (!canAccessContent) {
+    unauthorizedPopupElement.style.display = "block";
+}
 
 //Request initial content
 let history = 0;
 requestNextPost();
 
 function requestNextPost() {
-    const req = {
-        creatorId,
-        history: history,
-        userId: userId
-    };
-    console.log(req);
-    socket.emit("requestContent", req);
-    history += 1;
+    if (canAccessContent) {
+        const req = {
+            creatorId,
+            history: history,
+            userId: userId
+        };
+        console.log(req);
+        socket.emit("requestContent", req);
+        history += 1;
+    }
 }
 
 const feed = document.getElementById("feed");
@@ -366,52 +453,3 @@ document.addEventListener('fullscreenchange', () => {
 
 
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-// STYLING
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-
-function getBrightness(color) {
-    const el = document.createElement('div');
-    el.style.color = color;
-    document.body.appendChild(el);
-
-    const rgb = getComputedStyle(el).color;
-    document.body.removeChild(el);
-
-    const [r, g, b] = rgb.match(/\d+/g).map(Number);
-
-    return (r * 299 + g * 587 + b * 114) / 1000;
-}
-
-
-function tintColor(color, amount = 0.92) {
-    const div = document.createElement("div");
-    div.style.color = color;
-    document.body.appendChild(div);
-
-    const rgb = getComputedStyle(div).color;
-    document.body.removeChild(div);
-
-    const [r, g, b] = rgb.match(/\d+/g).map(Number);
-
-    const mix = c => Math.round(c + (255 - c) * amount);
-
-    return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
-}
-
-if (getBrightness(brandColor) < 128) {
-    document.documentElement.style.setProperty(
-        '--color-heading',
-        'white'
-    );
-    document.documentElement.style.setProperty(
-        '--color-brand-background',
-        tintColor(brandColor)
-    );
-}
