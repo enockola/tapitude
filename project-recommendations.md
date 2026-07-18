@@ -20,7 +20,7 @@ The main recommendations are:
 ### 1. Decide if Users should be allowed to view content on a desktop
 To help prevent access to the content hub without buying a NFC merchandise, the project should decide if users should be allowed to view content on a desktop.
 
-On public/js/content-hub.js, set the `canAccessContent` constant from `true` to `isMobile()`.
+On public/js/content-hub.js, set the `canAccessContent` constant to `true` or `isMobile()`.
 ```js
 ///////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////
