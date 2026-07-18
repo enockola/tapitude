@@ -161,7 +161,7 @@ if (window.isProduction === false) {
 
 //TODO: If we want to ONLY allow users to access the content hub on a mobile device in order
 // to prevent access to the content hub without buying a NFC merchandise
-const canAccessContent = true;//isMobile();
+const canAccessContent = isMobile();
 if(!window.isProduction) console.log("Can access content: ", canAccessContent);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
